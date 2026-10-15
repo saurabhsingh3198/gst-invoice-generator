@@ -16,6 +16,8 @@ import {
   Table as TableIcon,
   Percent,
   RefreshCw,
+  Bookmark,
+  CheckCircle2,
 } from 'lucide-react';
 import { formatIndianCurrency, numberToIndianWords, taxNumberToIndianWords } from '../utils/numberToWords';
 import {
@@ -24,6 +26,10 @@ import {
   getTaxTotals,
   isInterStateTax,
 } from '../utils/taxCalculation';
+import { analyzeGstin } from '../utils/gstUtils';
+import { ProductMasterModal } from './ProductMasterModal';
+import { saveProductToLibrary } from '../utils/productMaster';
+import type { ProductTemplate } from '../utils/productMaster';
 
 interface InvoiceFormProps {
   data: InvoiceData;
@@ -40,6 +46,8 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'items' | 'seller' | 'parties' | 'dispatch' | 'tax' | 'settings'>('items');
   const [showAdvancedColumns, setShowAdvancedColumns] = useState<boolean>(false);
+  const [showProductMaster, setShowProductMaster] = useState<boolean>(false);
+  const [savedProductToast, setSavedProductToast] = useState<string>('');
   const [itemsViewMode, setItemsViewMode] = useState<'cards' | 'table'>(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       return 'cards';
@@ -47,25 +55,55 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
     return 'table';
   });
 
-  // Helper updates
+  // Helper updates with smart GSTIN auto-detection
   const updateSeller = (key: keyof InvoiceData['seller'], val: string) => {
+    let extra = {};
+    if (key === 'gstin') {
+      const analysis = analyzeGstin(val);
+      if (analysis.stateCode && analysis.stateName) {
+        extra = {
+          stateCode: analysis.stateCode,
+          stateName: analysis.stateName,
+        };
+      }
+    }
     onChange({
       ...data,
-      seller: { ...data.seller, [key]: val },
+      seller: { ...data.seller, [key]: val, ...extra },
     });
   };
 
   const updateConsignee = (key: keyof InvoiceData['consignee'], val: string) => {
+    let extra = {};
+    if (key === 'gstin') {
+      const analysis = analyzeGstin(val);
+      if (analysis.stateCode && analysis.stateName) {
+        extra = {
+          stateCode: analysis.stateCode,
+          stateName: analysis.stateName,
+        };
+      }
+    }
     onChange({
       ...data,
-      consignee: { ...data.consignee, [key]: val },
+      consignee: { ...data.consignee, [key]: val, ...extra },
     });
   };
 
   const updateBuyer = (key: keyof InvoiceData['buyer'], val: string) => {
+    let extra = {};
+    if (key === 'gstin') {
+      const analysis = analyzeGstin(val);
+      if (analysis.stateCode && analysis.stateName) {
+        extra = {
+          stateCode: analysis.stateCode,
+          stateName: analysis.stateName,
+        };
+      }
+    }
     onChange({
       ...data,
-      buyer: { ...data.buyer, [key]: val },
+      buyer: { ...data.buyer, [key]: val, ...extra },
     });
   };
 
@@ -114,7 +152,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
       altQuantity: '0.000 KG',
       quantity: 1,
       unit: 'PC',
-      rateInclTax: '',
+      rateInclTax: '118.00',
       rate: 100,
       per: 'PC',
       discountPercent: '',
@@ -125,6 +163,44 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
       ...data,
       items: [...data.items, newItem],
     });
+  };
+
+  const handleSelectFromLibrary = (template: ProductTemplate) => {
+    const nextSl = data.items.length + 1;
+    const newItem: InvoiceItem = {
+      id: Date.now().toString(),
+      slNo: nextSl,
+      description: template.description,
+      hsnSac: template.hsnSac,
+      altQuantity: template.altQuantityDefault || '0.000 KG',
+      quantity: 1,
+      unit: template.unit,
+      rateInclTax: template.rateInclTax || '',
+      rate: template.rate,
+      per: template.unit,
+      discountPercent: '',
+      amount: template.rate,
+      gstRate: template.gstRate,
+    };
+    onChange({
+      ...data,
+      items: [...data.items, newItem],
+    });
+  };
+
+  const handleSaveItemToLibrary = (item: InvoiceItem) => {
+    saveProductToLibrary({
+      description: item.description,
+      hsnSac: item.hsnSac,
+      unit: item.unit,
+      altQuantityDefault: item.altQuantity,
+      rate: Number(item.rate) || 0,
+      rateInclTax: item.rateInclTax,
+      gstRate: Number(item.gstRate) || (data.defaultGstRate ?? 18),
+      category: 'Saved Items',
+    });
+    setSavedProductToast(`Saved "${item.description}" to product library!`);
+    setTimeout(() => setSavedProductToast(''), 3000);
   };
 
   const removeItem = (index: number) => {
@@ -139,19 +215,54 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
     });
   };
 
+  // Two-way calculation between rate and rateInclTax
   const updateItem = (index: number, key: keyof InvoiceItem, val: any) => {
     const updated = [...data.items];
     const current = { ...updated[index], [key]: val };
+    const gst = typeof current.gstRate === 'number' ? current.gstRate : (data.defaultGstRate ?? 18);
 
-    // Auto calculate amount when rate or quantity or discount changes
-    if (key === 'rate' || key === 'quantity' || key === 'discountPercent') {
+    if (key === 'rateInclTax') {
+      const rIncl = Number(val) || 0;
+      current.rateInclTax = val;
+      if (rIncl > 0 && gst > 0) {
+        const base = rIncl / (1 + gst / 100);
+        current.rate = Math.round(base * 100) / 100;
+      } else if (rIncl > 0) {
+        current.rate = rIncl;
+      }
+      const q = Number(current.quantity) || 0;
+      const disc = Number(current.discountPercent) || 0;
+      let calculated = q * current.rate;
+      if (disc > 0) calculated -= (calculated * disc) / 100;
+      current.amount = Math.round(calculated * 100) / 100;
+    } else if (key === 'rate' || key === 'quantity' || key === 'discountPercent') {
       const q = key === 'quantity' ? Number(val) || 0 : Number(current.quantity) || 0;
       const r = key === 'rate' ? Number(val) || 0 : Number(current.rate) || 0;
       const disc = key === 'discountPercent' ? Number(val) || 0 : Number(current.discountPercent) || 0;
+
+      if (key === 'rate' && r > 0) {
+        const rInc = r * (1 + gst / 100);
+        current.rateInclTax = (Math.round(rInc * 100) / 100).toFixed(2);
+      }
       let calculated = q * r;
       if (disc > 0) {
         calculated = calculated - (calculated * disc) / 100;
       }
+      current.amount = Math.round(calculated * 100) / 100;
+    } else if (key === 'gstRate') {
+      const newGst = Number(val) || 0;
+      current.gstRate = newGst;
+      if (data.pricingMode === 'inclusive' && Number(current.rateInclTax) > 0) {
+        const base = newGst > 0 ? Number(current.rateInclTax) / (1 + newGst / 100) : Number(current.rateInclTax);
+        current.rate = Math.round(base * 100) / 100;
+      } else if (Number(current.rate) > 0) {
+        const rInc = Number(current.rate) * (1 + newGst / 100);
+        current.rateInclTax = (Math.round(rInc * 100) / 100).toFixed(2);
+      }
+      const q = Number(current.quantity) || 0;
+      const disc = Number(current.discountPercent) || 0;
+      let calculated = q * current.rate;
+      if (disc > 0) calculated -= (calculated * disc) / 100;
       current.amount = Math.round(calculated * 100) / 100;
     }
 
@@ -457,11 +568,20 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               </div>
 
               {/* Row 2 on mobile, Right on desktop: Symmetrical Action Buttons */}
-              <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 pt-1.5 sm:pt-0 border-t sm:border-t-0 border-slate-200">
+              <div className="grid grid-cols-3 sm:flex sm:items-center gap-2 pt-1.5 sm:pt-0 border-t sm:border-t-0 border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setShowProductMaster(true)}
+                  className="px-2.5 py-1.5 text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95"
+                  title="Choose from saved Product Library"
+                >
+                  <Package className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Library</span>
+                </button>
                 <button
                   type="button"
                   onClick={() => setShowAdvancedColumns(!showAdvancedColumns)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer text-center flex items-center justify-center gap-1 ${
+                  className={`px-2.5 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer text-center flex items-center justify-center gap-1 ${
                     showAdvancedColumns
                       ? 'bg-indigo-50 border-indigo-300 text-indigo-700 font-bold'
                       : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
@@ -473,13 +593,21 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <button
                   type="button"
                   onClick={addItem}
-                  className="px-3.5 py-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer active:scale-95"
+                  className="px-3 py-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer active:scale-95"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add Item</span>
                 </button>
               </div>
             </div>
+
+            {/* Product Saved Toast Notification */}
+            {savedProductToast && (
+              <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800 text-xs flex items-center gap-2 animate-in fade-in">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{savedProductToast}</span>
+              </div>
+            )}
 
             {/* DUAL-MODE 1: TOUCH-FRIENDLY CARDS LIST (DEFAULT ON MOBILE) */}
             {itemsViewMode === 'cards' && (
@@ -505,6 +633,14 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                           <span className="font-extrabold text-xs text-indigo-700 bg-indigo-50/80 border border-indigo-200/70 px-2 py-0.5 rounded-md">
                             ₹ {(Number(item.amount) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                           </span>
+                          <button
+                            type="button"
+                            onClick={() => handleSaveItemToLibrary(item)}
+                            className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition cursor-pointer"
+                            title="Save this item to Product Library"
+                          >
+                            <Bookmark className="w-3.5 h-3.5" />
+                          </button>
                           <button
                             type="button"
                             onClick={() => removeItem(index)}
@@ -826,17 +962,27 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                           />
                         </td>
 
-                        {/* Delete */}
+                        {/* Actions */}
                         <td className="p-1.5 text-center">
-                          <button
-                            type="button"
-                            onClick={() => removeItem(index)}
-                            disabled={data.items.length <= 1}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 rounded transition disabled:opacity-20 cursor-pointer"
-                            title="Delete line"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                          <div className="flex items-center justify-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleSaveItemToLibrary(item)}
+                              className="p-1 text-slate-400 hover:text-indigo-600 rounded transition cursor-pointer"
+                              title="Save to Product Library"
+                            >
+                              <Bookmark className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeItem(index)}
+                              disabled={data.items.length <= 1}
+                              className="p-1 text-slate-400 hover:text-rose-600 rounded transition disabled:opacity-20 cursor-pointer"
+                              title="Delete line"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -974,9 +1120,14 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  GSTIN / UIN Number
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-slate-700">
+                    GSTIN / UIN Number
+                  </label>
+                  <span className="text-[10px] text-indigo-600 font-medium">
+                    ⚡ Auto-detects State
+                  </span>
+                </div>
                 <input
                   type="text"
                   value={data.seller.gstin}
@@ -984,6 +1135,29 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   placeholder="09FELPS6664L1ZE"
                   className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none"
                 />
+                {data.seller.gstin && (() => {
+                  const info = analyzeGstin(data.seller.gstin);
+                  if (info.isValid) {
+                    return (
+                      <p className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1 mt-1">
+                        <CheckCircle2 className="w-3 h-3 shrink-0" />
+                        Valid GSTIN ({info.stateName})
+                      </p>
+                    );
+                  }
+                  if (info.stateName) {
+                    return (
+                      <p className="text-[10px] text-indigo-600 font-medium mt-1">
+                        Auto-detected: <strong>{info.stateName} ({info.stateCode})</strong>
+                      </p>
+                    );
+                  }
+                  return (
+                    <p className="text-[10px] text-amber-600 mt-1">
+                      {info.errorMessage}
+                    </p>
+                  );
+                })()}
               </div>
 
               <div>
@@ -1186,6 +1360,33 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   />
                 </div>
 
+                <div>
+                  <div className="flex items-center justify-between mb-0.5">
+                    <label className="block text-[11px] font-semibold text-slate-600">
+                      GSTIN / UIN (Optional)
+                    </label>
+                    <span className="text-[10px] text-indigo-600 font-medium">⚡ Auto State</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={data.consignee.gstin || ''}
+                    onChange={(e) => updateConsignee('gstin', e.target.value)}
+                    placeholder="09AABCM1234F1Z5"
+                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-mono uppercase font-bold text-slate-800 outline-none focus:border-indigo-500"
+                  />
+                  {data.consignee.gstin && (() => {
+                    const info = analyzeGstin(data.consignee.gstin);
+                    if (info.stateName) {
+                      return (
+                        <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">
+                          ✓ {info.stateName} ({info.stateCode})
+                        </p>
+                      );
+                    }
+                    return null;
+                  })()}
+                </div>
+
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">
@@ -1247,6 +1448,33 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     placeholder="KUSHINAGAR"
                     className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg text-slate-800 outline-none focus:border-indigo-500"
                   />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-0.5">
+                    <label className="block text-[11px] font-semibold text-slate-600">
+                      GSTIN / UIN (Optional)
+                    </label>
+                    <span className="text-[10px] text-indigo-600 font-medium">⚡ Auto State</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={data.buyer.gstin || ''}
+                    onChange={(e) => updateBuyer('gstin', e.target.value)}
+                    placeholder="09AABCM1234F1Z5"
+                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-mono uppercase font-bold text-slate-800 outline-none focus:border-indigo-500"
+                  />
+                  {data.buyer.gstin && (() => {
+                    const info = analyzeGstin(data.buyer.gstin);
+                    if (info.stateName) {
+                      return (
+                        <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">
+                          ✓ {info.stateName} ({info.stateCode})
+                        </p>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
@@ -1837,6 +2065,37 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               </div>
             </div>
 
+            {/* Round Off Setting */}
+            <div className="bg-slate-50/90 p-3 sm:p-4 rounded-xl border border-slate-200 flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h4 className="text-xs font-bold text-slate-800">
+                    Automatic Round Off (Round to Nearest ₹)
+                  </h4>
+                  <span className={`text-[10px] px-2 py-0.5 rounded font-bold font-mono ${
+                    data.enableRoundOff !== false
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : 'bg-slate-200 text-slate-600'
+                  }`}>
+                    {data.enableRoundOff !== false ? 'Active' : 'Disabled'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Eliminates decimal paise in Net Payable total on invoice (e.g. ₹ 4,42,290.48 → ₹ 4,42,290.00)
+                </p>
+              </div>
+
+              <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                <input
+                  type="checkbox"
+                  checked={data.enableRoundOff !== false}
+                  onChange={(e) => onChange({ ...data, enableRoundOff: e.target.checked })}
+                  className="sr-only peer"
+                />
+                <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+              </label>
+            </div>
+
             {/* In Words & Signatory Section */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Tax Amount in Words */}
@@ -2083,6 +2342,15 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
           </div>
         )}
       </div>
+
+      {/* Product Master Quick Selection Modal */}
+      {showProductMaster && (
+        <ProductMasterModal
+          isOpen={showProductMaster}
+          onClose={() => setShowProductMaster(false)}
+          onSelectItem={handleSelectFromLibrary}
+        />
+      )}
     </div>
   );
 };

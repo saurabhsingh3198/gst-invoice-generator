@@ -89,4 +89,6 @@ export interface InvoiceData {
   customAmountInWords?: string;
   signatoryCompany?: string;
   bankDetails?: BankDetails;
+  enableRoundOff?: boolean;
+  roundOffAmount?: number;
 }

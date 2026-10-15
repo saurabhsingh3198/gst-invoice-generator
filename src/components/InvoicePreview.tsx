@@ -10,11 +10,15 @@ interface InvoicePreviewProps {
 
 export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
   ({ data }, ref) => {
-    // Calculate total amount
-    const totalAmount = data.items.reduce(
+    // Calculate total amount & optional Round Off
+    const rawTotal = data.items.reduce(
       (sum, item) => sum + (Number(item.amount) || 0),
       0
     );
+    const isRoundOffEnabled = data.enableRoundOff !== false;
+    const roundedTotal = isRoundOffEnabled ? Math.round(rawTotal) : rawTotal;
+    const roundOffDiff = isRoundOffEnabled ? Math.round((roundedTotal - rawTotal) * 100) / 100 : 0;
+    const totalAmount = roundedTotal;
 
     // Sum Alt Quantities
     const totalAltQtyNumber = data.items.reduce((sum, item) => {
@@ -747,6 +751,38 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
 
               {/* Total Row */}
               <tfoot>
+                {isRoundOffEnabled && Math.abs(roundOffDiff) > 0.001 && (
+                  <tr
+                    style={{
+                      borderTop: '1px solid #000000',
+                      fontSize: '9px',
+                      color: '#222222',
+                      height: '18px',
+                    }}
+                  >
+                    <td
+                      colSpan={8}
+                      style={{
+                        borderRight: '1px solid #000000',
+                        textAlign: 'right',
+                        padding: '1px 6px',
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      Round Off
+                    </td>
+                    <td
+                      style={{
+                        textAlign: 'right',
+                        whiteSpace: 'nowrap',
+                        padding: '1px 4px',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {roundOffDiff > 0 ? `+${roundOffDiff.toFixed(2)}` : roundOffDiff.toFixed(2)}
+                    </td>
+                  </tr>
+                )}
                 <tr
                   style={{
                     borderTop: '1px solid #000000',

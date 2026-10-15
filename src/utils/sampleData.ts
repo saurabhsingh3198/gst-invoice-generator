@@ -156,4 +156,5 @@ export const sampleInvoiceData: InvoiceData = {
     upiId: '8896925131@naviaxis',
     showQrCode: true,
   },
+  enableRoundOff: true,
 };

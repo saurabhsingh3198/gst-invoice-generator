@@ -3,6 +3,7 @@ import type { InvoiceData } from './types/invoice';
 import { sampleInvoiceData } from './utils/sampleData';
 import { InvoicePreview } from './components/InvoicePreview';
 import { InvoiceForm } from './components/InvoiceForm';
+import { InvoiceHistoryModal } from './components/InvoiceHistoryModal';
 import { formatIndianCurrency } from './utils/numberToWords';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
@@ -19,10 +20,30 @@ import {
   ExternalLink,
   Edit3,
   ArrowRight,
+  History,
 } from 'lucide-react';
 
+const DRAFT_STORAGE_KEY = 'gst_invoice_current_draft_v1';
+
 export const App: React.FC = () => {
-  const [invoiceData, setInvoiceData] = useState<InvoiceData>(sampleInvoiceData);
+  const [invoiceData, setInvoiceData] = useState<InvoiceData>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
+        if (savedDraft) {
+          const parsed = JSON.parse(savedDraft);
+          if (parsed && parsed.seller && Array.isArray(parsed.items) && parsed.items.length > 0) {
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to load draft from localStorage', e);
+      }
+    }
+    return sampleInvoiceData;
+  });
+
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState<boolean>(false);
 
   const [viewMode, setViewMode] = useState<'split' | 'editor' | 'preview'>(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
@@ -167,95 +188,124 @@ export const App: React.FC = () => {
     }
   };
 
+  // Live Auto-Save to localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(invoiceData));
+    } catch (e) {
+      console.warn('Failed to auto-save draft to localStorage', e);
+    }
+  }, [invoiceData]);
+
   // Restore sample data
   const handleLoadSample = () => {
-    setInvoiceData(JSON.parse(JSON.stringify(sampleInvoiceData)));
+    if (
+      window.confirm(
+        'Reset to Sample Invoice? Any unsaved edits in your current invoice will be overwritten.'
+      )
+    ) {
+      setInvoiceData(JSON.parse(JSON.stringify(sampleInvoiceData)));
+      try {
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+      } catch (e) {}
+    }
   };
 
   // Reset to blank invoice
   const handleReset = () => {
-    setInvoiceData({
-      title: 'Tax Invoice',
-      seller: {
-        name: '',
-        addressLine1: '',
-        addressLine2: '',
-        gstin: '',
-        stateName: '',
-        stateCode: '',
-        email: '',
-      },
-      consignee: {
-        name: '',
-        address: '',
-        stateName: '',
-        stateCode: '',
-      },
-      buyer: {
-        name: '',
-        address: '',
-        stateName: '',
-        stateCode: '',
-      },
-      dispatch: {
-        invoiceNo: '',
-        invoiceDate: new Date().toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: 'short',
-          year: '2-digit',
-        }),
-        deliveryNote: '',
-        modeTermsOfPayment: '',
-        referenceNoAndDate: '',
-        otherReferences: '',
-        buyersOrderNo: '',
-        orderDate: '',
-        dispatchDocNo: '',
-        deliveryNoteDate: '',
-        dispatchedThrough: '',
-        destination: '',
-        termsOfDelivery: '',
-      },
-      items: [
-        {
-          id: '1',
-          slNo: 1,
-          description: '',
-          hsnSac: '',
-          altQuantity: '',
-          quantity: 1,
-          unit: 'PC',
-          rateInclTax: '',
-          rate: 0,
-          per: 'PC',
-          discountPercent: '',
-          amount: 0,
+    if (
+      window.confirm('Start a new blank invoice? Your current draft will be cleared.')
+    ) {
+      setInvoiceData({
+        title: 'Tax Invoice',
+        seller: {
+          name: '',
+          addressLine1: '',
+          addressLine2: '',
+          gstin: '',
+          stateName: '',
+          stateCode: '',
+          email: '',
         },
-      ],
-      declaration:
-        'We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.',
-      showTaxSummary: true,
-      taxMode: 'auto',
-      taxType: 'cgst_sgst',
-      pricingMode: 'inclusive',
-      defaultGstRate: 18,
-      customAmountInWords: '',
-      customTaxAmountInWords: '',
-      bankDetails: {
-        showBankDetails: true,
-        bankName: '',
-        accountNo: '',
-        branchAndIfsc: '',
-        upiId: '',
-        showQrCode: true,
-      },
-    });
+        consignee: {
+          name: '',
+          address: '',
+          stateName: '',
+          stateCode: '',
+        },
+        buyer: {
+          name: '',
+          address: '',
+          stateName: '',
+          stateCode: '',
+        },
+        dispatch: {
+          invoiceNo: '',
+          invoiceDate: new Date().toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: '2-digit',
+          }),
+          deliveryNote: '',
+          modeTermsOfPayment: '',
+          referenceNoAndDate: '',
+          otherReferences: '',
+          buyersOrderNo: '',
+          orderDate: '',
+          dispatchDocNo: '',
+          deliveryNoteDate: '',
+          dispatchedThrough: '',
+          destination: '',
+          termsOfDelivery: '',
+        },
+        items: [
+          {
+            id: '1',
+            slNo: 1,
+            description: '',
+            hsnSac: '',
+            altQuantity: '',
+            quantity: 1,
+            unit: 'PC',
+            rateInclTax: '',
+            rate: 0,
+            per: 'PC',
+            discountPercent: '',
+            amount: 0,
+          },
+        ],
+        declaration:
+          'We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.',
+        showTaxSummary: true,
+        taxMode: 'auto',
+        taxType: 'cgst_sgst',
+        pricingMode: 'inclusive',
+        defaultGstRate: 18,
+        enableRoundOff: true,
+        customAmountInWords: '',
+        customTaxAmountInWords: '',
+        bankDetails: {
+          showBankDetails: true,
+          bankName: '',
+          accountNo: '',
+          branchAndIfsc: '',
+          upiId: '',
+          showQrCode: true,
+        },
+      });
+      try {
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+      } catch (e) {}
+    }
   };
 
-  const totalAmount = invoiceData.items.reduce(
+  const rawTotal = invoiceData.items.reduce(
     (sum, item) => sum + (Number(item.amount) || 0),
     0
   );
+  const totalAmount =
+    invoiceData.enableRoundOff !== false ? Math.round(rawTotal) : rawTotal;
 
   // Render Preview Canvas with mathematically precise scaling wrapper
   const renderPreviewCanvas = (isSplitLayout: boolean = false) => {
@@ -397,10 +447,27 @@ export const App: React.FC = () => {
                 ₹ {formatIndianCurrency(totalAmount)}
               </span>
             </div>
+            <div className="h-3 w-px bg-slate-300"></div>
+            <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 font-semibold" title="Changes auto-saved to browser storage">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="hidden xl:inline">Auto-Saved</span>
+            </div>
           </div>
 
           {/* View Mode & Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* History Button */}
+            <button
+              id="btn-invoice-history"
+              type="button"
+              onClick={() => setIsHistoryModalOpen(true)}
+              className="p-1.5 sm:px-3 sm:py-1.5 text-xs font-semibold rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 flex items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95"
+              title="Open Invoice History & Backups"
+            >
+              <History className="w-3.5 h-3.5 text-indigo-600" />
+              <span className="hidden sm:inline">History</span>
+            </button>
+
             {/* Desktop View Mode Toggle (Hidden on mobile, mobile has top segmented bar) */}
             <div className="hidden lg:flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-medium">
               <button
@@ -644,6 +711,16 @@ export const App: React.FC = () => {
       <div id="invoice-print-container" style={{ display: 'none' }}>
         <InvoicePreview data={invoiceData} />
       </div>
+
+      {/* Invoice History & Backup Modal */}
+      {isHistoryModalOpen && (
+        <InvoiceHistoryModal
+          isOpen={isHistoryModalOpen}
+          onClose={() => setIsHistoryModalOpen(false)}
+          currentInvoice={invoiceData}
+          onLoadInvoice={(loadedData) => setInvoiceData(loadedData)}
+        />
+      )}
     </div>
   );
 };

@@ -108,11 +108,13 @@ export const App: React.FC = () => {
 
   // Direct Client-Side PDF Download & View
   const handleDownloadPdf = async (action: 'download' | 'open' = 'download') => {
-    // Always capture from dedicated offscreen export container to guarantee 100% unscaled capture
-    let target = exportRef.current || document.getElementById('invoice-export-document');
-    if (!target) {
-      target = previewRef.current || document.getElementById('invoice-document');
-    }
+    // Look up target element: offscreen unscaled container first, fallback to preview
+    let target: HTMLElement | null =
+      exportRef.current ||
+      (document.querySelector('#invoice-export-container .invoice-a4-page') as HTMLElement) ||
+      (document.getElementById('invoice-document') as HTMLElement) ||
+      previewRef.current;
+
     if (!target) {
       alert('Invoice document not found. Please try again.');
       return;
@@ -122,21 +124,24 @@ export const App: React.FC = () => {
     setDownloadSuccess(false);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 80));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
+      // Ensure filename strictly ends with .pdf and has clean alphanumeric characters
       const rawInvoiceNo = invoiceData.dispatch.invoiceNo ? invoiceData.dispatch.invoiceNo.trim() : '74';
-      const cleanInvoiceNo = rawInvoiceNo.replace(/[^a-zA-Z0-9_-]/g, '_');
+      const cleanInvoiceNo = rawInvoiceNo.replace(/[^a-zA-Z0-9_-]/g, '_') || '74';
       const fileName = `Sales_${cleanInvoiceNo}.pdf`;
 
-      // Render high resolution canvas (scale 2.5 for crisp 240-300dpi output)
+      // Render high resolution canvas (scale 2 for crisp vector-like output)
       const canvas = await html2canvas(target, {
-        scale: 2.5,
+        scale: 2,
         useCORS: true,
+        allowTaint: true,
         logging: false,
         backgroundColor: '#ffffff',
+        windowWidth: 794,
       });
 
-      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
       // Create A4 jsPDF instance (210mm x 297mm)
       const pdf = new jsPDF({
@@ -149,39 +154,44 @@ export const App: React.FC = () => {
       const pdfWidth = 210;
       const pdfHeight = 297;
 
-      // Single exact A4 page
+      // Fit into single exact A4 page
       pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
 
-      const pdfBlob = pdf.output('blob');
+      // Generate binary array buffer and wrap into explicit application/pdf Blob
+      const pdfArrayBuffer = pdf.output('arraybuffer');
+      const pdfBlob = new Blob([pdfArrayBuffer], { type: 'application/pdf' });
+      const blobUrl = URL.createObjectURL(pdfBlob);
 
       if (action === 'open') {
-        const fileUrl = URL.createObjectURL(pdfBlob);
-        window.open(fileUrl, '_blank');
+        window.open(blobUrl, '_blank');
       } else {
-        const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
-        const downloadUrl = URL.createObjectURL(file);
-
+        // Direct reliable download via DOM-appended anchor
+        // Note: Browsers (Chrome, Edge, Firefox) REQUIRE the anchor element to be in the DOM
+        // for the download attribute and filename extension to be properly respected.
         const link = document.createElement('a');
-        link.href = downloadUrl;
+        link.style.display = 'none';
+        link.href = blobUrl;
         link.download = fileName;
         link.setAttribute('download', fileName);
-        link.style.display = 'none';
-
+        link.setAttribute('type', 'application/pdf');
         document.body.appendChild(link);
+
         link.click();
 
         setTimeout(() => {
           if (link.parentNode) {
             link.parentNode.removeChild(link);
           }
-          URL.revokeObjectURL(downloadUrl);
-        }, 1500);
-
-        setDownloadSuccess(true);
-        setTimeout(() => setDownloadSuccess(false), 3500);
+          URL.revokeObjectURL(blobUrl);
+        }, 3000);
       }
+
+      setDownloadSuccess(true);
+      setTimeout(() => setDownloadSuccess(false), 3500);
     } catch (err) {
       console.error('PDF generation error:', err);
+      // Fallback
+      alert('Could not generate PDF canvas. Opening Print dialog instead.');
       window.print();
     } finally {
       setIsGeneratingPdf(false);
@@ -695,12 +705,13 @@ export const App: React.FC = () => {
         id="invoice-export-container"
         style={{
           position: 'fixed',
-          top: '-10000px',
-          left: '-10000px',
-          width: '210mm',
+          top: 0,
+          left: 0,
+          width: '794px',
           backgroundColor: '#ffffff',
-          zIndex: -10000,
+          zIndex: -9999,
           pointerEvents: 'none',
+          opacity: 1,
         }}
         aria-hidden="true"
       >

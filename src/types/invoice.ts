@@ -45,16 +45,30 @@ export interface InvoiceItem {
   per: string;
   discountPercent?: number | string;
   amount: number;
+  gstRate?: number;
 }
 
 export interface TaxSummaryItem {
+  id?: string;
   hsnSac: string;
   taxableValue: number;
   cgstRate: number;
   cgstAmount: number;
   sgstRate: number;
   sgstAmount: number;
+  igstRate?: number;
+  igstAmount?: number;
   totalTaxAmount: number;
+}
+
+export interface BankDetails {
+  showBankDetails?: boolean;
+  bankName: string;
+  accountNo: string;
+  branchAndIfsc: string;
+  upiId?: string;
+  showQrCode?: boolean;
+  customQrUrl?: string;
 }
 
 export interface InvoiceData {
@@ -66,6 +80,13 @@ export interface InvoiceData {
   items: InvoiceItem[];
   declaration: string;
   showTaxSummary: boolean;
+  taxMode?: 'auto' | 'manual';
+  taxType?: 'cgst_sgst' | 'igst' | 'auto';
+  pricingMode?: 'inclusive' | 'exclusive';
+  defaultGstRate?: number;
   taxSummary?: TaxSummaryItem[];
+  customTaxAmountInWords?: string;
   customAmountInWords?: string;
+  signatoryCompany?: string;
+  bankDetails?: BankDetails;
 }

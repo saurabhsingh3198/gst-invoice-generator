@@ -234,8 +234,21 @@ export const App: React.FC = () => {
       ],
       declaration:
         'We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.',
-      showTaxSummary: false,
+      showTaxSummary: true,
+      taxMode: 'auto',
+      taxType: 'cgst_sgst',
+      pricingMode: 'inclusive',
+      defaultGstRate: 18,
       customAmountInWords: '',
+      customTaxAmountInWords: '',
+      bankDetails: {
+        showBankDetails: true,
+        bankName: '',
+        accountNo: '',
+        branchAndIfsc: '',
+        upiId: '',
+        showQrCode: true,
+      },
     });
   };
 

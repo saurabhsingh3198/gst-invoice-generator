@@ -1,6 +1,8 @@
 import { forwardRef } from 'react';
 import type { InvoiceData } from '../types/invoice';
-import { formatIndianCurrency, numberToIndianWords } from '../utils/numberToWords';
+import { formatIndianCurrency, numberToIndianWords, taxNumberToIndianWords } from '../utils/numberToWords';
+import { getEffectiveTaxSummary, getTaxTotals, isInterStateTax } from '../utils/taxCalculation';
+import { UpiQrCode } from './UpiQrCode';
 
 interface InvoicePreviewProps {
   data: InvoiceData;
@@ -50,10 +52,25 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
       ? data.customAmountInWords
       : numberToIndianWords(totalAmount);
 
+    // Tax breakdown calculation
+    const taxRows = getEffectiveTaxSummary(data);
+    const taxTotals = getTaxTotals(taxRows);
+    const isInterState = isInterStateTax(data);
+
+    // Tax amount in words
+    const taxAmountInWords = data.customTaxAmountInWords?.trim()
+      ? data.customTaxAmountInWords
+      : taxNumberToIndianWords(taxTotals.totalTaxAmount);
+
+    const signatoryCompany = data.signatoryCompany?.trim() || data.seller.name;
+
     // Calculate dynamic filler height so table seamlessly fills A4 page height
     // Each item is approx 30px
     const itemCount = data.items.length;
-    const fillerHeight = Math.max(40, 260 - itemCount * 28);
+    const hasBankDetails = data.bankDetails?.showBankDetails !== false;
+    const bankDetailsHeightAdjustment = hasBankDetails ? 45 : 0;
+    const taxHeightAdjustment = data.showTaxSummary ? (50 + Math.min(taxRows.length, 4) * 16) : 0;
+    const fillerHeight = Math.max(10, 240 - itemCount * 28 - taxHeightAdjustment - bankDetailsHeightAdjustment);
 
     return (
       <div className="invoice-print-wrapper flex flex-col items-center w-full">
@@ -792,7 +809,7 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
               style={{
                 width: '100%',
                 borderCollapse: 'collapse',
-                borderBottom: data.showTaxSummary ? '1px solid #000000' : 'none',
+                borderBottom: '1px solid #000000',
                 fontSize: '9.5px',
               }}
             >
@@ -830,72 +847,537 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
               </tbody>
             </table>
 
-            {/* Optional Tax Breakdown Table (if toggled) */}
-            {data.showTaxSummary && (
-              <table
-                style={{
-                  width: '100%',
-                  borderCollapse: 'collapse',
-                  fontSize: '8.5px',
-                  textAlign: 'center',
-                  borderTop: '1px solid #000000',
-                }}
-              >
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #000000', fontWeight: 'bold' }}>
-                    <th style={{ borderRight: '1px solid #000000', padding: '2px' }}>HSN/SAC</th>
-                    <th style={{ borderRight: '1px solid #000000', padding: '2px' }}>Taxable Value</th>
-                    <th style={{ borderRight: '1px solid #000000', padding: '2px' }}>CGST Rate & Amt</th>
-                    <th style={{ borderRight: '1px solid #000000', padding: '2px' }}>SGST Rate & Amt</th>
-                    <th style={{ padding: '2px' }}>Total Tax Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td style={{ borderRight: '1px solid #000000', padding: '2px' }}>721420</td>
-                    <td style={{ borderRight: '1px solid #000000', padding: '2px', textAlign: 'right' }}>
-                      {formatIndianCurrency(totalAmount / 1.18)}
-                    </td>
-                    <td style={{ borderRight: '1px solid #000000', padding: '2px' }}>
-                      9% : {formatIndianCurrency((totalAmount / 1.18) * 0.09)}
-                    </td>
-                    <td style={{ borderRight: '1px solid #000000', padding: '2px' }}>
-                      9% : {formatIndianCurrency((totalAmount / 1.18) * 0.09)}
-                    </td>
-                    <td style={{ padding: '2px', textAlign: 'right', fontWeight: 'bold' }}>
-                      {formatIndianCurrency((totalAmount / 1.18) * 0.18)}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            {/* HSN/SAC Tax Summary Table & Tax in Words (Pixel-exact match to user screenshot) */}
+            {data.showTaxSummary ? (
+              <>
+                <table
+                  style={{
+                    width: '100%',
+                    borderCollapse: 'collapse',
+                    fontSize: '8.5px',
+                    tableLayout: 'fixed',
+                  }}
+                >
+                  <thead>
+                    {isInterState ? (
+                      /* Inter-State Tax (IGST) Header */
+                      <>
+                        <tr style={{ borderBottom: '1px solid #000000' }}>
+                          <th
+                            rowSpan={2}
+                            style={{
+                              width: '45%',
+                              borderRight: '1px solid #000000',
+                              padding: '2px 4px',
+                              textAlign: 'center',
+                              verticalAlign: 'middle',
+                              fontWeight: 'normal',
+                            }}
+                          >
+                            HSN/SAC
+                          </th>
+                          <th
+                            rowSpan={2}
+                            style={{
+                              width: '17%',
+                              borderRight: '1px solid #000000',
+                              padding: '2px 4px',
+                              textAlign: 'center',
+                              verticalAlign: 'middle',
+                              lineHeight: '1.2',
+                              fontWeight: 'normal',
+                            }}
+                          >
+                            Taxable<br />Value
+                          </th>
+                          <th
+                            colSpan={2}
+                            style={{
+                              width: '23%',
+                              borderRight: '1px solid #000000',
+                              borderBottom: '1px solid #000000',
+                              padding: '2px 4px',
+                              textAlign: 'center',
+                              verticalAlign: 'middle',
+                              fontWeight: 'normal',
+                            }}
+                          >
+                            Integrated Tax
+                          </th>
+                          <th
+                            rowSpan={2}
+                            style={{
+                              width: '15%',
+                              padding: '2px 4px',
+                              textAlign: 'center',
+                              verticalAlign: 'middle',
+                              lineHeight: '1.2',
+                              fontWeight: 'normal',
+                            }}
+                          >
+                            Total<br />Tax Amount
+                          </th>
+                        </tr>
+                        <tr style={{ borderBottom: '1px solid #000000' }}>
+                          <th
+                            style={{
+                              width: '8%',
+                              borderRight: '1px solid #000000',
+                              padding: '2px 2px',
+                              textAlign: 'center',
+                              fontWeight: 'normal',
+                            }}
+                          >
+                            Rate
+                          </th>
+                          <th
+                            style={{
+                              width: '15%',
+                              borderRight: '1px solid #000000',
+                              padding: '2px 3px',
+                              textAlign: 'center',
+                              fontWeight: 'normal',
+                            }}
+                          >
+                            Amount
+                          </th>
+                        </tr>
+                      </>
+                    ) : (
+                      /* Intra-State Tax (CGST + SGST/UTGST) Header - Pixel-exact to user screenshot */
+                      <>
+                        <tr style={{ borderBottom: '1px solid #000000' }}>
+                          <th
+                            rowSpan={2}
+                            style={{
+                              width: '40%',
+                              borderRight: '1px solid #000000',
+                              padding: '3px 4px',
+                              textAlign: 'center',
+                              verticalAlign: 'middle',
+                              fontWeight: 'normal',
+                            }}
+                          >
+                            HSN/SAC
+                          </th>
+                          <th
+                            rowSpan={2}
+                            style={{
+                              width: '12%',
+                              borderRight: '1px solid #000000',
+                              padding: '3px 4px',
+                              textAlign: 'center',
+                              verticalAlign: 'middle',
+                              lineHeight: '1.15',
+                              fontWeight: 'normal',
+                            }}
+                          >
+                            Taxable<br />Value
+                          </th>
+                          <th
+                            colSpan={2}
+                            style={{
+                              width: '17%',
+                              borderRight: '1px solid #000000',
+                              borderBottom: '1px solid #000000',
+                              padding: '2px 4px',
+                              textAlign: 'center',
+                              verticalAlign: 'middle',
+                              fontWeight: 'normal',
+                            }}
+                          >
+                            CGST
+                          </th>
+                          <th
+                            colSpan={2}
+                            style={{
+                              width: '17%',
+                              borderRight: '1px solid #000000',
+                              borderBottom: '1px solid #000000',
+                              padding: '2px 4px',
+                              textAlign: 'center',
+                              verticalAlign: 'middle',
+                              fontWeight: 'normal',
+                            }}
+                          >
+                            SGST/UTGST
+                          </th>
+                          <th
+                            rowSpan={2}
+                            style={{
+                              width: '14%',
+                              padding: '3px 4px',
+                              textAlign: 'center',
+                              verticalAlign: 'middle',
+                              lineHeight: '1.15',
+                              fontWeight: 'normal',
+                            }}
+                          >
+                            Total<br />Tax Amount
+                          </th>
+                        </tr>
+                        <tr style={{ borderBottom: '1px solid #000000' }}>
+                          <th
+                            style={{
+                              width: '5.5%',
+                              borderRight: '1px solid #000000',
+                              padding: '2px 2px',
+                              textAlign: 'center',
+                              fontWeight: 'normal',
+                            }}
+                          >
+                            Rate
+                          </th>
+                          <th
+                            style={{
+                              width: '11.5%',
+                              borderRight: '1px solid #000000',
+                              padding: '2px 3px',
+                              textAlign: 'center',
+                              fontWeight: 'normal',
+                            }}
+                          >
+                            Amount
+                          </th>
+                          <th
+                            style={{
+                              width: '5.5%',
+                              borderRight: '1px solid #000000',
+                              padding: '2px 2px',
+                              textAlign: 'center',
+                              fontWeight: 'normal',
+                            }}
+                          >
+                            Rate
+                          </th>
+                          <th
+                            style={{
+                              width: '11.5%',
+                              borderRight: '1px solid #000000',
+                              padding: '2px 3px',
+                              textAlign: 'center',
+                              fontWeight: 'normal',
+                            }}
+                          >
+                            Amount
+                          </th>
+                        </tr>
+                      </>
+                    )}
+                  </thead>
+                  <tbody>
+                    {taxRows.map((row, idx) => (
+                      <tr key={row.id || row.hsnSac || idx} style={{ fontSize: '9px' }}>
+                        <td
+                          style={{
+                            borderRight: '1px solid #000000',
+                            padding: '2px 6px',
+                            textAlign: 'left',
+                          }}
+                        >
+                          {row.hsnSac}
+                        </td>
+                        <td
+                          style={{
+                            borderRight: '1px solid #000000',
+                            padding: '2px 4px',
+                            textAlign: 'right',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {formatIndianCurrency(row.taxableValue)}
+                        </td>
+                        {isInterState ? (
+                          <>
+                            <td
+                              style={{
+                                borderRight: '1px solid #000000',
+                                padding: '2px 2px',
+                                textAlign: 'right',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {row.igstRate || 0}%
+                            </td>
+                            <td
+                              style={{
+                                borderRight: '1px solid #000000',
+                                padding: '2px 4px',
+                                textAlign: 'right',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {formatIndianCurrency(row.igstAmount || row.totalTaxAmount)}
+                            </td>
+                          </>
+                        ) : (
+                          <>
+                            <td
+                              style={{
+                                borderRight: '1px solid #000000',
+                                padding: '2px 2px',
+                                textAlign: 'right',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {row.cgstRate}%
+                            </td>
+                            <td
+                              style={{
+                                borderRight: '1px solid #000000',
+                                padding: '2px 4px',
+                                textAlign: 'right',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {formatIndianCurrency(row.cgstAmount)}
+                            </td>
+                            <td
+                              style={{
+                                borderRight: '1px solid #000000',
+                                padding: '2px 2px',
+                                textAlign: 'right',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {row.sgstRate}%
+                            </td>
+                            <td
+                              style={{
+                                borderRight: '1px solid #000000',
+                                padding: '2px 4px',
+                                textAlign: 'right',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {formatIndianCurrency(row.sgstAmount)}
+                            </td>
+                          </>
+                        )}
+                        <td
+                          style={{
+                            padding: '2px 4px',
+                            textAlign: 'right',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {formatIndianCurrency(row.totalTaxAmount)}
+                        </td>
+                      </tr>
+                    ))}
+
+                    {/* Total Row - Exact match to user screenshot */}
+                    <tr
+                      style={{
+                        borderTop: '1px solid #000000',
+                        borderBottom: '1px solid #000000',
+                        fontWeight: 'bold',
+                        fontSize: '9px',
+                      }}
+                    >
+                      <td
+                        style={{
+                          borderRight: '1px solid #000000',
+                          padding: '2px 6px',
+                          textAlign: 'right',
+                        }}
+                      >
+                        Total
+                      </td>
+                      <td
+                        style={{
+                          borderRight: '1px solid #000000',
+                          padding: '2px 4px',
+                          textAlign: 'right',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {formatIndianCurrency(taxTotals.totalTaxableValue)}
+                      </td>
+                      {isInterState ? (
+                        <>
+                          <td
+                            style={{
+                              borderRight: '1px solid #000000',
+                              padding: '2px 2px',
+                            }}
+                          ></td>
+                          <td
+                            style={{
+                              borderRight: '1px solid #000000',
+                              padding: '2px 4px',
+                              textAlign: 'right',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {formatIndianCurrency(taxTotals.totalIgstAmount || taxTotals.totalTaxAmount)}
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td
+                            style={{
+                              borderRight: '1px solid #000000',
+                              padding: '2px 2px',
+                            }}
+                          ></td>
+                          <td
+                            style={{
+                              borderRight: '1px solid #000000',
+                              padding: '2px 4px',
+                              textAlign: 'right',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {formatIndianCurrency(taxTotals.totalCgstAmount)}
+                          </td>
+                          <td
+                            style={{
+                              borderRight: '1px solid #000000',
+                              padding: '2px 2px',
+                            }}
+                          ></td>
+                          <td
+                            style={{
+                              borderRight: '1px solid #000000',
+                              padding: '2px 4px',
+                              textAlign: 'right',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {formatIndianCurrency(taxTotals.totalSgstAmount)}
+                          </td>
+                        </>
+                      )}
+                      <td
+                        style={{
+                          padding: '2px 4px',
+                          textAlign: 'right',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {formatIndianCurrency(taxTotals.totalTaxAmount)}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                {/* Tax Amount (in words) Row - Exactly matching screenshot */}
+                <div
+                  style={{
+                    borderBottom: '1px solid #000000',
+                    padding: '3px 6px',
+                    fontSize: '9px',
+                    lineHeight: '1.3',
+                  }}
+                >
+                  <span style={{ fontWeight: 'normal' }}>Tax Amount (in words) : &nbsp;&nbsp;</span>
+                  <span style={{ fontWeight: 'bold' }}>
+                    {taxAmountInWords}
+                  </span>
+                </div>
+              </>
+            ) : (
+              /* Blank spacing before Declaration if no tax summary */
+              <div style={{ height: '75px', width: '100%', borderBottom: '1px solid #000000' }}></div>
             )}
 
-            {/* Blank spacing before Declaration if no tax summary */}
-            {!data.showTaxSummary && (
-              <div style={{ height: '75px', width: '100%' }}></div>
-            )}
-
-            {/* 5. Declaration & Authorised Signatory */}
+            {/* 5. Bank Details, Declaration & Authorised Signatory */}
             <table
               style={{
                 width: '100%',
                 borderCollapse: 'collapse',
-                borderTop: '1px solid #000000',
                 fontSize: '9px',
                 tableLayout: 'fixed',
               }}
             >
               <tbody>
                 <tr>
-                  {/* Left Column: Declaration (~55%) */}
+                  {/* Left Column: Bank Details & Declaration (~58%) */}
                   <td
                     style={{
-                      width: '55%',
+                      width: '58%',
                       borderRight: '1px solid #000000',
                       padding: '4px 6px',
                       verticalAlign: 'top',
                     }}
                   >
+                    {data.bankDetails?.showBankDetails !== false && (
+                      <>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start',
+                          }}
+                        >
+                          {/* Bank details text */}
+                          <div style={{ flex: 1, paddingRight: '4px' }}>
+                            <div
+                              style={{
+                                textDecoration: 'underline',
+                                fontWeight: 'bold',
+                                fontSize: '8.5px',
+                                marginBottom: '2px',
+                              }}
+                            >
+                              Company&apos;s Bank Details
+                            </div>
+                            <div style={{ fontSize: '8.5px', lineHeight: '1.3' }}>
+                              <div>
+                                <span>Bank Name : </span>
+                                <span style={{ fontWeight: 'bold' }}>
+                                  {data.bankDetails?.bankName || 'STATE BANK OF INDIA'}
+                                </span>
+                              </div>
+                              <div>
+                                <span>A/c No. : </span>
+                                <span style={{ fontWeight: 'bold' }}>
+                                  {data.bankDetails?.accountNo || '381928371928'}
+                                </span>
+                              </div>
+                              <div>
+                                <span>Branch & IFS Code : </span>
+                                <span style={{ fontWeight: 'bold' }}>
+                                  {data.bankDetails?.branchAndIfsc || 'NAUSAD GORAKHPUR & SBIN0001234'}
+                                </span>
+                              </div>
+                              {data.bankDetails?.upiId && (
+                                <div>
+                                  <span>UPI ID (Pay) : </span>
+                                  <span style={{ fontWeight: 'bold', color: '#1a56db' }}>
+                                    {data.bankDetails.upiId}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* QR Code (if enabled) */}
+                          {data.bankDetails?.showQrCode !== false && (
+                            <div style={{ flexShrink: 0, marginLeft: '4px' }}>
+                              <UpiQrCode
+                                upiId={data.bankDetails?.upiId || '8896925131@naviaxis'}
+                                payeeName={signatoryCompany}
+                                customQrUrl={data.bankDetails?.customQrUrl}
+                                size={56}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Dashed horizontal divider line matching screenshot */}
+                        <div
+                          style={{
+                            borderTop: '1px dashed #666666',
+                            margin: '3px 0 3px 0',
+                            width: '100%',
+                          }}
+                        ></div>
+                      </>
+                    )}
+
+                    {/* Declaration */}
                     <div
                       style={{
                         textDecoration: 'underline',
@@ -911,10 +1393,10 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                     </div>
                   </td>
 
-                  {/* Right Column: Signatory (~45%) */}
+                  {/* Right Column: Signatory (~42%) */}
                   <td
                     style={{
-                      width: '45%',
+                      width: '42%',
                       padding: '4px 6px',
                       verticalAlign: 'top',
                       textAlign: 'right',
@@ -922,10 +1404,10 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                   >
                     <div style={{ fontWeight: 'bold', fontSize: '9.5px' }}>
                       <span>for </span>
-                      <span style={{ textTransform: 'uppercase' }}>{data.seller.name}</span>
+                      <span style={{ textTransform: 'uppercase' }}>{signatoryCompany}</span>
                     </div>
 
-                    <div style={{ height: '38px' }}></div>
+                    <div style={{ height: data.bankDetails?.showBankDetails !== false ? '64px' : '38px' }}></div>
 
                     <div style={{ fontSize: '9px', color: '#111111' }}>
                       Authorised Signatory

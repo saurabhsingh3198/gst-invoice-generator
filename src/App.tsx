@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import type { InvoiceData } from './types/invoice';
 import { sampleInvoiceData } from './utils/sampleData';
 import { InvoicePreview } from './components/InvoicePreview';
@@ -17,17 +17,68 @@ import {
   ZoomOut,
   CheckCircle2,
   ExternalLink,
+  Edit3,
+  ArrowRight,
 } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [invoiceData, setInvoiceData] = useState<InvoiceData>(sampleInvoiceData);
-  const [zoomLevel, setZoomLevel] = useState<number>(0.78);
-  const [viewMode, setViewMode] = useState<'split' | 'editor' | 'preview'>('split');
+
+  const [viewMode, setViewMode] = useState<'split' | 'editor' | 'preview'>(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      return 'editor';
+    }
+    return 'split';
+  });
+
+  // Calculate optimal zoom level based on container/screen size
+  const getOptimalZoom = useCallback((isSplit: boolean = false): number => {
+    if (typeof window === 'undefined') return 0.78;
+    const width = window.innerWidth;
+    if (width < 450) {
+      // Mobile screen: fit within available width with margin
+      return Math.round(Math.max(0.35, Math.min(0.5, (width - 24) / 794)) * 100) / 100;
+    }
+    if (width < 768) {
+      // Large phone / small tablet
+      return Math.round(Math.max(0.45, Math.min(0.7, (width - 32) / 794)) * 100) / 100;
+    }
+    if (width < 1024) {
+      // Tablet portrait
+      return Math.round(Math.max(0.65, Math.min(0.85, (width - 48) / 794)) * 100) / 100;
+    }
+    // Desktop / Laptop
+    if (isSplit) {
+      const halfWidth = width / 2;
+      return Math.round(Math.max(0.6, Math.min(0.9, (halfWidth - 48) / 794)) * 100) / 100;
+    }
+    return 0.85;
+  }, []);
+
+  const [zoomLevel, setZoomLevel] = useState<number>(() => getOptimalZoom(false));
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
   const [downloadSuccess, setDownloadSuccess] = useState<boolean>(false);
 
   const previewRef = useRef<HTMLDivElement>(null);
   const exportRef = useRef<HTMLDivElement>(null);
+
+  // Handle window resize dynamically
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024 && viewMode === 'split') {
+        setViewMode('editor');
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [viewMode]);
+
+  // Fit to screen width helper
+  const handleFitScreen = () => {
+    const optimal = getOptimalZoom(viewMode === 'split');
+    setZoomLevel(optimal);
+  };
 
   // Native Print (Best vector crispness, Save as PDF via browser)
   const handlePrint = () => {
@@ -50,7 +101,6 @@ export const App: React.FC = () => {
     setDownloadSuccess(false);
 
     try {
-      // Small delay to ensure all fonts and DOM layout are settled
       await new Promise((resolve) => setTimeout(resolve, 80));
 
       const rawInvoiceNo = invoiceData.dispatch.invoiceNo ? invoiceData.dispatch.invoiceNo.trim() : '74';
@@ -84,11 +134,9 @@ export const App: React.FC = () => {
       const pdfBlob = pdf.output('blob');
 
       if (action === 'open') {
-        // Open PDF in new tab
         const fileUrl = URL.createObjectURL(pdfBlob);
         window.open(fileUrl, '_blank');
       } else {
-        // Direct browser file download with explicit .pdf MIME and filename
         const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
         const downloadUrl = URL.createObjectURL(file);
 
@@ -113,7 +161,6 @@ export const App: React.FC = () => {
       }
     } catch (err) {
       console.error('PDF generation error:', err);
-      // Fallback to native print dialog
       window.print();
     } finally {
       setIsGeneratingPdf(false);
@@ -197,47 +244,142 @@ export const App: React.FC = () => {
     0
   );
 
-  return (
-    <div className="min-h-screen bg-slate-100/90 flex flex-col text-slate-800 font-sans">
-      {/* ================= TOP CLASSIC EXECUTIVE HEADER ================= */}
-      <header className="no-print sticky top-0 z-40 bg-white border-b border-slate-200/90 shadow-2xs">
-        <div className="max-w-[1780px] mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
-          {/* Brand */}
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-indigo-400 shadow-sm">
-              <FileSpreadsheet className="w-5 h-5 text-indigo-400" />
+  // Render Preview Canvas with mathematically precise scaling wrapper
+  const renderPreviewCanvas = (isSplitLayout: boolean = false) => {
+    const scaledWidth = Math.round(794 * zoomLevel);
+    const scaledHeight = Math.round(1123 * zoomLevel);
+
+    return (
+      <div className="w-full h-full flex flex-col">
+        {/* Preview Toolbar */}
+        <div className="no-print w-full flex items-center justify-between bg-white px-3 sm:px-4 py-2 rounded-t-xl border border-slate-200 border-b-0 shadow-2xs shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-xs font-bold text-slate-800">
+              A4 Proof
+            </span>
+            <span className="text-[11px] text-slate-400 hidden sm:inline">
+              (Vector Exact)
+            </span>
+          </div>
+
+          {/* Zoom controls */}
+          <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-0.5 border border-slate-200">
+            <button
+              type="button"
+              onClick={() => setZoomLevel((z) => Math.max(0.35, Math.round((z - 0.08) * 100) / 100))}
+              className="p-1 hover:bg-white rounded text-slate-600 transition cursor-pointer"
+              title="Zoom Out"
+            >
+              <ZoomOut className="w-3.5 h-3.5" />
+            </button>
+
+            <span className="text-[11px] font-mono text-slate-700 px-1 min-w-[38px] text-center font-bold">
+              {Math.round(zoomLevel * 100)}%
+            </span>
+
+            <button
+              type="button"
+              onClick={() => setZoomLevel((z) => Math.min(1.4, Math.round((z + 0.08) * 100) / 100))}
+              className="p-1 hover:bg-white rounded text-slate-600 transition cursor-pointer"
+              title="Zoom In"
+            >
+              <ZoomIn className="w-3.5 h-3.5" />
+            </button>
+
+            <button
+              type="button"
+              onClick={handleFitScreen}
+              className="px-1.5 py-0.5 hover:bg-white rounded text-slate-700 text-[10px] font-bold transition flex items-center gap-1 border border-slate-200/80 bg-slate-50 cursor-pointer"
+              title="Fit to Screen"
+            >
+              <Maximize2 className="w-3 h-3 text-indigo-600" />
+              <span>Fit</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setZoomLevel(1.0)}
+              className="hidden sm:inline-block px-1.5 py-0.5 hover:bg-white rounded text-slate-600 text-[10px] font-medium transition cursor-pointer"
+              title="Actual 100% Size"
+            >
+              100%
+            </button>
+          </div>
+        </div>
+
+        {/* Scrollable canvas container with bulletproof centered scale wrapper */}
+        <div
+          className={`w-full flex-1 bg-slate-200/80 p-2 sm:p-5 rounded-b-xl border border-slate-200 overflow-auto flex flex-col items-center shadow-inner ${
+            isSplitLayout ? '' : 'min-h-[500px] sm:min-h-[850px]'
+          }`}
+        >
+          {/* Scaled bounding container that eliminates the CSS transform offset bug */}
+          <div
+            style={{
+              width: `${scaledWidth}px`,
+              minHeight: `${scaledHeight}px`,
+              position: 'relative',
+              margin: '0 auto',
+              flexShrink: 0,
+              boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            <div
+              style={{
+                width: '794px',
+                transform: `scale(${zoomLevel})`,
+                transformOrigin: 'top left',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                transition: 'transform 0.12s ease-out',
+              }}
+            >
+              <InvoicePreview ref={previewRef} data={invoiceData} />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-sm tracking-tight text-slate-900">
-                  GST Invoice Studio
-                </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  Tally A4 Exact
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-500">
-                Professional Tax Invoice Designer with Vector PDF Export
-              </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-100/90 flex flex-col text-slate-800 font-sans pb-16 lg:pb-0">
+      {/* ================= TOP RESPONSIVE HEADER ================= */}
+      <header className="no-print sticky top-0 z-40 bg-white border-b border-slate-200 shadow-2xs">
+        <div className="max-w-[1780px] mx-auto px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-4">
+          {/* Brand - Perfectly single line with whitespace-nowrap */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-indigo-400 shadow-sm shrink-0">
+              <FileSpreadsheet className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-400" />
+            </div>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="font-bold text-sm sm:text-base tracking-tight text-slate-900 whitespace-nowrap">
+                GST Invoice Studio
+              </span>
+              <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                A4
+              </span>
             </div>
           </div>
 
-          {/* Quick Metrics Badge */}
-          <div className="hidden md:flex items-center gap-3.5 bg-slate-50 px-3.5 py-1.5 rounded-lg border border-slate-200 text-xs">
+          {/* Quick Metrics Badge (Desktop / Tablet >= 768px) */}
+          <div className="hidden md:flex items-center gap-3 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 text-xs">
             <div>
-              <span className="text-slate-400 font-medium">Invoice: </span>
+              <span className="text-slate-400 font-medium">Inv: </span>
               <span className="font-bold text-slate-800">
                 #{invoiceData.dispatch.invoiceNo || '—'}
               </span>
             </div>
-            <div className="h-3.5 w-px bg-slate-300"></div>
+            <div className="h-3 w-px bg-slate-300"></div>
             <div>
               <span className="text-slate-400 font-medium">Items: </span>
               <span className="font-bold text-slate-800">{invoiceData.items.length}</span>
             </div>
-            <div className="h-3.5 w-px bg-slate-300"></div>
+            <div className="h-3 w-px bg-slate-300"></div>
             <div>
-              <span className="text-slate-400 font-medium">Gross Total: </span>
+              <span className="text-slate-400 font-medium">Gross: </span>
               <span className="font-extrabold text-indigo-700">
                 ₹ {formatIndianCurrency(totalAmount)}
               </span>
@@ -245,73 +387,73 @@ export const App: React.FC = () => {
           </div>
 
           {/* View Mode & Actions */}
-          <div className="flex items-center gap-2.5">
-            {/* View Mode Toggle */}
-            <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-medium">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Desktop View Mode Toggle (Hidden on mobile, mobile has top segmented bar) */}
+            <div className="hidden lg:flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-medium">
               <button
                 type="button"
                 onClick={() => setViewMode('split')}
-                className={`px-2.5 py-1 rounded-md flex items-center gap-1.5 transition ${
+                className={`px-2.5 py-1 rounded-md flex items-center gap-1.5 transition cursor-pointer ${
                   viewMode === 'split'
                     ? 'bg-white text-indigo-700 shadow-xs font-semibold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
-                title="Split View: Editor & Preview"
+                title="Split View: Side-by-side Editor & Preview"
               >
                 <Columns className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Split</span>
+                <span>Split</span>
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('editor')}
-                className={`px-2.5 py-1 rounded-md flex items-center gap-1.5 transition ${
+                className={`px-2.5 py-1 rounded-md flex items-center gap-1.5 transition cursor-pointer ${
                   viewMode === 'editor'
                     ? 'bg-white text-indigo-700 shadow-xs font-semibold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
-                title="Full Editor View"
+                title="Editor Only"
               >
                 <FileSpreadsheet className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Editor</span>
+                <span>Editor</span>
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('preview')}
-                className={`px-2.5 py-1 rounded-md flex items-center gap-1.5 transition ${
+                className={`px-2.5 py-1 rounded-md flex items-center gap-1.5 transition cursor-pointer ${
                   viewMode === 'preview'
                     ? 'bg-white text-indigo-700 shadow-xs font-semibold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
-                title="Full A4 Preview"
+                title="Preview Only"
               >
                 <Eye className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Preview</span>
+                <span>Preview</span>
               </button>
             </div>
 
-            {/* Print / Save as PDF Button */}
+            {/* Print Button */}
             <button
               id="btn-print-invoice"
               type="button"
               onClick={handlePrint}
-              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-900 text-white flex items-center gap-1.5 transition shadow-xs"
-              title="Print directly or select 'Save as PDF' in print dialog for 100% crisp vector quality"
+              className="p-1.5 sm:px-3 sm:py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-900 text-white flex items-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95"
+              title="Print directly or save as PDF"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Print</span>
+              <span className="hidden sm:inline">Print</span>
             </button>
 
-            {/* View PDF in new tab Button */}
+            {/* View PDF Button (Desktop / Tablet) */}
             <button
               id="btn-view-pdf"
               type="button"
               onClick={() => handleDownloadPdf('open')}
               disabled={isGeneratingPdf}
-              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center gap-1.5 border border-slate-300 transition shadow-xs disabled:opacity-50"
-              title="Open generated PDF in a new browser tab to view and inspect"
+              className="hidden sm:flex px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 items-center gap-1.5 border border-slate-300 transition shadow-xs disabled:opacity-50 cursor-pointer active:scale-95"
+              title="Open generated PDF in new tab"
             >
               <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
-              <span className="hidden sm:inline">View PDF</span>
+              <span>View</span>
             </button>
 
             {/* Download PDF Button */}
@@ -320,8 +462,8 @@ export const App: React.FC = () => {
               type="button"
               onClick={() => handleDownloadPdf('download')}
               disabled={isGeneratingPdf}
-              className="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1.5 shadow-sm transition disabled:opacity-50 cursor-pointer"
-              title="Download Tax_Invoice_74.pdf directly to your computer"
+              className="px-2.5 sm:px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1.5 shadow-sm transition disabled:opacity-50 cursor-pointer active:scale-95"
+              title="Download PDF"
             >
               {isGeneratingPdf ? (
                 <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -330,19 +472,58 @@ export const App: React.FC = () => {
               ) : (
                 <Download className="w-3.5 h-3.5" />
               )}
-              <span>{isGeneratingPdf ? 'Generating...' : downloadSuccess ? 'Saved!' : 'Download PDF'}</span>
+              <span className="hidden xs:inline sm:inline">
+                {isGeneratingPdf ? 'Saving...' : downloadSuccess ? 'Saved!' : 'Download PDF'}
+              </span>
+              <span className="inline xs:hidden sm:hidden">
+                {isGeneratingPdf ? '...' : downloadSuccess ? 'Done' : 'PDF'}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* ================= MOBILE VIEW SWITCHER (VISIBLE ON SCREENS < 1024px) ================= */}
+        <div className="lg:hidden border-t border-slate-200 bg-slate-50/90 px-3 py-1.5 flex items-center justify-center gap-2">
+          <div className="w-full max-w-md grid grid-cols-2 bg-slate-200/80 p-0.5 rounded-lg text-xs font-semibold">
+            <button
+              type="button"
+              onClick={() => setViewMode('editor')}
+              className={`py-1.5 rounded-md flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                viewMode === 'editor'
+                  ? 'bg-white text-indigo-700 shadow-xs font-bold'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>Edit Invoice</span>
+              <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded-full">
+                {invoiceData.items.length}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setViewMode('preview')}
+              className={`py-1.5 rounded-md flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                viewMode === 'preview'
+                  ? 'bg-white text-indigo-700 shadow-xs font-bold'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span>A4 Preview</span>
             </button>
           </div>
         </div>
       </header>
 
       {/* ================= WORKSPACE BODY ================= */}
-      <main className="flex-1 max-w-[1780px] w-full mx-auto p-3 sm:p-4 flex flex-col">
-        {/* SPLIT VIEW */}
+      <main className="flex-1 max-w-[1780px] w-full mx-auto p-2.5 sm:p-4 flex flex-col">
+        {/* SPLIT VIEW (DESKTOP / LAPTOP DEFAULT) */}
         {viewMode === 'split' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 items-start">
-            {/* Left 6 cols: Editor (hidden on print) */}
-            <div className="no-print lg:col-span-6 h-[calc(100vh-84px)] sticky top-[68px]">
+            {/* Left 6 cols: Editor */}
+            <div className="no-print lg:col-span-6 h-auto lg:h-[calc(100vh-84px)] lg:sticky lg:top-[68px]">
               <InvoiceForm
                 data={invoiceData}
                 onChange={setInvoiceData}
@@ -352,70 +533,15 @@ export const App: React.FC = () => {
             </div>
 
             {/* Right 6 cols: Preview Workbench */}
-            <div className="lg:col-span-6 h-[calc(100vh-84px)] sticky top-[68px] flex flex-col">
-              {/* Preview Workbench Bar */}
-              <div className="no-print w-full flex items-center justify-between bg-white px-4 py-2 rounded-t-xl border border-slate-200 border-b-0 shadow-2xs shrink-0">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span className="text-xs font-bold text-slate-800">
-                    A4 Paper Proof
-                  </span>
-                  <span className="text-[11px] text-slate-400">
-                    (100% Vector Quality)
-                  </span>
-                </div>
-
-                {/* Floating Zoom Controls */}
-                <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-0.5 border border-slate-200">
-                  <button
-                    type="button"
-                    onClick={() => setZoomLevel((z) => Math.max(0.5, z - 0.08))}
-                    className="p-1 hover:bg-white rounded text-slate-600 transition"
-                    title="Zoom Out"
-                  >
-                    <ZoomOut className="w-3.5 h-3.5" />
-                  </button>
-                  <span className="text-[11px] font-mono text-slate-700 px-1.5 min-w-[42px] text-center font-bold">
-                    {Math.round(zoomLevel * 100)}%
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setZoomLevel((z) => Math.min(1.3, z + 0.08))}
-                    className="p-1 hover:bg-white rounded text-slate-600 transition"
-                    title="Zoom In"
-                  >
-                    <ZoomIn className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setZoomLevel(0.78)}
-                    className="p-1 hover:bg-white rounded text-slate-600 transition"
-                    title="Fit A4 View"
-                  >
-                    <Maximize2 className="w-3 h-3" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Workbench canvas with independent scrolling */}
-              <div className="w-full flex-1 bg-slate-200/80 p-3 sm:p-5 rounded-b-xl border border-slate-200 overflow-auto flex justify-center shadow-inner">
-                <div
-                  style={{
-                    transform: `scale(${zoomLevel})`,
-                    transformOrigin: 'top center',
-                    transition: 'transform 0.15s ease-out',
-                  }}
-                >
-                  <InvoicePreview ref={previewRef} data={invoiceData} />
-                </div>
-              </div>
+            <div className="lg:col-span-6 h-auto lg:h-[calc(100vh-84px)] lg:sticky lg:top-[68px] flex flex-col">
+              {renderPreviewCanvas(true)}
             </div>
           </div>
         )}
 
         {/* EDITOR ONLY VIEW */}
         {viewMode === 'editor' && (
-          <div className="max-w-6xl w-full mx-auto flex-1 min-h-[calc(100vh-100px)]">
+          <div className="max-w-5xl w-full mx-auto flex-1 min-h-[calc(100vh-120px)]">
             <InvoiceForm
               data={invoiceData}
               onChange={setInvoiceData}
@@ -427,60 +553,62 @@ export const App: React.FC = () => {
 
         {/* PREVIEW ONLY VIEW */}
         {viewMode === 'preview' && (
-          <div className="flex flex-col items-center w-full">
-            {/* Toolbar */}
-            <div className="no-print w-full max-w-[210mm] flex items-center justify-between bg-white px-4 py-2 rounded-t-xl border border-slate-200 border-b-0 shadow-2xs mb-0">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span className="text-xs font-bold text-slate-800">
-                  Full Page A4 Preview
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-0.5 border border-slate-200">
-                  <button
-                    type="button"
-                    onClick={() => setZoomLevel((z) => Math.max(0.6, z - 0.08))}
-                    className="p-1 hover:bg-white rounded text-slate-600 transition"
-                  >
-                    <ZoomOut className="w-3.5 h-3.5" />
-                  </button>
-                  <span className="text-[11px] font-mono text-slate-700 px-1.5 min-w-[42px] text-center font-bold">
-                    {Math.round(zoomLevel * 100)}%
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setZoomLevel((z) => Math.min(1.4, z + 0.08))}
-                    className="p-1 hover:bg-white rounded text-slate-600 transition"
-                  >
-                    <ZoomIn className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setZoomLevel(1)}
-                    className="p-1 hover:bg-white rounded text-slate-600 transition"
-                  >
-                    <Maximize2 className="w-3 h-3" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="w-full bg-slate-200/70 p-4 sm:p-8 rounded-b-xl border border-slate-200 overflow-x-auto flex justify-center shadow-inner min-h-[850px]">
-              <div
-                style={{
-                  transform: `scale(${zoomLevel})`,
-                  transformOrigin: 'top center',
-                  transition: 'transform 0.15s ease-out',
-                }}
-              >
-                <InvoicePreview ref={previewRef} data={invoiceData} />
-              </div>
-            </div>
+          <div className="max-w-5xl w-full mx-auto flex-1 flex flex-col items-center">
+            {renderPreviewCanvas(false)}
           </div>
         )}
       </main>
+
+      {/* ================= MOBILE STICKY BOTTOM ACTION BAR (VISIBLE ON SCREENS < 1024px) ================= */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2 shadow-lg flex items-center justify-between gap-3">
+        <div className="flex flex-col min-w-0">
+          <span className="text-[10px] text-slate-500 font-medium">Total Amount:</span>
+          <span className="text-sm font-extrabold text-indigo-700 truncate">
+            ₹ {formatIndianCurrency(totalAmount)}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {viewMode === 'editor' ? (
+            <button
+              type="button"
+              onClick={() => {
+                setViewMode('preview');
+                // Auto adjust zoom for preview
+                handleFitScreen();
+              }}
+              className="px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 flex items-center gap-1.5 shadow-2xs hover:bg-indigo-100 transition cursor-pointer active:scale-95"
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span>Preview A4</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setViewMode('editor')}
+              className="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 border border-slate-200 text-slate-700 flex items-center gap-1.5 shadow-2xs hover:bg-slate-200 transition cursor-pointer active:scale-95"
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>Back to Edit</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => handleDownloadPdf('download')}
+            disabled={isGeneratingPdf}
+            className="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1.5 shadow-sm transition disabled:opacity-50 cursor-pointer active:scale-95"
+          >
+            {isGeneratingPdf ? (
+              <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Download className="w-3.5 h-3.5" />
+            )}
+            <span>PDF</span>
+          </button>
+        </div>
+      </div>
 
       {/* Offscreen unscaled invoice container for 100% crisp, zero-transform PDF export */}
       <div

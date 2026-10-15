@@ -6,6 +6,18 @@
   body {
     @apply bg-slate-100 text-slate-800 antialiased;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent iOS Safari from auto-zooming inputs on focus when font-size < 16px */
+  @media (max-width: 768px) {
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
   }
 }
 

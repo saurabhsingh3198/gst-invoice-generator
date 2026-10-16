@@ -165,6 +165,17 @@ export const App: React.FC = () => {
         scrollX: 0,
         scrollY: 0,
         windowWidth: 794,
+        onclone: (clonedDoc) => {
+          const exportContainer = clonedDoc.getElementById('invoice-export-container');
+          if (exportContainer) {
+            exportContainer.style.setProperty('position', 'fixed', 'important');
+            exportContainer.style.setProperty('left', '0px', 'important');
+            exportContainer.style.setProperty('top', '0px', 'important');
+            exportContainer.style.setProperty('visibility', 'visible', 'important');
+            exportContainer.style.setProperty('opacity', '1', 'important');
+            exportContainer.style.setProperty('z-index', '9999', 'important');
+          }
+        },
       });
 
       const imgData = canvas.toDataURL('image/jpeg', 0.95);
@@ -448,7 +459,7 @@ export const App: React.FC = () => {
 
         {/* Scrollable canvas container with bulletproof centered scale wrapper */}
         <div
-          className={`w-full flex-1 bg-slate-200/80 p-2 sm:p-5 rounded-b-xl border border-slate-200 overflow-auto flex flex-col items-center shadow-inner ${
+          className={`w-full flex-1 bg-slate-200 p-2 sm:p-5 rounded-b-xl border border-slate-200 overflow-auto flex flex-col items-center shadow-inner ${
             isSplitLayout ? '' : 'min-h-[500px] sm:min-h-[850px]'
           }`}
         >
@@ -483,7 +494,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100/90 flex flex-col text-slate-800 font-sans pb-16 lg:pb-0">
+    <div className="min-h-screen bg-slate-100 flex flex-col text-slate-800 font-sans pb-16 lg:pb-0">
       {/* ================= TOP RESPONSIVE HEADER ================= */}
       <header className="no-print sticky top-0 z-40 bg-white border-b border-slate-200 shadow-2xs">
         <div className="max-w-[1780px] mx-auto px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-4">
@@ -663,8 +674,8 @@ export const App: React.FC = () => {
         </div>
 
         {/* ================= MOBILE VIEW SWITCHER (VISIBLE ON SCREENS < 1024px) ================= */}
-        <div className="lg:hidden border-t border-slate-200 bg-slate-50/90 px-3 py-1.5 flex items-center justify-center gap-2">
-          <div className="w-full max-w-md grid grid-cols-2 bg-slate-200/80 p-0.5 rounded-lg text-xs font-semibold">
+        <div className="lg:hidden border-t border-slate-200 bg-slate-50 px-3 py-1.5 flex items-center justify-center gap-2">
+          <div className="w-full max-w-md grid grid-cols-2 bg-slate-200 p-0.5 rounded-lg text-xs font-semibold">
             <button
               type="button"
               onClick={() => setViewMode('editor')}
@@ -796,12 +807,13 @@ export const App: React.FC = () => {
         style={{
           position: 'fixed',
           top: 0,
-          left: 0,
+          left: '-9999px',
           width: '794px',
           backgroundColor: '#ffffff',
           zIndex: -9999,
           pointerEvents: 'none',
-          opacity: 1,
+          visibility: 'hidden',
+          opacity: 0,
         }}
         aria-hidden="true"
       >

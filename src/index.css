@@ -81,7 +81,18 @@
   }
 }
 
-/* Dedicated export container clean styling */
+/* Dedicated export container clean styling - off-screen and invisible during normal view */
+#invoice-export-container {
+  position: fixed !important;
+  left: -9999px !important;
+  top: 0 !important;
+  width: 794px !important;
+  z-index: -9999 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
 #invoice-export-container .invoice-a4-page {
   box-shadow: none !important;
 }

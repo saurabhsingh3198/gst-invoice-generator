@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import type { InvoiceData } from '../types/invoice';
 import {
   X,
@@ -44,6 +45,21 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
   const [records, setRecords] = useState<SavedInvoiceRecord[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [saveSuccessMessage, setSaveSuccessMessage] = useState<string>('');
+
+  // Handle escape key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   const loadRecordsFromStorage = (): SavedInvoiceRecord[] => {
     if (typeof window === 'undefined') return [];
@@ -168,9 +184,14 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
       r.invoiceDate.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[85vh] border border-slate-200 overflow-hidden">
+  const modalContent = (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[85vh] border border-slate-200 overflow-hidden relative z-[101]">
         {/* Header */}
         <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
           <div className="flex items-center gap-2.5">
@@ -331,4 +352,8 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(modalContent, document.body)
+    : modalContent;
 };

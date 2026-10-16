@@ -10,13 +10,23 @@ interface InvoicePreviewProps {
 
 export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
   ({ data }, ref) => {
+    // Tax breakdown calculation
+    const taxRows = getEffectiveTaxSummary(data);
+    const taxTotals = getTaxTotals(taxRows);
+    const isInterState = isInterStateTax(data);
+
     // Calculate total amount & optional Round Off
-    const rawTotal = data.items.reduce(
+    const itemsSubtotal = data.items.reduce(
       (sum, item) => sum + (Number(item.amount) || 0),
       0
     );
+    const isInclusive = data.pricingMode !== 'exclusive';
+    const rawTotal = isInclusive
+      ? itemsSubtotal
+      : itemsSubtotal + taxTotals.totalTaxAmount;
+
     const isRoundOffEnabled = data.enableRoundOff !== false;
-    const roundedTotal = isRoundOffEnabled ? Math.round(rawTotal) : rawTotal;
+    const roundedTotal = isRoundOffEnabled ? Math.round(rawTotal) : Math.round(rawTotal * 100) / 100;
     const roundOffDiff = isRoundOffEnabled ? Math.round((roundedTotal - rawTotal) * 100) / 100 : 0;
     const totalAmount = roundedTotal;
 
@@ -65,11 +75,6 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
     const amountInWords = data.customAmountInWords?.trim()
       ? data.customAmountInWords
       : numberToIndianWords(totalAmount);
-
-    // Tax breakdown calculation
-    const taxRows = getEffectiveTaxSummary(data);
-    const taxTotals = getTaxTotals(taxRows);
-    const isInterState = isInterStateTax(data);
 
     // Tax amount in words
     const taxAmountInWords = data.customTaxAmountInWords?.trim()
@@ -773,7 +778,7 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                     }}
                   >
                     <td
-                      colSpan={8}
+                      colSpan={9}
                       style={{
                         borderRight: '1px solid #000000',
                         textAlign: 'right',

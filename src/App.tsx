@@ -5,6 +5,7 @@ import { InvoicePreview } from './components/InvoicePreview';
 import { InvoiceForm } from './components/InvoiceForm';
 import { InvoiceHistoryModal } from './components/InvoiceHistoryModal';
 import { formatIndianCurrency } from './utils/numberToWords';
+import { getEffectiveTaxSummary, getTaxTotals } from './utils/taxCalculation';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import {
@@ -33,6 +34,23 @@ export const App: React.FC = () => {
         if (savedDraft) {
           const parsed = JSON.parse(savedDraft);
           if (parsed && parsed.seller && Array.isArray(parsed.items) && parsed.items.length > 0) {
+            // Clean up legacy hardcoded sample values if present so calculation is immediately dynamic
+            if (parsed.customAmountInWords === 'INR Thirty Nine Thousand Five Hundred Sixty Only') {
+              parsed.customAmountInWords = '';
+            }
+            if (
+              parsed.customTaxAmountInWords ===
+              'INR Six Thousand Thirty Four and Fifty Eight paise Only'
+            ) {
+              parsed.customTaxAmountInWords = '';
+            }
+            if (
+              parsed.taxMode === 'manual' &&
+              (parsed.taxSummary?.[0]?.taxableValue === 33525.4 || !parsed.taxSummary || parsed.taxSummary.length === 0)
+            ) {
+              parsed.taxMode = 'auto';
+              parsed.taxSummary = [];
+            }
             return parsed;
           }
         }
@@ -338,12 +356,18 @@ export const App: React.FC = () => {
     }
   };
 
-  const rawTotal = invoiceData.items.reduce(
+  const isInclusive = invoiceData.pricingMode !== 'exclusive';
+  const itemsSubtotal = invoiceData.items.reduce(
     (sum, item) => sum + (Number(item.amount) || 0),
     0
   );
+  const taxRows = getEffectiveTaxSummary(invoiceData);
+  const taxTotals = getTaxTotals(taxRows);
+  const rawTotal = isInclusive
+    ? itemsSubtotal
+    : itemsSubtotal + taxTotals.totalTaxAmount;
   const totalAmount =
-    invoiceData.enableRoundOff !== false ? Math.round(rawTotal) : rawTotal;
+    invoiceData.enableRoundOff !== false ? Math.round(rawTotal) : Math.round(rawTotal * 100) / 100;
 
   // Render Preview Canvas with mathematically precise scaling wrapper
   const renderPreviewCanvas = (isSplitLayout: boolean = false) => {

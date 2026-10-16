@@ -303,6 +303,17 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
       let calculated = q * current.rate;
       if (disc > 0) calculated -= (calculated * disc) / 100;
       current.amount = Math.round(calculated * 100) / 100;
+    } else if (key === 'amount') {
+      const amt = Number(val) || 0;
+      current.amount = amt;
+      const q = Number(current.quantity) || 0;
+      if (q > 0) {
+        current.rate = Math.round((amt / q) * 100) / 100;
+        if (gst > 0) {
+          const rInc = current.rate * (1 + gst / 100);
+          current.rateInclTax = (Math.round(rInc * 100) / 100).toFixed(2);
+        }
+      }
     }
 
     updated[index] = current;
@@ -312,7 +323,8 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
     });
   };
 
-  const totalAmount = data.items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+  const isInclusive = data.pricingMode !== 'exclusive';
+  const itemsSubtotal = data.items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
 
   const totalAltQtyNumber = data.items.reduce((acc, i) => {
     const m = (i.altQuantity || '').match(/([0-9.,]+)/);
@@ -335,6 +347,12 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
   const taxTotals = getTaxTotals(effectiveTaxRows);
   const isInterState = isInterStateTax(data);
 
+  const rawGrossTotal = isInclusive
+    ? itemsSubtotal
+    : itemsSubtotal + taxTotals.totalTaxAmount;
+  const isRoundOffEnabled = data.enableRoundOff !== false;
+  const totalAmount = isRoundOffEnabled ? Math.round(rawGrossTotal) : Math.round(rawGrossTotal * 100) / 100;
+
   const autoTaxWords = taxNumberToIndianWords(taxTotals.totalTaxAmount);
   const autoAmountWords = numberToIndianWords(totalAmount);
 
@@ -342,6 +360,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
     const computed = computeTaxSummaryFromItems(data);
     onChange({
       ...data,
+      taxMode: 'auto',
       taxSummary: computed,
     });
   };
@@ -1756,7 +1775,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <div className="grid grid-cols-2 gap-1.5 bg-slate-200/70 p-1 rounded-lg text-xs font-semibold">
                   <button
                     type="button"
-                    onClick={() => onChange({ ...data, taxMode: 'auto' })}
+                    onClick={() => onChange({ ...data, taxMode: 'auto', taxSummary: [] })}
                     className={`py-1.5 px-2 rounded-md transition cursor-pointer text-center ${
                       data.taxMode !== 'manual'
                         ? 'bg-white text-indigo-700 shadow-2xs font-bold'

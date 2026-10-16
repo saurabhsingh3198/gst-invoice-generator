@@ -37,7 +37,7 @@ export function computeTaxSummaryFromItems(data: InvoiceData): TaxSummaryItem[] 
   > = {};
 
   data.items.forEach((item) => {
-    const hsn = (item.hsnSac || '721420').trim();
+    const hsn = (item.hsnSac || '').trim();
     const amount = Number(item.amount) || 0;
     const gstRate = typeof item.gstRate === 'number' ? item.gstRate : defaultGst;
 
@@ -59,6 +59,24 @@ export function computeTaxSummaryFromItems(data: InvoiceData): TaxSummaryItem[] 
 
   const keys = Object.keys(groups);
   if (keys.length === 0) {
+    if (data.items.length > 0) {
+      const firstHsn = (data.items[0]?.hsnSac || '').trim();
+      const halfRate = Math.round((defaultGst / 2) * 100) / 100;
+      return [
+        {
+          id: '1',
+          hsnSac: firstHsn,
+          taxableValue: 0,
+          cgstRate: isInterState ? 0 : halfRate,
+          cgstAmount: 0,
+          sgstRate: isInterState ? 0 : halfRate,
+          sgstAmount: 0,
+          igstRate: isInterState ? defaultGst : 0,
+          igstAmount: 0,
+          totalTaxAmount: 0,
+        },
+      ];
+    }
     return [];
   }
 

@@ -443,24 +443,24 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200/90 flex flex-col h-full overflow-hidden">
-      {/* Top Header Card - Classic Executive Styling */}
-      <div className="bg-slate-900 text-white px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between border-b border-slate-800">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 shrink-0">
-            <Receipt className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col h-full overflow-hidden">
+      {/* Top Header Card - Executive Dark Aesthetic */}
+      <div className="bg-slate-900 text-white px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-b border-slate-800">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-xs shrink-0">
+            <Receipt className="w-4 h-4" />
           </div>
           <div>
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <h2 className="text-xs sm:text-sm font-bold text-white tracking-tight">
-                Invoice Editor
+            <div className="flex items-center gap-2">
+              <h2 className="text-xs sm:text-sm font-extrabold text-white tracking-tight">
+                Invoice Studio Editor
               </h2>
-              <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded font-semibold border border-emerald-500/30 flex items-center gap-1">
+              <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded-full font-bold border border-emerald-500/30 flex items-center gap-1 shadow-2xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 Live Sync
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 hidden xs:block sm:block">Tally A4 GST Tax Invoice Designer</p>
+            <p className="text-[10px] text-slate-400 hidden xs:block sm:block">Tally Exact GST Tax Invoice Designer</p>
           </div>
         </div>
 
@@ -468,41 +468,42 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
           <button
             type="button"
             onClick={onLoadSample}
-            className="px-2.5 py-1 text-[11px] font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg flex items-center gap-1 transition shadow-xs cursor-pointer active:scale-95"
-            title="Load sample invoice from photo"
+            className="px-2.5 sm:px-3 py-1 text-[11px] font-bold bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-400 hover:to-violet-500 text-white rounded-lg flex items-center gap-1 transition shadow-xs cursor-pointer active:scale-95"
+            title="Load sample invoice data"
           >
-            <Sparkles className="w-3 h-3 text-indigo-200" />
+            <Sparkles className="w-3 h-3 text-indigo-100" />
             <span>Sample</span>
           </button>
           <button
             type="button"
             onClick={onReset}
-            className="px-2.5 py-1 text-[11px] font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg flex items-center gap-1 transition border border-slate-700 cursor-pointer active:scale-95"
+            className="px-2.5 sm:px-3 py-1 text-[11px] font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg flex items-center gap-1 transition border border-slate-700 cursor-pointer active:scale-95"
             title="Clear all fields"
           >
-            <RotateCcw className="w-3 h-3" />
+            <RotateCcw className="w-3 h-3 text-slate-400" />
             <span>Reset</span>
           </button>
         </div>
       </div>
 
-      {/* Tabs Navigation Bar - Sleek, Classic, Perfectly Spaced */}
-      <div className="bg-slate-50 border-b border-slate-200 px-1.5 sm:px-2 py-1 flex items-center gap-1 overflow-x-auto text-xs no-scrollbar">
+      {/* Tabs Navigation Bar - Smart Semantic Color Accents */}
+      <div className="bg-slate-50/90 border-b border-slate-200/90 px-2 py-1.5 flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar">
+        {/* Items Tab - Indigo */}
         <button
           type="button"
           onClick={() => setActiveTab('items')}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'items'
-              ? 'bg-white text-indigo-700 shadow-2xs border border-slate-200 font-bold'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-indigo-50/90 text-indigo-700 border-indigo-200 shadow-2xs font-bold'
+              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
-          <Package className="w-3.5 h-3.5 shrink-0" />
+          <Package className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'items' ? 'text-indigo-600' : 'text-slate-400'}`} />
           <span>Items</span>
           <span
             className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold leading-none ${
               activeTab === 'items'
-                ? 'bg-indigo-100 text-indigo-700'
+                ? 'bg-indigo-600 text-white'
                 : 'bg-slate-200 text-slate-600'
             }`}
           >
@@ -510,71 +511,76 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
           </span>
         </button>
 
+        {/* Seller Tab - Emerald */}
         <button
           type="button"
           onClick={() => setActiveTab('seller')}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'seller'
-              ? 'bg-white text-indigo-700 shadow-2xs border border-slate-200 font-bold'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-emerald-50 text-emerald-800 border-emerald-200 shadow-2xs font-bold'
+              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
-          <Building2 className="w-3.5 h-3.5 shrink-0" />
+          <Building2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'seller' ? 'text-emerald-600' : 'text-slate-400'}`} />
           <span>Seller</span>
         </button>
 
+        {/* Buyer Tab - Sky */}
         <button
           type="button"
           onClick={() => setActiveTab('parties')}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'parties'
-              ? 'bg-white text-indigo-700 shadow-2xs border border-slate-200 font-bold'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-sky-50 text-sky-800 border-sky-200 shadow-2xs font-bold'
+              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
-          <Users className="w-3.5 h-3.5 shrink-0" />
+          <Users className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'parties' ? 'text-sky-600' : 'text-slate-400'}`} />
           <span>Buyer</span>
         </button>
 
+        {/* Dispatch Tab - Amber */}
         <button
           type="button"
           onClick={() => setActiveTab('dispatch')}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'dispatch'
-              ? 'bg-white text-indigo-700 shadow-2xs border border-slate-200 font-bold'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-amber-50 text-amber-800 border-amber-200 shadow-2xs font-bold'
+              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
-          <Truck className="w-3.5 h-3.5 shrink-0" />
+          <Truck className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'dispatch' ? 'text-amber-600' : 'text-slate-400'}`} />
           <span>Dispatch</span>
         </button>
 
+        {/* Tax Tab - Purple */}
         <button
           type="button"
           onClick={() => setActiveTab('tax')}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'tax'
-              ? 'bg-white text-indigo-700 shadow-2xs border border-slate-200 font-bold'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-purple-50 text-purple-800 border-purple-200 shadow-2xs font-bold'
+              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
-          <Percent className="w-3.5 h-3.5 shrink-0" />
+          <Percent className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'tax' ? 'text-purple-600' : 'text-slate-400'}`} />
           <span>Tax & GST</span>
           {data.showTaxSummary && (
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Tax Table Active"></span>
           )}
         </button>
 
+        {/* Settings Tab - Slate */}
         <button
           type="button"
           onClick={() => setActiveTab('settings')}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'settings'
-              ? 'bg-white text-indigo-700 shadow-2xs border border-slate-200 font-bold'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-slate-100 text-slate-900 border-slate-300 shadow-2xs font-bold'
+              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
-          <Settings className="w-3.5 h-3.5 shrink-0" />
+          <Settings className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'settings' ? 'text-slate-700' : 'text-slate-400'}`} />
           <span>Settings</span>
         </button>
       </div>
@@ -584,16 +590,16 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
         {/* ================= 1. LINE ITEMS TAB ================= */}
         {activeTab === 'items' && (
           <div className="space-y-3">
-            {/* Classic Action Bar: Zero Jagged Wrapping, Perfectly Symmetrical */}
+            {/* Classic Action Bar: Zero Jagged Wrapping, Symmetrical & Sleek */}
             <div className="bg-slate-50/90 p-2.5 sm:p-3 rounded-xl border border-slate-200/90 shadow-2xs space-y-2.5 sm:space-y-0 sm:flex sm:items-center sm:justify-between gap-3">
               {/* Row 1 on mobile, Left on desktop */}
               <div className="flex items-center justify-between sm:justify-start gap-2.5">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
-                  <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                  <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
                     Product Items
                   </h3>
-                  <span className="text-[10px] font-extrabold text-slate-600 bg-slate-200/80 px-1.5 py-0.2 rounded-full">
+                  <span className="text-[10px] font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200/70">
                     {data.items.length}
                   </span>
                 </div>
@@ -634,7 +640,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowProductMaster(true)}
-                  className="px-2.5 py-1.5 text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95"
+                  className="px-2.5 py-1.5 text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95 shadow-2xs"
                   title="Choose from saved Product Library"
                 >
                   <Package className="w-3.5 h-3.5 text-indigo-600" />
@@ -643,7 +649,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowAdvancedColumns(!showAdvancedColumns)}
-                  className={`px-2.5 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer text-center flex items-center justify-center gap-1 ${
+                  className={`px-2.5 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer text-center flex items-center justify-center gap-1 shadow-2xs ${
                     showAdvancedColumns
                       ? 'bg-indigo-50 border-indigo-300 text-indigo-700 font-bold'
                       : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
@@ -655,7 +661,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <button
                   type="button"
                   onClick={addItem}
-                  className="px-3 py-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer active:scale-95"
+                  className="px-3 py-1.5 text-xs font-bold bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-lg flex items-center justify-center gap-1.5 shadow-sm shadow-indigo-600/25 transition cursor-pointer active:scale-95"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add Item</span>

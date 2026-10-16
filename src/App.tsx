@@ -400,46 +400,50 @@ export const App: React.FC = () => {
 
     return (
       <div className="w-full h-full flex flex-col">
-        {/* Preview Toolbar */}
-        <div className="no-print w-full flex items-center justify-between bg-white px-3 sm:px-4 py-2 rounded-t-xl border border-slate-200 border-b-0 shadow-2xs shrink-0">
+        {/* Preview Toolbar - Studio Grade Glassmorphism */}
+        <div className="no-print w-full flex items-center justify-between bg-white/95 backdrop-blur-md px-3.5 sm:px-4 py-2.5 rounded-t-2xl border border-slate-200/90 border-b-0 shadow-2xs shrink-0">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-xs font-bold text-slate-800">
-              A4 Proof
-            </span>
-            <span className="text-[11px] text-slate-400 hidden sm:inline">
-              (Vector Exact)
-            </span>
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-xs shadow-emerald-500/50"></span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs sm:text-sm font-extrabold text-slate-800 tracking-tight">
+                A4 Document Studio
+              </span>
+              <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full hidden sm:inline border border-slate-200/70">
+                210 × 297 mm • Vector Exact
+              </span>
+            </div>
           </div>
 
-          {/* Zoom controls */}
-          <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-0.5 border border-slate-200">
+          {/* Zoom controls - Pill Segmented Stepper */}
+          <div className="flex items-center gap-1 bg-slate-100/90 rounded-xl p-1 border border-slate-200/80 shadow-2xs">
             <button
               type="button"
               onClick={() => setZoomLevel((z) => Math.max(0.35, Math.round((z - 0.08) * 100) / 100))}
-              className="p-1 hover:bg-white rounded text-slate-600 transition cursor-pointer"
+              className="p-1 sm:p-1.5 hover:bg-white rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer active:scale-90"
               title="Zoom Out"
             >
               <ZoomOut className="w-3.5 h-3.5" />
             </button>
 
-            <span className="text-[11px] font-mono text-slate-700 px-1 min-w-[38px] text-center font-bold">
+            <span className="text-[11px] font-mono font-bold text-slate-800 px-1.5 min-w-[42px] text-center">
               {Math.round(zoomLevel * 100)}%
             </span>
 
             <button
               type="button"
               onClick={() => setZoomLevel((z) => Math.min(1.4, Math.round((z + 0.08) * 100) / 100))}
-              className="p-1 hover:bg-white rounded text-slate-600 transition cursor-pointer"
+              className="p-1 sm:p-1.5 hover:bg-white rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer active:scale-90"
               title="Zoom In"
             >
               <ZoomIn className="w-3.5 h-3.5" />
             </button>
 
+            <div className="h-3 w-px bg-slate-300 mx-0.5"></div>
+
             <button
               type="button"
               onClick={handleFitScreen}
-              className="px-1.5 py-0.5 hover:bg-white rounded text-slate-700 text-[10px] font-bold transition flex items-center gap-1 border border-slate-200/80 bg-slate-50 cursor-pointer"
+              className="px-2 py-1 hover:bg-white rounded-lg text-indigo-700 text-[10px] font-bold transition flex items-center gap-1 border border-indigo-100 bg-white shadow-2xs cursor-pointer active:scale-95"
               title="Fit to Screen"
             >
               <Maximize2 className="w-3 h-3 text-indigo-600" />
@@ -449,7 +453,7 @@ export const App: React.FC = () => {
             <button
               type="button"
               onClick={() => setZoomLevel(1.0)}
-              className="hidden sm:inline-block px-1.5 py-0.5 hover:bg-white rounded text-slate-600 text-[10px] font-medium transition cursor-pointer"
+              className="hidden sm:inline-block px-2 py-1 hover:bg-white rounded-lg text-slate-600 hover:text-slate-900 text-[10px] font-semibold transition cursor-pointer active:scale-95"
               title="Actual 100% Size"
             >
               100%
@@ -457,13 +461,13 @@ export const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Scrollable canvas container with bulletproof centered scale wrapper */}
+        {/* Scrollable canvas container with bulletproof centered scale wrapper & Studio Canvas */}
         <div
-          className={`w-full flex-1 bg-slate-200 p-2 sm:p-5 rounded-b-xl border border-slate-200 overflow-auto flex flex-col items-center shadow-inner ${
-            isSplitLayout ? '' : 'min-h-[500px] sm:min-h-[850px]'
+          className={`w-full flex-1 bg-studio-canvas p-3 sm:p-6 rounded-b-2xl border border-slate-200/90 overflow-auto flex flex-col items-center shadow-inner ${
+            isSplitLayout ? '' : 'min-h-[520px] sm:min-h-[880px]'
           }`}
         >
-          {/* Scaled bounding container that eliminates the CSS transform offset bug */}
+          {/* Scaled bounding container with realistic paper shadow */}
           <div
             style={{
               width: `${scaledWidth}px`,
@@ -471,8 +475,8 @@ export const App: React.FC = () => {
               position: 'relative',
               margin: '0 auto',
               flexShrink: 0,
-              boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
             }}
+            className="shadow-paper rounded-[2px] transition-shadow duration-300"
           >
             <div
               style={{
@@ -496,19 +500,19 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col text-slate-800 font-sans pb-16 lg:pb-0">
       {/* ================= TOP RESPONSIVE HEADER ================= */}
-      <header className="no-print sticky top-0 z-40 bg-white border-b border-slate-200 shadow-2xs">
+      <header className="no-print sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
         <div className="max-w-[1780px] mx-auto px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-4">
-          {/* Brand - Perfectly single line with whitespace-nowrap */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-indigo-400 shadow-sm shrink-0">
-              <FileSpreadsheet className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-400" />
+          {/* Brand Logo & Name */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-violet-700 flex items-center justify-center text-white shadow-md shadow-indigo-600/25 shrink-0">
+              <FileSpreadsheet className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base tracking-tight text-slate-900 whitespace-nowrap">
+              <span className="font-extrabold text-sm sm:text-base tracking-tight text-slate-900 whitespace-nowrap">
                 GST Invoice Studio
               </span>
-              <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
-                A4
+              <span className="text-[9px] sm:text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 border border-emerald-200/80 shrink-0 shadow-2xs">
+                Tally A4
               </span>
               {isOffline && (
                 <span
@@ -523,17 +527,17 @@ export const App: React.FC = () => {
           </div>
 
           {/* Quick Metrics Badge (Desktop / Tablet >= 768px) */}
-          <div className="hidden md:flex items-center gap-3 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 text-xs">
+          <div className="hidden md:flex items-center gap-3 bg-slate-50/90 px-3.5 py-1.5 rounded-xl border border-slate-200/80 text-xs shadow-2xs">
             <div>
               <span className="text-slate-400 font-medium">Inv: </span>
-              <span className="font-bold text-slate-800">
+              <span className="font-mono font-bold text-slate-900">
                 #{invoiceData.dispatch.invoiceNo || '—'}
               </span>
             </div>
             <div className="h-3 w-px bg-slate-300"></div>
             <div>
               <span className="text-slate-400 font-medium">Items: </span>
-              <span className="font-bold text-slate-800">{invoiceData.items.length}</span>
+              <span className="font-bold text-slate-900">{invoiceData.items.length}</span>
             </div>
             <div className="h-3 w-px bg-slate-300"></div>
             <div>
@@ -544,8 +548,8 @@ export const App: React.FC = () => {
             </div>
             <div className="h-3 w-px bg-slate-300"></div>
             <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 font-semibold" title="Changes auto-saved to browser storage">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="hidden xl:inline">Auto-Saved</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="hidden xl:inline font-bold">Auto-Saved</span>
             </div>
           </div>
 
@@ -556,15 +560,15 @@ export const App: React.FC = () => {
               id="btn-install-app"
               type="button"
               onClick={installApp}
-              className={`p-1.5 sm:px-2.5 sm:py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95 ${
+              className={`p-1.5 sm:px-3 sm:py-1.5 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95 ${
                 isInstallable
-                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white font-bold animate-pulse'
-                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300'
+                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white font-bold animate-pulse shadow-emerald-600/30'
+                  : 'bg-slate-100/90 hover:bg-slate-200 text-slate-700 border border-slate-300/80'
               }`}
               title="Install GST Invoice Studio App on this device for 100% offline billing"
             >
               <DownloadCloud className={`w-3.5 h-3.5 ${isInstallable ? 'text-white' : 'text-slate-600'}`} />
-              <span className="hidden sm:inline">Install App</span>
+              <span className="hidden sm:inline">Install</span>
             </button>
 
             {/* History Button */}
@@ -572,21 +576,21 @@ export const App: React.FC = () => {
               id="btn-invoice-history"
               type="button"
               onClick={() => setIsHistoryModalOpen(true)}
-              className="p-1.5 sm:px-3 sm:py-1.5 text-xs font-semibold rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 flex items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95"
+              className="p-1.5 sm:px-3 sm:py-1.5 text-xs font-semibold rounded-xl bg-indigo-50/80 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 flex items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95"
               title="Open Invoice History & Backups"
             >
               <History className="w-3.5 h-3.5 text-indigo-600" />
               <span className="hidden sm:inline">History</span>
             </button>
 
-            {/* Desktop View Mode Toggle (Hidden on mobile, mobile has top segmented bar) */}
-            <div className="hidden lg:flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-medium">
+            {/* Desktop View Mode Toggle */}
+            <div className="hidden lg:flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 text-xs font-medium shadow-2xs">
               <button
                 type="button"
                 onClick={() => setViewMode('split')}
-                className={`px-2.5 py-1 rounded-md flex items-center gap-1.5 transition cursor-pointer ${
+                className={`px-3 py-1 rounded-lg flex items-center gap-1.5 transition cursor-pointer ${
                   viewMode === 'split'
-                    ? 'bg-white text-indigo-700 shadow-xs font-semibold'
+                    ? 'bg-white text-indigo-700 shadow-xs font-bold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
                 title="Split View: Side-by-side Editor & Preview"
@@ -597,9 +601,9 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setViewMode('editor')}
-                className={`px-2.5 py-1 rounded-md flex items-center gap-1.5 transition cursor-pointer ${
+                className={`px-3 py-1 rounded-lg flex items-center gap-1.5 transition cursor-pointer ${
                   viewMode === 'editor'
-                    ? 'bg-white text-indigo-700 shadow-xs font-semibold'
+                    ? 'bg-white text-indigo-700 shadow-xs font-bold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
                 title="Editor Only"
@@ -610,9 +614,9 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setViewMode('preview')}
-                className={`px-2.5 py-1 rounded-md flex items-center gap-1.5 transition cursor-pointer ${
+                className={`px-3 py-1 rounded-lg flex items-center gap-1.5 transition cursor-pointer ${
                   viewMode === 'preview'
-                    ? 'bg-white text-indigo-700 shadow-xs font-semibold'
+                    ? 'bg-white text-indigo-700 shadow-xs font-bold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
                 title="Preview Only"
@@ -627,10 +631,10 @@ export const App: React.FC = () => {
               id="btn-print-invoice"
               type="button"
               onClick={handlePrint}
-              className="p-1.5 sm:px-3 sm:py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-900 text-white flex items-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95"
-              title="Print directly or save as PDF"
+              className="p-1.5 sm:px-3 sm:py-1.5 text-xs font-semibold rounded-xl bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95"
+              title="Print directly or save as PDF via browser"
             >
-              <Printer className="w-3.5 h-3.5" />
+              <Printer className="w-3.5 h-3.5 text-slate-300" />
               <span className="hidden sm:inline">Print</span>
             </button>
 
@@ -640,7 +644,7 @@ export const App: React.FC = () => {
               type="button"
               onClick={() => handleDownloadPdf('open')}
               disabled={isGeneratingPdf}
-              className="hidden sm:flex px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 items-center gap-1.5 border border-slate-300 transition shadow-xs disabled:opacity-50 cursor-pointer active:scale-95"
+              className="hidden sm:flex px-2.5 py-1.5 text-xs font-semibold rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 items-center gap-1.5 border border-slate-200/90 transition shadow-2xs disabled:opacity-50 cursor-pointer active:scale-95"
               title="Open generated PDF in new tab"
             >
               <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
@@ -653,7 +657,7 @@ export const App: React.FC = () => {
               type="button"
               onClick={() => handleDownloadPdf('download')}
               disabled={isGeneratingPdf}
-              className="px-2.5 sm:px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1.5 shadow-sm transition disabled:opacity-50 cursor-pointer active:scale-95"
+              className="px-3 sm:px-4 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white flex items-center gap-1.5 shadow-md shadow-indigo-600/25 hover:shadow-indigo-600/35 transition disabled:opacity-50 cursor-pointer active:scale-95"
               title="Download PDF"
             >
               {isGeneratingPdf ? (
@@ -674,12 +678,12 @@ export const App: React.FC = () => {
         </div>
 
         {/* ================= MOBILE VIEW SWITCHER (VISIBLE ON SCREENS < 1024px) ================= */}
-        <div className="lg:hidden border-t border-slate-200 bg-slate-50 px-3 py-1.5 flex items-center justify-center gap-2">
-          <div className="w-full max-w-md grid grid-cols-2 bg-slate-200 p-0.5 rounded-lg text-xs font-semibold">
+        <div className="lg:hidden border-t border-slate-200/80 bg-slate-50/95 px-3 py-1.5 flex items-center justify-center gap-2">
+          <div className="w-full max-w-md grid grid-cols-2 bg-slate-200/80 p-0.5 rounded-xl text-xs font-semibold shadow-inner">
             <button
               type="button"
               onClick={() => setViewMode('editor')}
-              className={`py-1.5 rounded-md flex items-center justify-center gap-1.5 transition cursor-pointer ${
+              className={`py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${
                 viewMode === 'editor'
                   ? 'bg-white text-indigo-700 shadow-xs font-bold'
                   : 'text-slate-600 hover:text-slate-900'
@@ -687,7 +691,7 @@ export const App: React.FC = () => {
             >
               <Edit3 className="w-3.5 h-3.5" />
               <span>Edit Invoice</span>
-              <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded-full">
+              <span className="text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.2 rounded-full font-bold">
                 {invoiceData.items.length}
               </span>
             </button>
@@ -695,7 +699,7 @@ export const App: React.FC = () => {
             <button
               type="button"
               onClick={() => setViewMode('preview')}
-              className={`py-1.5 rounded-md flex items-center justify-center gap-1.5 transition cursor-pointer ${
+              className={`py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${
                 viewMode === 'preview'
                   ? 'bg-white text-indigo-700 shadow-xs font-bold'
                   : 'text-slate-600 hover:text-slate-900'
@@ -751,10 +755,10 @@ export const App: React.FC = () => {
       </main>
 
       {/* ================= MOBILE STICKY BOTTOM ACTION BAR (VISIBLE ON SCREENS < 1024px) ================= */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2 shadow-lg flex items-center justify-between gap-3">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-3.5 py-2.5 shadow-xl flex items-center justify-between gap-3">
         <div className="flex flex-col min-w-0">
-          <span className="text-[10px] text-slate-500 font-medium">Total Amount:</span>
-          <span className="text-sm font-extrabold text-indigo-700 truncate">
+          <span className="text-[10px] text-slate-500 font-semibold tracking-wide uppercase">Gross Total</span>
+          <span className="text-base font-extrabold text-indigo-700 truncate">
             ₹ {formatIndianCurrency(totalAmount)}
           </span>
         </div>
@@ -765,23 +769,22 @@ export const App: React.FC = () => {
               type="button"
               onClick={() => {
                 setViewMode('preview');
-                // Auto adjust zoom for preview
                 handleFitScreen();
               }}
-              className="px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 flex items-center gap-1.5 shadow-2xs hover:bg-indigo-100 transition cursor-pointer active:scale-95"
+              className="px-3.5 py-2 text-xs font-bold rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 flex items-center gap-1.5 shadow-2xs hover:bg-indigo-100 transition cursor-pointer active:scale-95"
             >
               <Eye className="w-3.5 h-3.5" />
-              <span>Preview A4</span>
+              <span>A4 Proof</span>
               <ArrowRight className="w-3 h-3" />
             </button>
           ) : (
             <button
               type="button"
               onClick={() => setViewMode('editor')}
-              className="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 border border-slate-200 text-slate-700 flex items-center gap-1.5 shadow-2xs hover:bg-slate-200 transition cursor-pointer active:scale-95"
+              className="px-3.5 py-2 text-xs font-bold rounded-xl bg-slate-100 border border-slate-200 text-slate-700 flex items-center gap-1.5 shadow-2xs hover:bg-slate-200 transition cursor-pointer active:scale-95"
             >
               <Edit3 className="w-3.5 h-3.5" />
-              <span>Back to Edit</span>
+              <span>Edit Form</span>
             </button>
           )}
 
@@ -789,7 +792,7 @@ export const App: React.FC = () => {
             type="button"
             onClick={() => handleDownloadPdf('download')}
             disabled={isGeneratingPdf}
-            className="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1.5 shadow-sm transition disabled:opacity-50 cursor-pointer active:scale-95"
+            className="px-4 py-2 text-xs font-extrabold rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white flex items-center gap-1.5 shadow-md shadow-indigo-600/30 transition disabled:opacity-50 cursor-pointer active:scale-95"
           >
             {isGeneratingPdf ? (
               <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />

@@ -159,33 +159,44 @@ export const App: React.FC = () => {
       // Fit into single exact A4 page
       pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
 
-      // Generate binary array buffer and wrap into explicit application/pdf Blob
-      const pdfArrayBuffer = pdf.output('arraybuffer');
-      const pdfBlob = new Blob([pdfArrayBuffer], { type: 'application/pdf' });
-      const blobUrl = URL.createObjectURL(pdfBlob);
-
       if (action === 'open') {
+        const pdfBlob = pdf.output('blob');
+        const blobUrl = URL.createObjectURL(pdfBlob);
         window.open(blobUrl, '_blank');
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 120000);
       } else {
-        // Direct reliable download via DOM-appended anchor
-        // Note: Browsers (Chrome, Edge, Firefox) REQUIRE the anchor element to be in the DOM
-        // for the download attribute and filename extension to be properly respected.
-        const link = document.createElement('a');
-        link.style.display = 'none';
-        link.href = blobUrl;
-        link.download = fileName;
-        link.setAttribute('download', fileName);
-        link.setAttribute('type', 'application/pdf');
-        document.body.appendChild(link);
+        // Direct reliable download: Use jsPDF's built-in save method with multi-layer fallback
+        try {
+          pdf.save(fileName);
+        } catch (saveErr) {
+          console.warn('pdf.save failed, falling back to manual anchor download', saveErr);
+          const pdfBlob = pdf.output('blob');
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = fileName;
+          link.setAttribute('download', fileName);
+          // Never use display: 'none' as Chromium drops programmatic clicks on unrendered nodes
+          link.style.position = 'fixed';
+          link.style.top = '-9999px';
+          link.style.left = '-9999px';
+          link.style.opacity = '0';
+          document.body.appendChild(link);
 
-        link.click();
+          const clickEvt = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          });
+          link.dispatchEvent(clickEvt);
 
-        setTimeout(() => {
-          if (link.parentNode) {
-            link.parentNode.removeChild(link);
-          }
-          URL.revokeObjectURL(blobUrl);
-        }, 3000);
+          setTimeout(() => {
+            if (link.parentNode) {
+              link.parentNode.removeChild(link);
+            }
+            URL.revokeObjectURL(blobUrl);
+          }, 60000);
+        }
       }
 
       setDownloadSuccess(true);

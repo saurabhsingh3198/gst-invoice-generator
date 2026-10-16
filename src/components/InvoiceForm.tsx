@@ -1725,20 +1725,20 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
 
         {/* ================= 5. TAX & GST TAB ================= */}
         {activeTab === 'tax' && (
-          <div className="space-y-4">
+          <div className="space-y-3.5 sm:space-y-4">
             {/* Main Header / Enable Tax Table Switch */}
-            <div className="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-3.5 sm:p-4 rounded-xl border border-slate-800 shadow-sm flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 shrink-0">
-                  <Percent className="w-5 h-5" />
+            <div className="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-3 sm:p-4 rounded-xl border border-slate-800 shadow-sm flex items-start sm:items-center justify-between gap-3">
+              <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 min-w-0">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 shrink-0 mt-0.5 sm:mt-0">
+                  <Percent className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-bold text-white tracking-tight">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <h3 className="text-xs sm:text-sm font-bold text-white tracking-tight">
                       HSN/SAC Tax Breakdown Table
                     </h3>
                     <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                      className={`text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
                         data.showTaxSummary
                           ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                           : 'bg-slate-700/60 text-slate-400 border border-slate-600'
@@ -1747,13 +1747,13 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       {data.showTaxSummary ? 'Active on Invoice' : 'Disabled'}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-300 mt-0.5">
+                  <p className="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-snug">
                     Renders CGST + SGST (or IGST) tax analysis table below items matching GST & Tally standards
                   </p>
                 </div>
               </div>
 
-              <label className="relative inline-flex items-center cursor-pointer shrink-0">
+              <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5 sm:mt-0" title="Toggle Tax Summary Table">
                 <input
                   type="checkbox"
                   id="toggle-show-tax-summary"
@@ -1761,22 +1761,22 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   onChange={(e) => onChange({ ...data, showTaxSummary: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                <div className="w-10 sm:w-11 h-5 sm:h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 sm:after:h-5 after:w-4 sm:after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
               </label>
             </div>
 
             {/* Quick Tax Settings Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
               {/* 1. Tax Calculation Mode */}
-              <div className="bg-slate-50/90 p-3 rounded-xl border border-slate-200 space-y-1.5">
-                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+              <div className="bg-slate-50/90 p-2.5 sm:p-3 rounded-xl border border-slate-200 space-y-1.5">
+                <label className="block text-[10px] sm:text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                   Calculation Mode
                 </label>
-                <div className="grid grid-cols-2 gap-1.5 bg-slate-200/70 p-1 rounded-lg text-xs font-semibold">
+                <div className="grid grid-cols-2 gap-1 bg-slate-200/70 p-1 rounded-lg text-xs font-semibold">
                   <button
                     type="button"
                     onClick={() => onChange({ ...data, taxMode: 'auto', taxSummary: [] })}
-                    className={`py-1.5 px-2 rounded-md transition cursor-pointer text-center ${
+                    className={`py-1.5 px-1.5 rounded-md transition cursor-pointer text-center text-[11px] sm:text-xs ${
                       data.taxMode !== 'manual'
                         ? 'bg-white text-indigo-700 shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
@@ -1787,7 +1787,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   <button
                     type="button"
                     onClick={() => onChange({ ...data, taxMode: 'manual', taxSummary: effectiveTaxRows })}
-                    className={`py-1.5 px-2 rounded-md transition cursor-pointer text-center ${
+                    className={`py-1.5 px-1.5 rounded-md transition cursor-pointer text-center text-[11px] sm:text-xs ${
                       data.taxMode === 'manual'
                         ? 'bg-white text-indigo-700 shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
@@ -1804,15 +1804,15 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               </div>
 
               {/* 2. Tax Structure (CGST+SGST vs IGST) */}
-              <div className="bg-slate-50/90 p-3 rounded-xl border border-slate-200 space-y-1.5">
-                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+              <div className="bg-slate-50/90 p-2.5 sm:p-3 rounded-xl border border-slate-200 space-y-1.5">
+                <label className="block text-[10px] sm:text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                   Tax Structure
                 </label>
                 <div className="grid grid-cols-3 gap-1 bg-slate-200/70 p-1 rounded-lg text-xs font-semibold">
                   <button
                     type="button"
                     onClick={() => onChange({ ...data, taxType: 'cgst_sgst' })}
-                    className={`py-1.5 px-1.5 rounded-md transition cursor-pointer text-center text-[11px] ${
+                    className={`py-1.5 px-1 rounded-md transition cursor-pointer text-center text-[10px] xs:text-[11px] truncate ${
                       data.taxType === 'cgst_sgst' || !data.taxType
                         ? 'bg-white text-indigo-700 shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
@@ -1824,7 +1824,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   <button
                     type="button"
                     onClick={() => onChange({ ...data, taxType: 'igst' })}
-                    className={`py-1.5 px-1.5 rounded-md transition cursor-pointer text-center text-[11px] ${
+                    className={`py-1.5 px-1 rounded-md transition cursor-pointer text-center text-[10px] xs:text-[11px] truncate ${
                       data.taxType === 'igst'
                         ? 'bg-white text-indigo-700 shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
@@ -1836,7 +1836,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   <button
                     type="button"
                     onClick={() => onChange({ ...data, taxType: 'auto' })}
-                    className={`py-1.5 px-1.5 rounded-md transition cursor-pointer text-center text-[11px] ${
+                    className={`py-1.5 px-1 rounded-md transition cursor-pointer text-center text-[10px] xs:text-[11px] truncate ${
                       data.taxType === 'auto'
                         ? 'bg-white text-indigo-700 shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
@@ -1847,20 +1847,20 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   </button>
                 </div>
                 <p className="text-[10px] text-slate-500">
-                  {isInterState ? 'Inter-state: Integrated Tax (IGST)' : 'Intra-state: CGST (9%) + SGST (9%) matching screenshot'}
+                  {isInterState ? 'Inter-state: Integrated Tax (IGST)' : 'Intra-state: CGST (9%) + SGST (9%)'}
                 </p>
               </div>
 
               {/* 3. Pricing Mode (Inclusive vs Exclusive) */}
-              <div className="bg-slate-50/90 p-3 rounded-xl border border-slate-200 space-y-1.5 sm:col-span-2 lg:col-span-1">
-                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+              <div className="bg-slate-50/90 p-2.5 sm:p-3 rounded-xl border border-slate-200 space-y-1.5 sm:col-span-2 lg:col-span-1">
+                <label className="block text-[10px] sm:text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                   Item Price Basis
                 </label>
-                <div className="grid grid-cols-2 gap-1.5 bg-slate-200/70 p-1 rounded-lg text-xs font-semibold">
+                <div className="grid grid-cols-2 gap-1 bg-slate-200/70 p-1 rounded-lg text-xs font-semibold">
                   <button
                     type="button"
                     onClick={() => onChange({ ...data, pricingMode: 'inclusive' })}
-                    className={`py-1.5 px-2 rounded-md transition cursor-pointer text-center ${
+                    className={`py-1.5 px-1.5 rounded-md transition cursor-pointer text-center text-[11px] sm:text-xs ${
                       data.pricingMode === 'inclusive' || !data.pricingMode
                         ? 'bg-white text-indigo-700 shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
@@ -1871,7 +1871,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   <button
                     type="button"
                     onClick={() => onChange({ ...data, pricingMode: 'exclusive' })}
-                    className={`py-1.5 px-2 rounded-md transition cursor-pointer text-center ${
+                    className={`py-1.5 px-1.5 rounded-md transition cursor-pointer text-center text-[11px] sm:text-xs ${
                       data.pricingMode === 'exclusive'
                         ? 'bg-white text-indigo-700 shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
@@ -1889,12 +1889,12 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
             </div>
 
             {/* Default GST Rate Quick Pills */}
-            <div className="bg-white p-3 rounded-xl border border-slate-200/90 flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-slate-700">Default GST Rate:</span>
-                <span className="text-[11px] text-slate-500">Applied to items without custom GST %</span>
+            <div className="bg-white p-3 rounded-xl border border-slate-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div className="space-y-0.5">
+                <span className="text-xs font-bold text-slate-700 block">Default GST Rate</span>
+                <span className="text-[11px] text-slate-500 block">Applied to items without custom GST %</span>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex flex-wrap items-center gap-1.5">
                 {[
                   { label: '18% (9+9)', val: 18 },
                   { label: '12% (6+6)', val: 12 },
@@ -1908,7 +1908,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onClick={() => onChange({ ...data, defaultGstRate: tier.val })}
                     className={`px-2.5 py-1 text-xs rounded-lg font-semibold transition cursor-pointer ${
                       (data.defaultGstRate ?? 18) === tier.val
-                        ? 'bg-indigo-600 text-white shadow-2xs'
+                        ? 'bg-indigo-600 text-white shadow-2xs font-bold'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
                     }`}
                   >
@@ -1920,9 +1920,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
 
             {/* HSN/SAC Tax Summary Table Card */}
             <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
-              <div className="bg-slate-50 px-3 sm:px-4 py-2.5 border-b border-slate-200 flex items-center justify-between gap-2">
+              <div className="bg-slate-50 px-3 sm:px-4 py-2.5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
+                  <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0"></span>
                   <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
                     HSN/SAC Breakdown Entries
                   </h4>
@@ -1931,46 +1931,52 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                   <button
                     type="button"
                     onClick={syncTaxFromItems}
-                    className="px-2.5 py-1 text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 rounded-lg border border-slate-300 flex items-center gap-1.5 transition cursor-pointer shadow-2xs active:scale-95"
+                    className="flex-1 sm:flex-initial px-2.5 py-1 text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 rounded-lg border border-slate-300 flex items-center justify-center gap-1.5 transition cursor-pointer shadow-2xs active:scale-95"
                     title="Recalculate summary live from items table"
                   >
-                    <RefreshCw className="w-3 h-3 text-indigo-600" />
+                    <RefreshCw className="w-3 h-3 text-indigo-600 shrink-0" />
                     <span>Sync from Items</span>
                   </button>
                   {data.taxMode === 'manual' && (
                     <button
                       type="button"
                       onClick={addTaxRow}
-                      className="px-2.5 py-1 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg flex items-center gap-1 transition cursor-pointer shadow-2xs active:scale-95"
+                      className="px-2.5 py-1 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg flex items-center justify-center gap-1 transition cursor-pointer shadow-2xs active:scale-95"
                     >
-                      <Plus className="w-3 h-3" />
+                      <Plus className="w-3 h-3 shrink-0" />
                       <span>Add HSN Row</span>
                     </button>
                   )}
                 </div>
               </div>
 
+              {/* Mobile Swipe Hint */}
+              <div className="sm:hidden px-3 py-1 bg-indigo-50/70 border-b border-indigo-100/60 text-[10px] text-indigo-700 flex items-center justify-between">
+                <span>Swipe table horizontally for all tax columns</span>
+                <span className="font-bold">⇄</span>
+              </div>
+
               {/* Table / Row List */}
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left border-collapse">
                   <thead>
-                    <tr className="bg-slate-100/90 text-slate-700 border-b border-slate-200 text-[11px] font-semibold">
-                      <th className="p-2 min-w-[90px]">HSN/SAC</th>
+                    <tr className="bg-slate-100/90 text-slate-700 border-b border-slate-200 text-[11px] font-semibold whitespace-nowrap">
+                      <th className="p-2 min-w-[85px]">HSN/SAC</th>
                       <th className="p-2 text-right min-w-[110px]">Taxable Value (₹)</th>
                       {isInterState ? (
                         <>
-                          <th className="p-2 text-center w-20">IGST Rate</th>
+                          <th className="p-2 text-center min-w-[70px]">IGST Rate</th>
                           <th className="p-2 text-right min-w-[95px]">IGST Amt (₹)</th>
                         </>
                       ) : (
                         <>
-                          <th className="p-2 text-center w-16">CGST %</th>
+                          <th className="p-2 text-center min-w-[65px]">CGST %</th>
                           <th className="p-2 text-right min-w-[95px]">CGST Amt (₹)</th>
-                          <th className="p-2 text-center w-16">SGST %</th>
+                          <th className="p-2 text-center min-w-[65px]">SGST %</th>
                           <th className="p-2 text-right min-w-[95px]">SGST Amt (₹)</th>
                         </>
                       )}
@@ -1978,7 +1984,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       {data.taxMode === 'manual' && <th className="p-2 w-10 text-center"></th>}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 whitespace-nowrap">
                     {effectiveTaxRows.map((row, idx) => (
                       <tr key={row.id || row.hsnSac || idx} className="hover:bg-slate-50/80 transition">
                         {/* HSN/SAC */}
@@ -2119,7 +2125,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
 
                   {/* Table Footer Totals */}
                   <tfoot>
-                    <tr className="bg-slate-50 border-t-2 border-slate-200 font-bold text-slate-900 text-xs">
+                    <tr className="bg-slate-50 border-t-2 border-slate-200 font-bold text-slate-900 text-xs whitespace-nowrap">
                       <td className="p-2 text-right uppercase">Total:</td>
                       <td className="p-2 text-right">₹ {formatIndianCurrency(taxTotals.totalTaxableValue)}</td>
                       {isInterState ? (
@@ -2145,12 +2151,43 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   </tfoot>
                 </table>
               </div>
+
+              {/* Mobile Quick Summary Card (visible on mobile < 640px) */}
+              <div className="sm:hidden bg-slate-50 p-3 border-t border-slate-200 space-y-2">
+                <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
+                  <span>Tax Summary At A Glance</span>
+                  <span className="text-indigo-700 font-mono font-extrabold">₹ {formatIndianCurrency(taxTotals.totalTaxAmount)} Tax</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="bg-white p-2 rounded-lg border border-slate-200">
+                    <span className="text-[10px] text-slate-500 block">Taxable Value</span>
+                    <span className="font-bold text-slate-800">₹ {formatIndianCurrency(taxTotals.totalTaxableValue)}</span>
+                  </div>
+                  {isInterState ? (
+                    <div className="bg-white p-2 rounded-lg border border-slate-200">
+                      <span className="text-[10px] text-slate-500 block">Total IGST</span>
+                      <span className="font-bold text-indigo-700">₹ {formatIndianCurrency(taxTotals.totalIgstAmount || taxTotals.totalTaxAmount)}</span>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="bg-white p-2 rounded-lg border border-slate-200">
+                        <span className="text-[10px] text-slate-500 block">CGST (9%)</span>
+                        <span className="font-bold text-indigo-700">₹ {formatIndianCurrency(taxTotals.totalCgstAmount)}</span>
+                      </div>
+                      <div className="bg-white p-2 rounded-lg border border-slate-200">
+                        <span className="text-[10px] text-slate-500 block">SGST (9%)</span>
+                        <span className="font-bold text-indigo-700">₹ {formatIndianCurrency(taxTotals.totalSgstAmount)}</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Round Off Setting */}
-            <div className="bg-slate-50/90 p-3 sm:p-4 rounded-xl border border-slate-200 flex items-center justify-between">
+            <div className="bg-slate-50/90 p-3 sm:p-4 rounded-xl border border-slate-200 flex items-start sm:items-center justify-between gap-3">
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <h4 className="text-xs font-bold text-slate-800">
                     Automatic Round Off (Round to Nearest ₹)
                   </h4>
@@ -2167,7 +2204,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 </p>
               </div>
 
-              <label className="relative inline-flex items-center cursor-pointer shrink-0">
+              <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5 sm:mt-0">
                 <input
                   type="checkbox"
                   checked={data.enableRoundOff !== false}
@@ -2185,7 +2222,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <label className="block text-xs font-bold text-slate-800">
                   Tax Amount (in words)
                 </label>
-                <div className="p-2 bg-white rounded-lg border border-slate-200 text-xs font-bold text-indigo-900">
+                <div className="p-2.5 bg-white rounded-lg border border-slate-200 text-xs font-bold text-indigo-900 break-words leading-relaxed">
                   {autoTaxWords}
                 </div>
                 <input
@@ -2205,7 +2242,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <label className="block text-xs font-bold text-slate-800">
                   Amount Chargeable (in words)
                 </label>
-                <div className="p-2 bg-white rounded-lg border border-slate-200 text-xs font-bold text-slate-800">
+                <div className="p-2.5 bg-white rounded-lg border border-slate-200 text-xs font-bold text-slate-800 break-words leading-relaxed">
                   {autoAmountWords}
                 </div>
                 <input

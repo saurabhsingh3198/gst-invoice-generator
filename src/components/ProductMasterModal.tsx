@@ -108,50 +108,50 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[85vh] border border-slate-200 overflow-hidden relative z-[101]">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[92vh] sm:max-h-[85vh] border border-slate-200 overflow-hidden relative z-[101]">
         {/* Header */}
-        <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-indigo-100 text-indigo-700 rounded-lg">
-              <Package className="w-5 h-5" />
+        <div className="px-3 sm:px-5 py-3 sm:py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 gap-2">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            <div className="p-1.5 sm:p-2 bg-indigo-100 text-indigo-700 rounded-lg shrink-0">
+              <Package className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <h3 className="font-bold text-slate-800 text-base">Product Master Library</h3>
-              <p className="text-xs text-slate-500">
-                Pick frequent items to instantly insert into your invoice with HSN, Unit & Rates
+            <div className="min-w-0">
+              <h3 className="font-bold text-slate-800 text-sm sm:text-base truncate">Product Master Library</h3>
+              <p className="text-[11px] sm:text-xs text-slate-500 hidden xs:block truncate">
+                Pick frequent items to instantly insert into your invoice
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200 transition"
+            className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200 transition shrink-0 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Action bar & Category Filter */}
-        <div className="p-4 border-b border-slate-100 space-y-3 bg-white">
-          <div className="flex items-center justify-between gap-3">
+        <div className="p-3 sm:p-4 border-b border-slate-100 space-y-2.5 bg-white">
+          <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-2">
             <div className="relative flex-1">
               <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search products by name or HSN code..."
+                placeholder="Search products or HSN..."
                 className="w-full text-xs pl-9 pr-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
               />
             </div>
 
             <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="px-3 py-2 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-lg flex items-center gap-1.5 transition border border-indigo-200 shrink-0 cursor-pointer active:scale-95"
+              className="px-3 py-2 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-lg flex items-center justify-center gap-1.5 transition border border-indigo-200 shrink-0 cursor-pointer active:scale-95"
             >
               <Plus className="w-4 h-4" />
               <span>{showAddForm ? 'Close Form' : 'New Product'}</span>
@@ -159,7 +159,7 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
           </div>
 
           {/* Categories */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -180,14 +180,14 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
         {showAddForm && (
           <form
             onSubmit={handleAddNewProduct}
-            className="p-4 bg-indigo-50/60 border-b border-indigo-100 space-y-3 animate-in slide-in-from-top-2"
+            className="p-3 sm:p-4 bg-indigo-50/60 border-b border-indigo-100 space-y-3 animate-in slide-in-from-top-2 overflow-y-auto max-h-[50vh]"
           >
             <div className="text-xs font-bold text-indigo-900 flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-indigo-600" />
               <span>Add New Product to Library</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-2.5">
               <div className="sm:col-span-2">
                 <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">
                   Description / Item Name
@@ -273,7 +273,7 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
                 />
               </div>
 
-              <div>
+              <div className="sm:col-span-2 md:col-span-1">
                 <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">
                   Category
                 </label>
@@ -287,17 +287,17 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-1">
+            <div className="flex items-center justify-end gap-2 pt-1">
               <button
                 type="button"
                 onClick={() => setShowAddForm(false)}
-                className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-200 rounded-lg transition"
+                className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-200 rounded-lg transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition shadow-xs"
+                className="px-4 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition shadow-xs cursor-pointer active:scale-95"
               >
                 Save to Library
               </button>
@@ -306,7 +306,7 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
         )}
 
         {/* Product Cards List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        <div className="flex-1 overflow-y-auto p-2.5 sm:p-4 space-y-2">
           {filtered.length === 0 ? (
             <div className="text-center py-10 text-slate-400 space-y-1">
               <Package className="w-8 h-8 mx-auto opacity-50" />
@@ -320,21 +320,22 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
                   onSelectItem(item);
                   onClose();
                 }}
-                className="group p-3 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/30 transition cursor-pointer flex items-center justify-between gap-3 bg-white"
+                className="group p-3 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/30 transition cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 bg-white"
               >
-                <div className="space-y-1 flex-1">
+                {/* Product Info (Top on Mobile, Left on Desktop) */}
+                <div className="space-y-1 flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition">
+                    <span className="text-xs sm:text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition break-words">
                       {item.description}
                     </span>
                     {item.category && (
-                      <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">
+                      <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium shrink-0">
                         {item.category}
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-3 text-[11px] text-slate-500">
+                  <div className="flex items-center gap-2 sm:gap-3 text-[11px] text-slate-500 flex-wrap">
                     <span className="font-mono">HSN: <strong className="text-slate-700">{item.hsnSac}</strong></span>
                     <span>•</span>
                     <span>Unit: <strong className="text-slate-700">{item.unit}</strong></span>
@@ -343,16 +344,17 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
                     {item.altQuantityDefault && (
                       <>
                         <span>•</span>
-                        <span>Alt: {item.altQuantityDefault}</span>
+                        <span className="truncate">Alt: {item.altQuantityDefault}</span>
                       </>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 shrink-0">
-                  <div className="text-right">
+                {/* Price & Actions (Bottom on Mobile, Right on Desktop) */}
+                <div className="flex items-center justify-between sm:justify-end gap-2.5 sm:gap-3 shrink-0 pt-2 sm:pt-0 border-t border-slate-100 sm:border-0">
+                  <div className="text-left sm:text-right">
                     <div className="text-xs font-bold text-slate-900 font-mono">
-                      ₹ {formatIndianCurrency(item.rate)} / {item.unit}
+                      ₹ {formatIndianCurrency(item.rate)} <span className="text-slate-500 font-normal">/ {item.unit}</span>
                     </div>
                     {item.rateInclTax && (
                       <div className="text-[10px] text-slate-400">
@@ -361,18 +363,21 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
                     )}
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={(e) => handleDelete(item.id, e)}
-                    className="p-1.5 text-slate-300 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
-                    title="Delete product"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={(e) => handleDelete(item.id, e)}
+                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                      title="Delete product"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
 
-                  <span className="px-2.5 py-1 text-xs bg-indigo-50 text-indigo-700 font-semibold rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition">
-                    + Add
-                  </span>
+                    <span className="px-3 py-1.5 sm:py-1 text-xs bg-indigo-50 text-indigo-700 font-semibold rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition flex items-center gap-1">
+                      <Plus className="w-3 h-3" />
+                      <span>Add</span>
+                    </span>
+                  </div>
                 </div>
               </div>
             ))
@@ -380,11 +385,11 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-3 border-t border-slate-200 bg-slate-50 text-[11px] text-slate-500 flex items-center justify-between px-5">
+        <div className="p-2.5 sm:p-3 border-t border-slate-200 bg-slate-50 text-[11px] text-slate-500 flex items-center justify-between px-3 sm:px-5">
           <span>{filtered.length} products available</span>
           <button
             onClick={onClose}
-            className="px-3 py-1 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-100 transition"
+            className="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-100 transition text-xs cursor-pointer"
           >
             Close
           </button>

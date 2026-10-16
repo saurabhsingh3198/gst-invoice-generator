@@ -32,6 +32,7 @@ import { analyzeGstin } from '../utils/gstUtils';
 import { ProductMasterModal } from './ProductMasterModal';
 import { saveProductToLibrary } from '../utils/productMaster';
 import type { ProductTemplate } from '../utils/productMaster';
+import { getNextInvoiceNo, recordLastInvoiceNo } from '../utils/invoiceSequence';
 
 interface InvoiceFormProps {
   data: InvoiceData;
@@ -147,6 +148,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
   };
 
   const updateDispatch = (key: keyof InvoiceData['dispatch'], val: string) => {
+    if (key === 'invoiceNo' && val && val.trim()) {
+      recordLastInvoiceNo(val.trim());
+    }
     onChange({
       ...data,
       dispatch: { ...data.dispatch, [key]: val },
@@ -1604,16 +1608,33 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Invoice Number
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-semibold text-slate-700">
+                    Invoice Number
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = getNextInvoiceNo(data.dispatch.invoiceNo);
+                      updateDispatch('invoiceNo', next);
+                    }}
+                    className="text-[11px] font-bold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200/80 px-2 py-0.5 rounded flex items-center gap-1 transition cursor-pointer active:scale-95"
+                    title="Automatically increment sequence number preserving prefix (e.g. INV/089 → INV/090)"
+                  >
+                    <Plus className="w-3 h-3 text-indigo-600" />
+                    <span>Auto Next (#{getNextInvoiceNo(data.dispatch.invoiceNo)})</span>
+                  </button>
+                </div>
                 <input
                   type="text"
                   value={data.dispatch.invoiceNo}
                   onChange={(e) => updateDispatch('invoiceNo', e.target.value)}
-                  placeholder="e.g. 74 or INV-001"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-900 outline-none focus:border-indigo-500"
+                  placeholder="e.g. 74 or INV-001 or INV/24-25/089"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-900 outline-none focus:border-indigo-500 font-mono"
                 />
+                <p className="text-[10px] text-slate-500 mt-1">
+                  Auto-Sequence preserves prefixes & zeros (e.g. INV/089 → INV/090)
+                </p>
               </div>
 
               <div>

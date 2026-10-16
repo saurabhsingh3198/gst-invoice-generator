@@ -22,11 +22,16 @@ import {
   Edit3,
   ArrowRight,
   History,
+  DownloadCloud,
+  Zap,
 } from 'lucide-react';
+import { getNextInvoiceNo, recordLastInvoiceNo } from './utils/invoiceSequence';
+import { usePwa } from './utils/usePwa';
 
 const DRAFT_STORAGE_KEY = 'gst_invoice_current_draft_v1';
 
 export const App: React.FC = () => {
+  const { isInstallable, isOffline, installApp } = usePwa();
   const [invoiceData, setInvoiceData] = useState<InvoiceData>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -146,6 +151,7 @@ export const App: React.FC = () => {
 
       // Ensure filename strictly ends with .pdf and has clean alphanumeric characters
       const rawInvoiceNo = invoiceData.dispatch.invoiceNo ? invoiceData.dispatch.invoiceNo.trim() : '74';
+      recordLastInvoiceNo(rawInvoiceNo);
       const cleanInvoiceNo = rawInvoiceNo.replace(/[^a-zA-Z0-9_-]/g, '_') || '74';
       const fileName = `Sales_${cleanInvoiceNo}.pdf`;
 
@@ -287,6 +293,13 @@ export const App: React.FC = () => {
         }
       } catch (e) {}
 
+      // Automatically compute next sequence invoice number (e.g. 74 -> 75, or INV/089 -> INV/090)
+      const currentNo = invoiceData.dispatch?.invoiceNo;
+      if (currentNo) {
+        recordLastInvoiceNo(currentNo);
+      }
+      const nextInvoiceNo = getNextInvoiceNo(currentNo);
+
       setInvoiceData({
         title: 'Tax Invoice',
         seller: defaultSeller,
@@ -304,7 +317,7 @@ export const App: React.FC = () => {
           stateCode: '',
         },
         dispatch: {
-          invoiceNo: '',
+          invoiceNo: nextInvoiceNo,
           invoiceDate: new Date().toLocaleDateString('en-GB', {
             day: '2-digit',
             month: 'short',
@@ -486,6 +499,15 @@ export const App: React.FC = () => {
               <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
                 A4
               </span>
+              {isOffline && (
+                <span
+                  className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1 shrink-0 animate-pulse"
+                  title="Offline Mode Active - You can create, calculate and print invoices without internet"
+                >
+                  <Zap className="w-2.5 h-2.5 text-amber-600" />
+                  <span>Offline</span>
+                </span>
+              )}
             </div>
           </div>
 
@@ -518,6 +540,22 @@ export const App: React.FC = () => {
 
           {/* View Mode & Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Install App Button (PWA) */}
+            <button
+              id="btn-install-app"
+              type="button"
+              onClick={installApp}
+              className={`p-1.5 sm:px-2.5 sm:py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95 ${
+                isInstallable
+                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white font-bold animate-pulse'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300'
+              }`}
+              title="Install GST Invoice Studio App on this device for 100% offline billing"
+            >
+              <DownloadCloud className={`w-3.5 h-3.5 ${isInstallable ? 'text-white' : 'text-slate-600'}`} />
+              <span className="hidden sm:inline">Install App</span>
+            </button>
+
             {/* History Button */}
             <button
               id="btn-invoice-history"

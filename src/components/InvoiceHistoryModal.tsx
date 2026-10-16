@@ -14,6 +14,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { formatIndianCurrency } from '../utils/numberToWords';
+import { recordLastInvoiceNo } from '../utils/invoiceSequence';
 
 export interface SavedInvoiceRecord {
   id: string;
@@ -102,6 +103,9 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
     const rounded = currentInvoice.enableRoundOff !== false ? Math.round(rawTotal) : rawTotal;
 
     const invNo = currentInvoice.dispatch.invoiceNo || 'Draft';
+    if (currentInvoice.dispatch.invoiceNo) {
+      recordLastInvoiceNo(currentInvoice.dispatch.invoiceNo);
+    }
     const newRecord: SavedInvoiceRecord = {
       id: `inv-${Date.now()}`,
       invoiceNo: invNo,

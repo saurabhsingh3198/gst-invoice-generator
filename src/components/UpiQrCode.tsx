@@ -50,10 +50,8 @@ export const UpiQrCode: React.FC<UpiQrCodeProps> = ({
   return (
     <div
       style={{
-        display: 'inline-flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
+        display: 'inline-block',
+        textAlign: 'center',
         padding: '1px',
       }}
     >
@@ -64,6 +62,7 @@ export const UpiQrCode: React.FC<UpiQrCodeProps> = ({
           width: `${size}px`,
           height: `${size}px`,
           display: 'block',
+          margin: '0 auto',
           imageRendering: 'pixelated',
         }}
       />
@@ -72,10 +71,11 @@ export const UpiQrCode: React.FC<UpiQrCodeProps> = ({
           fontSize: '7px',
           fontWeight: 'bold',
           letterSpacing: '0.5px',
-          marginTop: '2px',
+          marginTop: '3px',
+          marginBottom: '2px',
           color: '#000000',
           textAlign: 'center',
-          lineHeight: 1,
+          lineHeight: '9px',
           fontFamily: 'Arial, sans-serif',
           whiteSpace: 'nowrap',
         }}

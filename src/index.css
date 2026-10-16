@@ -81,6 +81,11 @@
   }
 }
 
+/* Dedicated export container clean styling */
+#invoice-export-container .invoice-a4-page {
+  box-shadow: none !important;
+}
+
 /* Exact Tally table borders */
 .tally-border-b {
   border-bottom: 1px solid #000000;

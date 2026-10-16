@@ -100,7 +100,9 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
               textAlign: 'center',
               fontWeight: 'bold',
               fontSize: '13px',
-              paddingBottom: '3px',
+              lineHeight: '16px',
+              paddingTop: '2px',
+              paddingBottom: '6px',
               color: '#000000',
               width: '100%',
             }}
@@ -851,15 +853,16 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
             >
               <tbody>
                 <tr>
-                  <td style={{ padding: '3px 6px', verticalAlign: 'top' }}>
-                    <div style={{ fontSize: '8.5px', color: '#222222' }}>
+                  <td style={{ padding: '4px 6px 6px 6px', verticalAlign: 'top' }}>
+                    <div style={{ fontSize: '8.5px', color: '#222222', lineHeight: '1.2' }}>
                       Amount Chargeable (in words)
                     </div>
                     <div
                       style={{
                         fontWeight: 'bold',
                         fontSize: '10px',
-                        marginTop: '1px',
+                        lineHeight: '1.3',
+                        marginTop: '2px',
                       }}
                     >
                       {amountInWords}
@@ -867,7 +870,7 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                   </td>
                   <td
                     style={{
-                      padding: '3px 6px',
+                      padding: '4px 6px 6px 6px',
                       textAlign: 'right',
                       verticalAlign: 'top',
                       fontStyle: 'italic',
@@ -898,13 +901,14 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                     {isInterState ? (
                       /* Inter-State Tax (IGST) Header */
                       <>
-                        <tr style={{ borderBottom: '1px solid #000000' }}>
+                        <tr style={{ height: '22px' }}>
                           <th
                             rowSpan={2}
                             style={{
                               width: '45%',
                               borderRight: '1px solid #000000',
-                              padding: '2px 4px',
+                              borderBottom: '1px solid #000000',
+                              padding: '4px 4px',
                               textAlign: 'center',
                               verticalAlign: 'middle',
                               fontWeight: 'normal',
@@ -917,10 +921,11 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                             style={{
                               width: '17%',
                               borderRight: '1px solid #000000',
-                              padding: '2px 4px',
+                              borderBottom: '1px solid #000000',
+                              padding: '4px 4px',
                               textAlign: 'center',
                               verticalAlign: 'middle',
-                              lineHeight: '1.2',
+                              lineHeight: '1.25',
                               fontWeight: 'normal',
                             }}
                           >
@@ -932,7 +937,7 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                               width: '23%',
                               borderRight: '1px solid #000000',
                               borderBottom: '1px solid #000000',
-                              padding: '2px 4px',
+                              padding: '3px 4px',
                               textAlign: 'center',
                               verticalAlign: 'middle',
                               fontWeight: 'normal',
@@ -944,23 +949,26 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                             rowSpan={2}
                             style={{
                               width: '15%',
-                              padding: '2px 4px',
+                              borderBottom: '1px solid #000000',
+                              padding: '4px 4px',
                               textAlign: 'center',
                               verticalAlign: 'middle',
-                              lineHeight: '1.2',
+                              lineHeight: '1.25',
                               fontWeight: 'normal',
                             }}
                           >
                             Total<br />Tax Amount
                           </th>
                         </tr>
-                        <tr style={{ borderBottom: '1px solid #000000' }}>
+                        <tr style={{ height: '20px' }}>
                           <th
                             style={{
                               width: '8%',
                               borderRight: '1px solid #000000',
-                              padding: '2px 2px',
+                              borderBottom: '1px solid #000000',
+                              padding: '3px 2px',
                               textAlign: 'center',
+                              verticalAlign: 'middle',
                               fontWeight: 'normal',
                             }}
                           >
@@ -970,8 +978,10 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                             style={{
                               width: '15%',
                               borderRight: '1px solid #000000',
-                              padding: '2px 3px',
+                              borderBottom: '1px solid #000000',
+                              padding: '3px 3px',
                               textAlign: 'center',
+                              verticalAlign: 'middle',
                               fontWeight: 'normal',
                             }}
                           >
@@ -982,13 +992,14 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                     ) : (
                       /* Intra-State Tax (CGST + SGST/UTGST) Header - Pixel-exact to user screenshot */
                       <>
-                        <tr style={{ borderBottom: '1px solid #000000' }}>
+                        <tr style={{ height: '22px' }}>
                           <th
                             rowSpan={2}
                             style={{
                               width: '40%',
                               borderRight: '1px solid #000000',
-                              padding: '3px 4px',
+                              borderBottom: '1px solid #000000',
+                              padding: '4px 4px',
                               textAlign: 'center',
                               verticalAlign: 'middle',
                               fontWeight: 'normal',
@@ -1001,10 +1012,11 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                             style={{
                               width: '12%',
                               borderRight: '1px solid #000000',
-                              padding: '3px 4px',
+                              borderBottom: '1px solid #000000',
+                              padding: '4px 4px',
                               textAlign: 'center',
                               verticalAlign: 'middle',
-                              lineHeight: '1.15',
+                              lineHeight: '1.25',
                               fontWeight: 'normal',
                             }}
                           >
@@ -1016,7 +1028,7 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                               width: '17%',
                               borderRight: '1px solid #000000',
                               borderBottom: '1px solid #000000',
-                              padding: '2px 4px',
+                              padding: '3px 4px',
                               textAlign: 'center',
                               verticalAlign: 'middle',
                               fontWeight: 'normal',
@@ -1030,7 +1042,7 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                               width: '17%',
                               borderRight: '1px solid #000000',
                               borderBottom: '1px solid #000000',
-                              padding: '2px 4px',
+                              padding: '3px 4px',
                               textAlign: 'center',
                               verticalAlign: 'middle',
                               fontWeight: 'normal',
@@ -1042,23 +1054,26 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                             rowSpan={2}
                             style={{
                               width: '14%',
-                              padding: '3px 4px',
+                              borderBottom: '1px solid #000000',
+                              padding: '4px 4px',
                               textAlign: 'center',
                               verticalAlign: 'middle',
-                              lineHeight: '1.15',
+                              lineHeight: '1.25',
                               fontWeight: 'normal',
                             }}
                           >
                             Total<br />Tax Amount
                           </th>
                         </tr>
-                        <tr style={{ borderBottom: '1px solid #000000' }}>
+                        <tr style={{ height: '20px' }}>
                           <th
                             style={{
                               width: '5.5%',
                               borderRight: '1px solid #000000',
-                              padding: '2px 2px',
+                              borderBottom: '1px solid #000000',
+                              padding: '3px 2px',
                               textAlign: 'center',
+                              verticalAlign: 'middle',
                               fontWeight: 'normal',
                             }}
                           >
@@ -1068,8 +1083,10 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                             style={{
                               width: '11.5%',
                               borderRight: '1px solid #000000',
-                              padding: '2px 3px',
+                              borderBottom: '1px solid #000000',
+                              padding: '3px 3px',
                               textAlign: 'center',
+                              verticalAlign: 'middle',
                               fontWeight: 'normal',
                             }}
                           >
@@ -1079,8 +1096,10 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                             style={{
                               width: '5.5%',
                               borderRight: '1px solid #000000',
-                              padding: '2px 2px',
+                              borderBottom: '1px solid #000000',
+                              padding: '3px 2px',
                               textAlign: 'center',
+                              verticalAlign: 'middle',
                               fontWeight: 'normal',
                             }}
                           >
@@ -1090,8 +1109,10 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                             style={{
                               width: '11.5%',
                               borderRight: '1px solid #000000',
-                              padding: '2px 3px',
+                              borderBottom: '1px solid #000000',
+                              padding: '3px 3px',
                               textAlign: 'center',
+                              verticalAlign: 'middle',
                               fontWeight: 'normal',
                             }}
                           >
@@ -1103,12 +1124,14 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                   </thead>
                   <tbody>
                     {taxRows.map((row, idx) => (
-                      <tr key={row.id || row.hsnSac || idx} style={{ fontSize: '9px' }}>
+                      <tr key={row.id || row.hsnSac || idx} style={{ height: '22px', fontSize: '9px' }}>
                         <td
                           style={{
                             borderRight: '1px solid #000000',
-                            padding: '2px 6px',
+                            padding: '3px 6px',
                             textAlign: 'left',
+                            verticalAlign: 'middle',
+                            lineHeight: '1.2',
                           }}
                         >
                           {row.hsnSac}
@@ -1116,9 +1139,11 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                         <td
                           style={{
                             borderRight: '1px solid #000000',
-                            padding: '2px 4px',
+                            padding: '3px 4px',
                             textAlign: 'right',
+                            verticalAlign: 'middle',
                             whiteSpace: 'nowrap',
+                            lineHeight: '1.2',
                           }}
                         >
                           {formatIndianCurrency(row.taxableValue)}
@@ -1128,9 +1153,11 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                             <td
                               style={{
                                 borderRight: '1px solid #000000',
-                                padding: '2px 2px',
+                                padding: '3px 2px',
                                 textAlign: 'right',
+                                verticalAlign: 'middle',
                                 whiteSpace: 'nowrap',
+                                lineHeight: '1.2',
                               }}
                             >
                               {row.igstRate || 0}%
@@ -1138,9 +1165,11 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                             <td
                               style={{
                                 borderRight: '1px solid #000000',
-                                padding: '2px 4px',
+                                padding: '3px 4px',
                                 textAlign: 'right',
+                                verticalAlign: 'middle',
                                 whiteSpace: 'nowrap',
+                                lineHeight: '1.2',
                               }}
                             >
                               {formatIndianCurrency(row.igstAmount || row.totalTaxAmount)}
@@ -1151,9 +1180,11 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                             <td
                               style={{
                                 borderRight: '1px solid #000000',
-                                padding: '2px 2px',
+                                padding: '3px 2px',
                                 textAlign: 'right',
+                                verticalAlign: 'middle',
                                 whiteSpace: 'nowrap',
+                                lineHeight: '1.2',
                               }}
                             >
                               {row.cgstRate}%
@@ -1161,9 +1192,11 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                             <td
                               style={{
                                 borderRight: '1px solid #000000',
-                                padding: '2px 4px',
+                                padding: '3px 4px',
                                 textAlign: 'right',
+                                verticalAlign: 'middle',
                                 whiteSpace: 'nowrap',
+                                lineHeight: '1.2',
                               }}
                             >
                               {formatIndianCurrency(row.cgstAmount)}
@@ -1171,9 +1204,11 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                             <td
                               style={{
                                 borderRight: '1px solid #000000',
-                                padding: '2px 2px',
+                                padding: '3px 2px',
                                 textAlign: 'right',
+                                verticalAlign: 'middle',
                                 whiteSpace: 'nowrap',
+                                lineHeight: '1.2',
                               }}
                             >
                               {row.sgstRate}%
@@ -1181,9 +1216,11 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                             <td
                               style={{
                                 borderRight: '1px solid #000000',
-                                padding: '2px 4px',
+                                padding: '3px 4px',
                                 textAlign: 'right',
+                                verticalAlign: 'middle',
                                 whiteSpace: 'nowrap',
+                                lineHeight: '1.2',
                               }}
                             >
                               {formatIndianCurrency(row.sgstAmount)}
@@ -1192,40 +1229,51 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                         )}
                         <td
                           style={{
-                            padding: '2px 4px',
+                            padding: '3px 4px',
                             textAlign: 'right',
+                            verticalAlign: 'middle',
                             whiteSpace: 'nowrap',
+                            lineHeight: '1.2',
                           }}
                         >
                           {formatIndianCurrency(row.totalTaxAmount)}
                         </td>
                       </tr>
                     ))}
+                  </tbody>
 
-                    {/* Total Row - Exact match to user screenshot */}
+                  {/* Total Row in tfoot with explicit 24px height, vertically centered */}
+                  <tfoot>
                     <tr
                       style={{
-                        borderTop: '1px solid #000000',
-                        borderBottom: '1px solid #000000',
+                        height: '24px',
                         fontWeight: 'bold',
                         fontSize: '9px',
                       }}
                     >
                       <td
                         style={{
+                          borderTop: '1px solid #000000',
+                          borderBottom: '1px solid #000000',
                           borderRight: '1px solid #000000',
-                          padding: '2px 6px',
+                          padding: '4px 6px',
                           textAlign: 'right',
+                          verticalAlign: 'middle',
+                          lineHeight: '1.2',
                         }}
                       >
                         Total
                       </td>
                       <td
                         style={{
+                          borderTop: '1px solid #000000',
+                          borderBottom: '1px solid #000000',
                           borderRight: '1px solid #000000',
-                          padding: '2px 4px',
+                          padding: '4px 4px',
                           textAlign: 'right',
+                          verticalAlign: 'middle',
                           whiteSpace: 'nowrap',
+                          lineHeight: '1.2',
                         }}
                       >
                         {formatIndianCurrency(taxTotals.totalTaxableValue)}
@@ -1234,16 +1282,23 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                         <>
                           <td
                             style={{
+                              borderTop: '1px solid #000000',
+                              borderBottom: '1px solid #000000',
                               borderRight: '1px solid #000000',
-                              padding: '2px 2px',
+                              padding: '4px 2px',
+                              verticalAlign: 'middle',
                             }}
                           ></td>
                           <td
                             style={{
+                              borderTop: '1px solid #000000',
+                              borderBottom: '1px solid #000000',
                               borderRight: '1px solid #000000',
-                              padding: '2px 4px',
+                              padding: '4px 4px',
                               textAlign: 'right',
+                              verticalAlign: 'middle',
                               whiteSpace: 'nowrap',
+                              lineHeight: '1.2',
                             }}
                           >
                             {formatIndianCurrency(taxTotals.totalIgstAmount || taxTotals.totalTaxAmount)}
@@ -1253,32 +1308,46 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                         <>
                           <td
                             style={{
+                              borderTop: '1px solid #000000',
+                              borderBottom: '1px solid #000000',
                               borderRight: '1px solid #000000',
-                              padding: '2px 2px',
+                              padding: '4px 2px',
+                              verticalAlign: 'middle',
                             }}
                           ></td>
                           <td
                             style={{
+                              borderTop: '1px solid #000000',
+                              borderBottom: '1px solid #000000',
                               borderRight: '1px solid #000000',
-                              padding: '2px 4px',
+                              padding: '4px 4px',
                               textAlign: 'right',
+                              verticalAlign: 'middle',
                               whiteSpace: 'nowrap',
+                              lineHeight: '1.2',
                             }}
                           >
                             {formatIndianCurrency(taxTotals.totalCgstAmount)}
                           </td>
                           <td
                             style={{
+                              borderTop: '1px solid #000000',
+                              borderBottom: '1px solid #000000',
                               borderRight: '1px solid #000000',
-                              padding: '2px 2px',
+                              padding: '4px 2px',
+                              verticalAlign: 'middle',
                             }}
                           ></td>
                           <td
                             style={{
+                              borderTop: '1px solid #000000',
+                              borderBottom: '1px solid #000000',
                               borderRight: '1px solid #000000',
-                              padding: '2px 4px',
+                              padding: '4px 4px',
                               textAlign: 'right',
+                              verticalAlign: 'middle',
                               whiteSpace: 'nowrap',
+                              lineHeight: '1.2',
                             }}
                           >
                             {formatIndianCurrency(taxTotals.totalSgstAmount)}
@@ -1287,24 +1356,28 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                       )}
                       <td
                         style={{
-                          padding: '2px 4px',
+                          borderTop: '1px solid #000000',
+                          borderBottom: '1px solid #000000',
+                          padding: '4px 4px',
                           textAlign: 'right',
+                          verticalAlign: 'middle',
                           whiteSpace: 'nowrap',
+                          lineHeight: '1.2',
                         }}
                       >
                         {formatIndianCurrency(taxTotals.totalTaxAmount)}
                       </td>
                     </tr>
-                  </tbody>
+                  </tfoot>
                 </table>
 
                 {/* Tax Amount (in words) Row - Exactly matching screenshot */}
                 <div
                   style={{
                     borderBottom: '1px solid #000000',
-                    padding: '3px 6px',
+                    padding: '4px 6px 5px 6px',
                     fontSize: '9px',
-                    lineHeight: '1.3',
+                    lineHeight: '1.35',
                   }}
                 >
                   <span style={{ fontWeight: 'normal' }}>Tax Amount (in words) : &nbsp;&nbsp;</span>
@@ -1340,73 +1413,86 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                   >
                     {data.bankDetails?.showBankDetails !== false && (
                       <>
-                        <div
+                        {/* 2-column robust table for Bank Details & QR Code (prevents flexbox height miscalculation) */}
+                        <table
                           style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'flex-start',
+                            width: '100%',
+                            borderCollapse: 'collapse',
+                            tableLayout: 'fixed',
+                            marginBottom: '4px',
                           }}
                         >
-                          {/* Bank details text */}
-                          <div style={{ flex: 1, paddingRight: '4px' }}>
-                            <div
-                              style={{
-                                textDecoration: 'underline',
-                                fontWeight: 'bold',
-                                fontSize: '8.5px',
-                                marginBottom: '2px',
-                              }}
-                            >
-                              Company&apos;s Bank Details
-                            </div>
-                            <div style={{ fontSize: '8.5px', lineHeight: '1.3' }}>
-                              <div>
-                                <span>Bank Name : </span>
-                                <span style={{ fontWeight: 'bold' }}>
-                                  {data.bankDetails?.bankName || 'STATE BANK OF INDIA'}
-                                </span>
-                              </div>
-                              <div>
-                                <span>A/c No. : </span>
-                                <span style={{ fontWeight: 'bold' }}>
-                                  {data.bankDetails?.accountNo || '381928371928'}
-                                </span>
-                              </div>
-                              <div>
-                                <span>Branch & IFS Code : </span>
-                                <span style={{ fontWeight: 'bold' }}>
-                                  {data.bankDetails?.branchAndIfsc || 'NAUSAD GORAKHPUR & SBIN0001234'}
-                                </span>
-                              </div>
-                              {data.bankDetails?.upiId && (
-                                <div>
-                                  <span>UPI ID (Pay) : </span>
-                                  <span style={{ fontWeight: 'bold', color: '#1a56db' }}>
-                                    {data.bankDetails.upiId}
-                                  </span>
+                          <tbody>
+                            <tr>
+                              {/* Bank details text */}
+                              <td style={{ verticalAlign: 'top', padding: 0 }}>
+                                <div
+                                  style={{
+                                    textDecoration: 'underline',
+                                    fontWeight: 'bold',
+                                    fontSize: '8.5px',
+                                    marginBottom: '3px',
+                                  }}
+                                >
+                                  Company&apos;s Bank Details
                                 </div>
-                              )}
-                            </div>
-                          </div>
+                                <div style={{ fontSize: '8.5px', lineHeight: '1.35' }}>
+                                  <div>
+                                    <span>Bank Name : </span>
+                                    <span style={{ fontWeight: 'bold' }}>
+                                      {data.bankDetails?.bankName || 'STATE BANK OF INDIA'}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span>A/c No. : </span>
+                                    <span style={{ fontWeight: 'bold' }}>
+                                      {data.bankDetails?.accountNo || '381928371928'}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span>Branch & IFS Code : </span>
+                                    <span style={{ fontWeight: 'bold' }}>
+                                      {data.bankDetails?.branchAndIfsc || 'NAUSAD GORAKHPUR & SBIN0001234'}
+                                    </span>
+                                  </div>
+                                  {data.bankDetails?.upiId && (
+                                    <div>
+                                      <span>UPI ID (Pay) : </span>
+                                      <span style={{ fontWeight: 'bold', color: '#1a56db' }}>
+                                        {data.bankDetails.upiId}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
 
-                          {/* QR Code (if enabled) */}
-                          {data.bankDetails?.showQrCode !== false && (
-                            <div style={{ flexShrink: 0, marginLeft: '4px' }}>
-                              <UpiQrCode
-                                upiId={data.bankDetails?.upiId || '8896925131@naviaxis'}
-                                payeeName={signatoryCompany}
-                                customQrUrl={data.bankDetails?.customQrUrl}
-                                size={56}
-                              />
-                            </div>
-                          )}
-                        </div>
+                              {/* QR Code (if enabled) */}
+                              {data.bankDetails?.showQrCode !== false && (
+                                <td
+                                  style={{
+                                    width: '74px',
+                                    verticalAlign: 'top',
+                                    textAlign: 'center',
+                                    padding: '0 0 4px 4px',
+                                  }}
+                                >
+                                  <UpiQrCode
+                                    upiId={data.bankDetails?.upiId || '8896925131@naviaxis'}
+                                    payeeName={signatoryCompany}
+                                    customQrUrl={data.bankDetails?.customQrUrl}
+                                    size={56}
+                                  />
+                                </td>
+                              )}
+                            </tr>
+                          </tbody>
+                        </table>
 
                         {/* Dashed horizontal divider line matching screenshot */}
                         <div
                           style={{
                             borderTop: '1px dashed #666666',
-                            margin: '3px 0 3px 0',
+                            margin: '4px 0 5px 0',
                             width: '100%',
                           }}
                         ></div>

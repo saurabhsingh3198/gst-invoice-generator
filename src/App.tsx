@@ -138,6 +138,8 @@ export const App: React.FC = () => {
         allowTaint: true,
         logging: false,
         backgroundColor: '#ffffff',
+        scrollX: 0,
+        scrollY: 0,
         windowWidth: 794,
       });
 

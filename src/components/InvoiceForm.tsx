@@ -18,6 +18,8 @@ import {
   RefreshCw,
   Bookmark,
   CheckCircle2,
+  Save,
+  FolderOpen,
 } from 'lucide-react';
 import { formatIndianCurrency, numberToIndianWords, taxNumberToIndianWords } from '../utils/numberToWords';
 import {
@@ -48,12 +50,49 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
   const [showAdvancedColumns, setShowAdvancedColumns] = useState<boolean>(false);
   const [showProductMaster, setShowProductMaster] = useState<boolean>(false);
   const [savedProductToast, setSavedProductToast] = useState<string>('');
+  const [profileToast, setProfileToast] = useState<string>('');
   const [itemsViewMode, setItemsViewMode] = useState<'cards' | 'table'>(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       return 'cards';
     }
     return 'table';
   });
+
+  const saveCompanyProfile = () => {
+    try {
+      const profileToSave = {
+        seller: data.seller,
+        signatoryCompany: data.signatoryCompany,
+        bankDetails: data.bankDetails,
+      };
+      localStorage.setItem('saved_user_company_profile', JSON.stringify(profileToSave));
+      setProfileToast('Company & Bank Profile saved as default!');
+      setTimeout(() => setProfileToast(''), 3500);
+    } catch (e) {
+      console.warn('Failed to save company profile', e);
+    }
+  };
+
+  const loadCompanyProfile = () => {
+    try {
+      const raw = localStorage.getItem('saved_user_company_profile');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        onChange({
+          ...data,
+          seller: parsed.seller || data.seller,
+          signatoryCompany: parsed.signatoryCompany || data.signatoryCompany,
+          bankDetails: parsed.bankDetails || data.bankDetails,
+        });
+        setProfileToast('Company profile loaded successfully!');
+        setTimeout(() => setProfileToast(''), 3500);
+      } else {
+        alert('No saved company profile found. Fill in your company details and click "Save as Default" first.');
+      }
+    } catch (e) {
+      console.warn('Failed to load company profile', e);
+    }
+  };
 
   // Helper updates with smart GSTIN auto-detection
   const updateSeller = (key: keyof InvoiceData['seller'], val: string) => {
@@ -126,10 +165,10 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
   const updateBankDetails = (key: keyof NonNullable<InvoiceData['bankDetails']>, val: any) => {
     const current = data.bankDetails || {
       showBankDetails: true,
-      bankName: 'STATE BANK OF INDIA',
-      accountNo: '381928371928',
-      branchAndIfsc: 'NAUSAD GORAKHPUR & SBIN0001234',
-      upiId: '8896925131@naviaxis',
+      bankName: '',
+      accountNo: '',
+      branchAndIfsc: '',
+      upiId: '',
       showQrCode: true,
     };
     onChange({
@@ -1065,19 +1104,43 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
         {/* ================= 2. SELLER / COMPANY TAB ================= */}
         {activeTab === 'seller' && (
           <div className="space-y-4">
-            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 flex items-center justify-between">
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
                   Company / Biller Profile
                 </h3>
                 <p className="text-[11px] text-slate-500">
-                  Seller details appearing on the top left of the invoice
+                  Seller & Bank details appearing on the invoice
                 </p>
               </div>
-              <span className="text-[11px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full">
-                Active Biller
-              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={saveCompanyProfile}
+                  className="px-2.5 py-1 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded-md flex items-center gap-1 font-semibold transition cursor-pointer active:scale-95 shadow-2xs"
+                  title="Save current details as permanent company profile"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Save as Default</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={loadCompanyProfile}
+                  className="px-2.5 py-1 text-xs bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-md flex items-center gap-1 font-semibold transition cursor-pointer active:scale-95 shadow-2xs"
+                  title="Load your saved permanent company profile"
+                >
+                  <FolderOpen className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Load Saved Profile</span>
+                </button>
+              </div>
             </div>
+
+            {profileToast && (
+              <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-semibold text-emerald-800 flex items-center gap-1.5 animate-in fade-in duration-150">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{profileToast}</span>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <div className="md:col-span-2">
@@ -1088,7 +1151,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   type="text"
                   value={data.seller.name}
                   onChange={(e) => updateSeller('name', e.target.value)}
-                  placeholder="BHANU TRADERS"
+                  placeholder="e.g. ACME Enterprise / Your Company Name"
                   className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none"
                 />
               </div>
@@ -1101,7 +1164,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   type="text"
                   value={data.seller.addressLine1}
                   onChange={(e) => updateSeller('addressLine1', e.target.value)}
-                  placeholder="NAUSAD, CHAURAHA NEAR HP PETROL"
+                  placeholder="e.g. 101, Business Park, M.G. Road"
                   className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none"
                 />
               </div>
@@ -1114,7 +1177,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   type="text"
                   value={data.seller.addressLine2}
                   onChange={(e) => updateSeller('addressLine2', e.target.value)}
-                  placeholder="PUMP BAGAHA GADA, GORAKHPUR"
+                  placeholder="e.g. Andheri East, Mumbai"
                   className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none"
                 />
               </div>
@@ -1132,7 +1195,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   type="text"
                   value={data.seller.gstin}
                   onChange={(e) => updateSeller('gstin', e.target.value)}
-                  placeholder="09FELPS6664L1ZE"
+                  placeholder="e.g. 27ABCDE1234F1Z5"
                   className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none"
                 />
                 {data.seller.gstin && (() => {
@@ -1168,7 +1231,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   type="email"
                   value={data.seller.email}
                   onChange={(e) => updateSeller('email', e.target.value)}
-                  placeholder="sharadsri82@gmail.com"
+                  placeholder="e.g. billing@yourcompany.com"
                   className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none"
                 />
               </div>
@@ -1234,7 +1297,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       type="text"
                       value={data.bankDetails?.bankName || ''}
                       onChange={(e) => updateBankDetails('bankName', e.target.value)}
-                      placeholder="STATE BANK OF INDIA"
+                      placeholder="e.g. State Bank of India, HDFC Bank"
                       className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none bg-white"
                     />
                   </div>
@@ -1247,7 +1310,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       type="text"
                       value={data.bankDetails?.accountNo || ''}
                       onChange={(e) => updateBankDetails('accountNo', e.target.value)}
-                      placeholder="381928371928"
+                      placeholder="e.g. 381928371928"
                       className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none bg-white"
                     />
                   </div>
@@ -1260,7 +1323,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       type="text"
                       value={data.bankDetails?.branchAndIfsc || ''}
                       onChange={(e) => updateBankDetails('branchAndIfsc', e.target.value)}
-                      placeholder="NAUSAD GORAKHPUR & SBIN0001234"
+                      placeholder="e.g. Main Branch & SBIN0001234"
                       className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none bg-white"
                     />
                   </div>
@@ -1273,7 +1336,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       type="text"
                       value={data.bankDetails?.upiId || ''}
                       onChange={(e) => updateBankDetails('upiId', e.target.value)}
-                      placeholder="8896925131@naviaxis"
+                      placeholder="e.g. yourbusiness@upi"
                       className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold text-indigo-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none bg-white"
                     />
                   </div>
@@ -1342,7 +1405,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     type="text"
                     value={data.consignee.name}
                     onChange={(e) => updateConsignee('name', e.target.value)}
-                    placeholder="MANAV UTTHAN SEWA SAMITI"
+                    placeholder="e.g. M/s ABC Enterprises / Client Name"
                     className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-semibold text-slate-900 outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -1355,7 +1418,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     rows={2}
                     value={data.consignee.address}
                     onChange={(e) => updateConsignee('address', e.target.value)}
-                    placeholder="KUSHINAGAR"
+                    placeholder="e.g. Plot No. 45, Industrial Area, Phase-2"
                     className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg text-slate-800 outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -1371,7 +1434,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     type="text"
                     value={data.consignee.gstin || ''}
                     onChange={(e) => updateConsignee('gstin', e.target.value)}
-                    placeholder="09AABCM1234F1Z5"
+                    placeholder="e.g. 09AABCM1234F1Z5"
                     className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-mono uppercase font-bold text-slate-800 outline-none focus:border-indigo-500"
                   />
                   {data.consignee.gstin && (() => {
@@ -1396,7 +1459,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       type="text"
                       value={data.consignee.stateName}
                       onChange={(e) => updateConsignee('stateName', e.target.value)}
-                      placeholder="Uttar Pradesh"
+                      placeholder="e.g. Uttar Pradesh"
                       className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg outline-none focus:border-indigo-500"
                     />
                   </div>
@@ -1432,7 +1495,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     type="text"
                     value={data.buyer.name}
                     onChange={(e) => updateBuyer('name', e.target.value)}
-                    placeholder="MANAV UTTHAN SEWA SAMITI"
+                    placeholder="e.g. M/s ABC Enterprises / Client Name"
                     className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-semibold text-slate-900 outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -1445,7 +1508,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     rows={2}
                     value={data.buyer.address}
                     onChange={(e) => updateBuyer('address', e.target.value)}
-                    placeholder="KUSHINAGAR"
+                    placeholder="e.g. Plot No. 45, Industrial Area, Phase-2"
                     className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg text-slate-800 outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -1529,7 +1592,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   type="text"
                   value={data.dispatch.invoiceNo}
                   onChange={(e) => updateDispatch('invoiceNo', e.target.value)}
-                  placeholder="74"
+                  placeholder="e.g. 74 or INV-001"
                   className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-900 outline-none focus:border-indigo-500"
                 />
               </div>
@@ -1542,7 +1605,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   type="text"
                   value={data.dispatch.invoiceDate}
                   onChange={(e) => updateDispatch('invoiceDate', e.target.value)}
-                  placeholder="14-Oct-26"
+                  placeholder="e.g. 14-Oct-26"
                   className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-semibold text-slate-900 outline-none focus:border-indigo-500"
                 />
               </div>
@@ -1555,7 +1618,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   type="text"
                   value={data.dispatch.dispatchedThrough}
                   onChange={(e) => updateDispatch('dispatchedThrough', e.target.value)}
-                  placeholder="THELA"
+                  placeholder="e.g. By Road / Transport / Courier"
                   className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg uppercase font-bold text-slate-900 outline-none focus:border-indigo-500"
                 />
               </div>
@@ -1568,7 +1631,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   type="text"
                   value={data.dispatch.destination}
                   onChange={(e) => updateDispatch('destination', e.target.value)}
-                  placeholder="Site-KUSHINAGAR"
+                  placeholder="e.g. Site / Destination City"
                   className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg uppercase font-bold text-slate-900 outline-none focus:border-indigo-500"
                 />
               </div>
@@ -1581,7 +1644,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   type="text"
                   value={data.dispatch.dispatchDocNo}
                   onChange={(e) => updateDispatch('dispatchDocNo', e.target.value)}
-                  placeholder="74"
+                  placeholder="e.g. LR-1024 or Doc No"
                   className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold outline-none focus:border-indigo-500"
                 />
               </div>
@@ -2203,7 +2266,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       type="text"
                       value={data.bankDetails?.bankName || ''}
                       onChange={(e) => updateBankDetails('bankName', e.target.value)}
-                      placeholder="STATE BANK OF INDIA"
+                      placeholder="e.g. State Bank of India, HDFC Bank"
                       className="w-full text-xs p-2 border border-slate-300 rounded-lg font-bold text-slate-800 outline-none focus:border-indigo-500 bg-white"
                     />
                   </div>
@@ -2216,7 +2279,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       type="text"
                       value={data.bankDetails?.accountNo || ''}
                       onChange={(e) => updateBankDetails('accountNo', e.target.value)}
-                      placeholder="381928371928"
+                      placeholder="e.g. 381928371928"
                       className="w-full text-xs p-2 border border-slate-300 rounded-lg font-mono font-bold text-slate-800 outline-none focus:border-indigo-500 bg-white"
                     />
                   </div>
@@ -2229,7 +2292,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       type="text"
                       value={data.bankDetails?.branchAndIfsc || ''}
                       onChange={(e) => updateBankDetails('branchAndIfsc', e.target.value)}
-                      placeholder="NAUSAD GORAKHPUR & SBIN0001234"
+                      placeholder="e.g. Main Branch & SBIN0001234"
                       className="w-full text-xs p-2 border border-slate-300 rounded-lg font-bold text-slate-800 outline-none focus:border-indigo-500 bg-white"
                     />
                   </div>
@@ -2242,7 +2305,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       type="text"
                       value={data.bankDetails?.upiId || ''}
                       onChange={(e) => updateBankDetails('upiId', e.target.value)}
-                      placeholder="8896925131@naviaxis"
+                      placeholder="e.g. yourbusiness@upi"
                       className="w-full text-xs p-2 border border-slate-300 rounded-lg font-mono font-bold text-indigo-700 outline-none focus:border-indigo-500 bg-white"
                     />
                   </div>

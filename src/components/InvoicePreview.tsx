@@ -20,7 +20,7 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
     const roundOffDiff = isRoundOffEnabled ? Math.round((roundedTotal - rawTotal) * 100) / 100 : 0;
     const totalAmount = roundedTotal;
 
-    // Sum Alt Quantities
+    // Sum Alt Quantities dynamically
     const totalAltQtyNumber = data.items.reduce((sum, item) => {
       const match = (item.altQuantity || '').match(/([0-9.,]+)/);
       if (match) {
@@ -30,26 +30,36 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
       return sum;
     }, 0);
 
+    const firstAltItemWithUnit = data.items.find((i) => i.altQuantity?.trim());
     const altUnit =
-      data.items.find((i) => i.altQuantity)?.altQuantity?.replace(/[0-9.,\s]/g, '') || 'KG';
+      firstAltItemWithUnit?.altQuantity?.replace(/[0-9.,\s]/g, '').trim() || '';
     const totalAltQtyStr =
       totalAltQtyNumber > 0
         ? `${totalAltQtyNumber.toLocaleString('en-IN', {
             minimumFractionDigits: 3,
             maximumFractionDigits: 3,
-          })} ${altUnit}`
+          })}${altUnit ? ` ${altUnit}` : ''}`
         : '';
 
-    // Calculate total primary quantity (e.g. PC items)
-    const pcItems = data.items.filter((i) => (i.unit || '').toUpperCase() === 'PC');
-    const totalPcQty = pcItems.reduce((sum, i) => sum + (Number(i.quantity) || 0), 0);
-    const nonPcItems = data.items.filter((i) => (i.unit || '').toUpperCase() !== 'PC');
-    const totalQuantityStr =
-      totalPcQty > 0
-        ? `${totalPcQty} PC`
-        : nonPcItems.length > 0
-        ? `${nonPcItems.reduce((s, i) => s + (Number(i.quantity) || 0), 0)} ${nonPcItems[0]?.unit || ''}`
-        : '';
+    // Calculate total primary quantity dynamically across ANY units (PC, BAG, BOX, NOS, MTR, LTR, KG, etc.)
+    const totalQtyNum = data.items.reduce((sum, i) => sum + (Number(i.quantity) || 0), 0);
+    const uniqueUnits = Array.from(
+      new Set(
+        data.items
+          .filter((i) => Number(i.quantity) > 0 && i.unit?.trim())
+          .map((i) => i.unit.trim().toUpperCase())
+      )
+    );
+    let totalQuantityStr = '';
+    if (totalQtyNum > 0) {
+      if (uniqueUnits.length === 1) {
+        totalQuantityStr = `${totalQtyNum} ${uniqueUnits[0]}`;
+      } else if (uniqueUnits.length > 1) {
+        totalQuantityStr = `${totalQtyNum} Items`;
+      } else {
+        totalQuantityStr = `${totalQtyNum}`;
+      }
+    }
 
     // Amount in words
     const amountInWords = data.customAmountInWords?.trim()
@@ -1411,7 +1421,14 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                       verticalAlign: 'top',
                     }}
                   >
-                    {data.bankDetails?.showBankDetails !== false && (
+                    {data.bankDetails?.showBankDetails !== false &&
+                      Boolean(
+                        data.bankDetails?.bankName?.trim() ||
+                        data.bankDetails?.accountNo?.trim() ||
+                        data.bankDetails?.branchAndIfsc?.trim() ||
+                        data.bankDetails?.upiId?.trim() ||
+                        data.bankDetails?.customQrUrl?.trim()
+                      ) && (
                       <>
                         {/* 2-column robust table for Bank Details & QR Code (prevents flexbox height miscalculation) */}
                         <table
@@ -1437,37 +1454,44 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                                   Company&apos;s Bank Details
                                 </div>
                                 <div style={{ fontSize: '8.5px', lineHeight: '1.35' }}>
-                                  <div>
-                                    <span>Bank Name : </span>
-                                    <span style={{ fontWeight: 'bold' }}>
-                                      {data.bankDetails?.bankName || 'STATE BANK OF INDIA'}
-                                    </span>
-                                  </div>
-                                  <div>
-                                    <span>A/c No. : </span>
-                                    <span style={{ fontWeight: 'bold' }}>
-                                      {data.bankDetails?.accountNo || '381928371928'}
-                                    </span>
-                                  </div>
-                                  <div>
-                                    <span>Branch & IFS Code : </span>
-                                    <span style={{ fontWeight: 'bold' }}>
-                                      {data.bankDetails?.branchAndIfsc || 'NAUSAD GORAKHPUR & SBIN0001234'}
-                                    </span>
-                                  </div>
-                                  {data.bankDetails?.upiId && (
+                                  {data.bankDetails?.bankName?.trim() && (
+                                    <div>
+                                      <span>Bank Name : </span>
+                                      <span style={{ fontWeight: 'bold' }}>
+                                        {data.bankDetails.bankName.trim()}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {data.bankDetails?.accountNo?.trim() && (
+                                    <div>
+                                      <span>A/c No. : </span>
+                                      <span style={{ fontWeight: 'bold' }}>
+                                        {data.bankDetails.accountNo.trim()}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {data.bankDetails?.branchAndIfsc?.trim() && (
+                                    <div>
+                                      <span>Branch & IFS Code : </span>
+                                      <span style={{ fontWeight: 'bold' }}>
+                                        {data.bankDetails.branchAndIfsc.trim()}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {data.bankDetails?.upiId?.trim() && (
                                     <div>
                                       <span>UPI ID (Pay) : </span>
                                       <span style={{ fontWeight: 'bold', color: '#1a56db' }}>
-                                        {data.bankDetails.upiId}
+                                        {data.bankDetails.upiId.trim()}
                                       </span>
                                     </div>
                                   )}
                                 </div>
                               </td>
 
-                              {/* QR Code (if enabled) */}
-                              {data.bankDetails?.showQrCode !== false && (
+                              {/* QR Code (if enabled and upiId or customQrUrl provided) */}
+                              {data.bankDetails?.showQrCode !== false &&
+                                (data.bankDetails?.upiId?.trim() || data.bankDetails?.customQrUrl?.trim()) && (
                                 <td
                                   style={{
                                     width: '74px',
@@ -1477,7 +1501,7 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                                   }}
                                 >
                                   <UpiQrCode
-                                    upiId={data.bankDetails?.upiId || '8896925131@naviaxis'}
+                                    upiId={data.bankDetails?.upiId?.trim()}
                                     payeeName={signatoryCompany}
                                     customQrUrl={data.bankDetails?.customQrUrl}
                                     size={56}

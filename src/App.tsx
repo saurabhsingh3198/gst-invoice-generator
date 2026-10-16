@@ -240,17 +240,39 @@ export const App: React.FC = () => {
     if (
       window.confirm('Start a new blank invoice? Your current draft will be cleared.')
     ) {
+      let defaultSeller = {
+        name: '',
+        addressLine1: '',
+        addressLine2: '',
+        gstin: '',
+        stateName: '',
+        stateCode: '',
+        email: '',
+      };
+      let defaultBankDetails = {
+        showBankDetails: true,
+        bankName: '',
+        accountNo: '',
+        branchAndIfsc: '',
+        upiId: '',
+        showQrCode: true,
+      };
+      let defaultSignatory = '';
+
+      try {
+        const savedProfile = localStorage.getItem('saved_user_company_profile');
+        if (savedProfile) {
+          const parsed = JSON.parse(savedProfile);
+          if (parsed.seller) defaultSeller = parsed.seller;
+          if (parsed.bankDetails) defaultBankDetails = parsed.bankDetails;
+          if (parsed.signatoryCompany) defaultSignatory = parsed.signatoryCompany;
+        }
+      } catch (e) {}
+
       setInvoiceData({
         title: 'Tax Invoice',
-        seller: {
-          name: '',
-          addressLine1: '',
-          addressLine2: '',
-          gstin: '',
-          stateName: '',
-          stateCode: '',
-          email: '',
-        },
+        seller: defaultSeller,
+        signatoryCompany: defaultSignatory,
         consignee: {
           name: '',
           address: '',
@@ -308,14 +330,7 @@ export const App: React.FC = () => {
         enableRoundOff: true,
         customAmountInWords: '',
         customTaxAmountInWords: '',
-        bankDetails: {
-          showBankDetails: true,
-          bankName: '',
-          accountNo: '',
-          branchAndIfsc: '',
-          upiId: '',
-          showQrCode: true,
-        },
+        bankDetails: defaultBankDetails,
       });
       try {
         localStorage.removeItem(DRAFT_STORAGE_KEY);

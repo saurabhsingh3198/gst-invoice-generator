@@ -3,11 +3,25 @@
 @tailwind utilities;
 
 @layer base {
+  html,
   body {
+    max-width: 100vw;
+    overflow-x: hidden;
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
     background-color: #f8fafc;
     color: #0f172a;
     font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  #root {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    position: relative;
   }
 
   /* Prevent iOS Safari from auto-zooming inputs on focus when font-size < 16px */

@@ -139,6 +139,20 @@ export const App: React.FC = () => {
     return 'split';
   });
 
+  // Responsive layout sync on screen resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setViewMode((current) => (current === 'split' ? 'editor' : current));
+      } else {
+        setViewMode((current) => (current !== 'split' ? 'split' : current));
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Calculate optimal zoom level based on container/screen size
   const getOptimalZoom = useCallback((isSplit: boolean = false): number => {
     if (typeof window === 'undefined') return 0.78;
@@ -646,35 +660,37 @@ Thank you for your business! 🙏`;
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col text-slate-900 font-sans pb-16 lg:pb-0">
-      {/* Guest Mode Banner */}
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-100 flex flex-col text-slate-900 font-sans pb-20 lg:pb-0">
+      {/* Guest Mode Banner - Fully Responsive */}
       {isGuestMode && !userSession && (
-        <div className="no-print bg-amber-500/10 border-b border-amber-200 px-4 py-2 flex items-center justify-between text-xs text-amber-900">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
-            <span className="font-semibold">Guest Demo Mode: Invoices are not synced to cloud shop database.</span>
+        <div className="no-print bg-amber-500/10 border-b border-amber-200 px-3 sm:px-4 py-1.5 sm:py-2 flex items-center justify-between gap-2 text-[11px] sm:text-xs text-amber-900 w-full max-w-full">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping shrink-0"></span>
+            <span className="font-semibold truncate sm:whitespace-normal">
+              Guest Demo Mode: Invoices not synced to cloud database.
+            </span>
           </div>
           <button
             type="button"
             onClick={() => setIsGuestMode(false)}
-            className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] shadow-xs transition cursor-pointer"
+            className="px-2.5 sm:px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] sm:text-[11px] shadow-xs transition cursor-pointer shrink-0 whitespace-nowrap"
           >
-            Shop Login / Signup
+            Shop Login
           </button>
         </div>
       )}
 
       {/* ================= TOP MODERN CLEAN HEADER ================= */}
-      <header className="no-print sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 shadow-md">
-        <div className="max-w-[1780px] mx-auto px-3 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between gap-3">
+      <header className="no-print sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 shadow-md w-full max-w-full">
+        <div className="max-w-[1780px] mx-auto px-3 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-3 w-full">
 
           {/* ZONE 1 (LEFT): BRAND IDENTITY & ACTIVE SHOP BADGE */}
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="flex items-center gap-2">
               <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/30 shrink-0">
                 <FileSpreadsheet className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 min-w-0">
                 <span className="font-extrabold text-sm sm:text-base tracking-tight text-white whitespace-nowrap">
                   GST Studio
                 </span>
@@ -682,7 +698,7 @@ Thank you for your business! 🙏`;
                   Tally A4
                 </span>
                 {isOffline && (
-                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 shrink-0">
                     <Zap className="w-2.5 h-2.5 text-amber-400" />
                     <span className="hidden md:inline">Offline</span>
                   </span>
@@ -817,20 +833,20 @@ Thank you for your business! 🙏`;
           </div>
 
           {/* ZONE 3 (RIGHT): PRIMARY ACTIONS */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {/* Sales Report Button */}
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            {/* Sales Report Button (hidden on mobile, accessible in mobile drawer) */}
             <button
               id="btn-daily-sales"
               type="button"
               onClick={() => setIsDailySalesModalOpen(true)}
-              className="px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95"
+              className="hidden sm:flex px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95"
               title="Daily Sales & Product Turnover Analytics"
             >
               <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
-              <span className="hidden sm:inline">Sales Report</span>
+              <span>Sales Report</span>
             </button>
 
-            {/* History Button */}
+            {/* History Button (hidden on mobile, in drawer) */}
             <button
               id="btn-invoice-history"
               type="button"
@@ -842,25 +858,25 @@ Thank you for your business! 🙏`;
               <span>History</span>
             </button>
 
-            {/* WhatsApp Share Button */}
+            {/* WhatsApp Share Button (hidden on mobile, in drawer) */}
             <button
               id="btn-whatsapp-share"
               type="button"
               onClick={handleShareWhatsApp}
-              className="hidden xs:flex sm:flex px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white items-center gap-1.5 shadow-sm shadow-emerald-600/30 transition cursor-pointer active:scale-95"
+              className="hidden md:flex px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white items-center gap-1.5 shadow-sm shadow-emerald-600/30 transition cursor-pointer active:scale-95"
               title="Share Invoice summary with customer on WhatsApp"
             >
               <MessageSquare className="w-3.5 h-3.5 text-white" />
-              <span className="hidden md:inline">WhatsApp</span>
+              <span>WhatsApp</span>
             </button>
 
-            {/* Primary Action: Download PDF */}
+            {/* Primary Action: Download PDF (hidden on mobile, mobile has sticky bottom PDF button) */}
             <button
               id="btn-download-pdf"
               type="button"
               onClick={() => handleDownloadPdf('download')}
               disabled={isGeneratingPdf}
-              className="px-3 sm:px-4 py-1.5 text-xs font-extrabold rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 shadow-md shadow-blue-500/25 transition disabled:opacity-50 cursor-pointer active:scale-95"
+              className="hidden sm:flex px-3 sm:px-4 py-1.5 text-xs font-extrabold rounded-xl bg-blue-600 hover:bg-blue-700 text-white items-center gap-1.5 shadow-md shadow-blue-500/25 transition disabled:opacity-50 cursor-pointer active:scale-95"
               title="Download PDF"
             >
               {isGeneratingPdf ? (
@@ -873,8 +889,23 @@ Thank you for your business! 🙏`;
               <span>{isGeneratingPdf ? 'Saving...' : downloadSuccess ? 'Saved!' : 'Download PDF'}</span>
             </button>
 
-            {/* Clean More Actions Dropdown */}
-            <div className="relative" id="more-menu-container">
+            {/* Mobile Quick PDF Button (< sm) */}
+            <button
+              type="button"
+              onClick={() => handleDownloadPdf('download')}
+              disabled={isGeneratingPdf}
+              className="sm:hidden p-1.5 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-xs transition disabled:opacity-50 cursor-pointer active:scale-95"
+              title="Download PDF"
+            >
+              {isGeneratingPdf ? (
+                <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Download className="w-3.5 h-3.5 text-white" />
+              )}
+            </button>
+
+            {/* Clean More Actions Dropdown (hidden on mobile, in drawer) */}
+            <div className="hidden sm:block relative" id="more-menu-container">
               <button
                 type="button"
                 onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
@@ -979,14 +1010,15 @@ Thank you for your business! 🙏`;
 
         {/* MOBILE VIEW SWITCHER (< 1024px) */}
         <div className="lg:hidden border-t border-slate-800 bg-slate-900 px-3 py-1.5 flex items-center justify-center gap-2">
-          <div className="w-full max-w-md grid grid-cols-2 bg-slate-950 p-0.5 rounded-xl text-xs font-semibold border border-slate-800 shadow-inner">
+          <div className="w-full max-w-md grid grid-cols-2 bg-slate-950 p-1 rounded-xl text-xs font-semibold border border-slate-800 shadow-inner">
             <button
               type="button"
               onClick={() => setViewMode('editor')}
-              className={`py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${viewMode === 'editor'
+              className={`py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                viewMode !== 'preview'
                   ? 'bg-blue-600 text-white shadow-xs font-bold'
                   : 'text-slate-400 hover:text-white'
-                }`}
+              }`}
             >
               <Edit3 className="w-3.5 h-3.5" />
               <span>Edit Invoice</span>
@@ -997,11 +1029,15 @@ Thank you for your business! 🙏`;
 
             <button
               type="button"
-              onClick={() => setViewMode('preview')}
-              className={`py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${viewMode === 'preview'
+              onClick={() => {
+                setViewMode('preview');
+                handleFitScreen();
+              }}
+              className={`py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                viewMode === 'preview'
                   ? 'bg-blue-600 text-white shadow-xs font-bold'
                   : 'text-slate-400 hover:text-white'
-                }`}
+              }`}
             >
               <Eye className="w-3.5 h-3.5" />
               <span>A4 Preview</span>
@@ -1158,10 +1194,10 @@ Thank you for your business! 🙏`;
       )}
 
       {/* ================= WORKSPACE BODY ================= */}
-      <main className="flex-1 max-w-[1780px] w-full mx-auto p-2.5 sm:p-4 flex flex-col">
-        {/* SPLIT VIEW (DESKTOP / LAPTOP DEFAULT) */}
+      <main className="flex-1 max-w-[1780px] w-full min-w-0 max-w-full overflow-x-hidden mx-auto p-2 sm:p-4 flex flex-col">
+        {/* SPLIT VIEW (DESKTOP / LAPTOP ONLY, >= 1024px) */}
         {viewMode === 'split' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 items-start">
+          <div className="hidden lg:grid grid-cols-12 gap-4 flex-1 items-start">
             {/* Left 6 cols: Editor */}
             <div className="no-print lg:col-span-6 h-auto lg:h-[calc(100vh-84px)] lg:sticky lg:top-[68px]">
               <InvoiceForm
@@ -1179,9 +1215,9 @@ Thank you for your business! 🙏`;
           </div>
         )}
 
-        {/* EDITOR ONLY VIEW */}
-        {viewMode === 'editor' && (
-          <div className="max-w-5xl w-full mx-auto flex-1 min-h-[calc(100vh-120px)]">
+        {/* EDITOR VIEW (ALWAYS WHEN IN EDITOR OR ON MOBILE WHEN NOT PREVIEW) */}
+        {(viewMode === 'editor' || viewMode === 'split') && (
+          <div className={`${viewMode === 'split' ? 'lg:hidden ' : ''}max-w-5xl w-full mx-auto flex-1 min-h-[calc(100vh-120px)]`}>
             <InvoiceForm
               data={invoiceData}
               onChange={setInvoiceData}
@@ -1200,7 +1236,7 @@ Thank you for your business! 🙏`;
       </main>
 
       {/* ================= MOBILE STICKY BOTTOM ACTION BAR (VISIBLE ON SCREENS < 1024px) ================= */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-3.5 py-2.5 shadow-2xl flex items-center justify-between gap-3 text-white">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-3.5 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] shadow-2xl flex items-center justify-between gap-3 text-white">
         <div className="flex flex-col min-w-0">
           <span className="text-[10px] text-slate-400 font-semibold tracking-wide uppercase">Gross Total</span>
           <span className="text-base font-extrabold text-emerald-400 truncate">
@@ -1209,7 +1245,16 @@ Thank you for your business! 🙏`;
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          {viewMode === 'editor' ? (
+          {viewMode === 'preview' ? (
+            <button
+              type="button"
+              onClick={() => setViewMode('editor')}
+              className="px-3.5 py-2 text-xs font-bold rounded-xl bg-slate-800 border border-slate-700 text-slate-200 flex items-center gap-1.5 shadow-2xs hover:bg-slate-700 transition cursor-pointer active:scale-95"
+            >
+              <Edit3 className="w-3.5 h-3.5 text-blue-400" />
+              <span>Edit Form</span>
+            </button>
+          ) : (
             <button
               type="button"
               onClick={() => {
@@ -1221,15 +1266,6 @@ Thank you for your business! 🙏`;
               <Eye className="w-3.5 h-3.5 text-blue-400" />
               <span>A4 Proof</span>
               <ArrowRight className="w-3 h-3 text-slate-400" />
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setViewMode('editor')}
-              className="px-3.5 py-2 text-xs font-bold rounded-xl bg-slate-800 border border-slate-700 text-slate-200 flex items-center gap-1.5 shadow-2xs hover:bg-slate-700 transition cursor-pointer active:scale-95"
-            >
-              <Edit3 className="w-3.5 h-3.5 text-blue-400" />
-              <span>Edit Form</span>
             </button>
           )}
 

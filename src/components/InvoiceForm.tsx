@@ -487,47 +487,49 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col h-full overflow-hidden text-slate-800">
       {/* Top Header Card - Unique Classic SaaS Header */}
-      <div className="bg-slate-50/90 backdrop-blur-xs text-slate-900 px-3.5 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between border-b border-slate-200/90">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white shadow-xs shadow-blue-500/20 shrink-0">
-            <Receipt className="w-4 h-4 text-white" />
+      <div className="bg-slate-50/90 backdrop-blur-xs text-slate-900 px-3 sm:px-5 py-2 sm:py-3 flex items-center justify-between border-b border-slate-200/90 gap-2 min-w-0">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white shadow-xs shadow-blue-500/20 shrink-0">
+            <Receipt className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight">
-                Invoice Studio Editor
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <h2 className="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight whitespace-nowrap truncate">
+                <span className="sm:hidden">Invoice Editor</span>
+                <span className="hidden sm:inline">Invoice Studio Editor</span>
               </h2>
-              <span className="text-[9px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-bold border border-emerald-200/80 flex items-center gap-1 shadow-2xs">
+              <span className="text-[9px] bg-emerald-50 text-emerald-700 px-1.5 sm:px-2 py-0.5 rounded-full font-bold border border-emerald-200/80 flex items-center gap-1 shadow-2xs shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Live Sync
+                <span className="hidden xs:inline">Live Sync</span>
+                <span className="xs:hidden">Live</span>
               </span>
-              <span className="hidden sm:inline-flex text-[10px] font-mono font-bold bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded-md">
+              <span className="hidden md:inline-flex text-[10px] font-mono font-bold bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded-md shrink-0">
                 #{data.dispatch?.invoiceNo || 'INV-001'}
               </span>
             </div>
-            <p className="text-[10px] text-slate-500 hidden xs:block sm:block">
+            <p className="text-[10px] text-slate-500 hidden sm:block truncate">
               Tally Exact GST Tax Invoice Designer & Real-time Live Sync
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <button
             type="button"
             onClick={onLoadSample}
-            className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 rounded-lg flex items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95"
+            className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 rounded-lg flex items-center gap-1 sm:gap-1.5 transition shadow-2xs cursor-pointer active:scale-95 shrink-0"
             title="Load sample invoice data"
           >
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+            <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
             <span>Sample</span>
           </button>
           <button
             type="button"
             onClick={onReset}
-            className="px-2.5 sm:px-3 py-1.5 text-xs font-medium bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 rounded-lg flex items-center gap-1.5 transition border border-slate-200 cursor-pointer active:scale-95 shadow-2xs"
+            className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 rounded-lg flex items-center gap-1 sm:gap-1.5 transition border border-slate-200 cursor-pointer active:scale-95 shadow-2xs shrink-0"
             title="Clear all fields"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
+            <RotateCcw className="w-3.5 h-3.5 text-slate-500 shrink-0" />
             <span>Reset</span>
           </button>
         </div>
@@ -683,35 +685,35 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               </div>
 
               {/* Row 2 on mobile, Right on desktop: Symmetrical Action Buttons */}
-              <div className="grid grid-cols-3 sm:flex sm:items-center gap-2 pt-1.5 sm:pt-0 border-t sm:border-t-0 border-slate-200/80">
+              <div className="grid grid-cols-3 sm:flex sm:items-center gap-1.5 sm:gap-2 pt-1.5 sm:pt-0 border-t sm:border-t-0 border-slate-200/80">
                 <button
                   type="button"
                   onClick={() => setShowProductMaster(true)}
-                  className="px-2.5 py-1.5 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95 shadow-2xs"
+                  className="px-2 py-1.5 text-[11px] sm:text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg flex items-center justify-center gap-1 transition cursor-pointer active:scale-95 shadow-2xs"
                   title="Choose from saved Product Library"
                 >
-                  <Package className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Library</span>
+                  <Package className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                  <span className="truncate">Library</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowAdvancedColumns(!showAdvancedColumns)}
-                  className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition cursor-pointer text-center flex items-center justify-center gap-1 shadow-2xs ${
+                  className={`px-2 py-1.5 text-[11px] sm:text-xs font-semibold rounded-lg border transition cursor-pointer text-center flex items-center justify-center gap-1 shadow-2xs ${
                     showAdvancedColumns
                       ? 'bg-slate-900 border-slate-900 text-white font-bold'
                       : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
                   }`}
                   title="Toggle Tax Rate and Discount columns"
                 >
-                  <span>{showAdvancedColumns ? '− Tax/Disc' : '+ Tax / Disc'}</span>
+                  <span className="truncate">{showAdvancedColumns ? '− Tax/Disc' : '+ Tax / Disc'}</span>
                 </button>
                 <button
                   type="button"
                   onClick={addItem}
-                  className="px-3.5 py-1.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1.5 shadow-sm shadow-blue-500/20 transition cursor-pointer active:scale-95"
+                  className="px-2.5 py-1.5 text-[11px] sm:text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1 shadow-sm shadow-blue-500/20 transition cursor-pointer active:scale-95"
                 >
-                  <Plus className="w-3.5 h-3.5 text-white" />
-                  <span>Add Item</span>
+                  <Plus className="w-3.5 h-3.5 text-white shrink-0" />
+                  <span className="truncate">Add Item</span>
                 </button>
               </div>
             </div>
@@ -898,8 +900,8 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                         )}
 
                         {/* Amount summary row */}
-                        <div className="bg-slate-50 p-2.5 rounded-lg flex items-center justify-between border border-slate-200/80">
-                          <span className="text-[11px] font-semibold text-slate-600">
+                        <div className="bg-blue-50/50 p-2.5 rounded-lg flex items-center justify-between border border-blue-100">
+                          <span className="text-[11px] font-bold text-slate-700">
                             Amount (Qty × Rate):
                           </span>
                           <div className="flex items-center gap-1.5">

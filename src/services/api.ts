@@ -87,6 +87,9 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
   } catch (err: any) {
     clearTimeout(timeoutId);
     console.error(`API request error on ${endpoint}:`, err);
+    if (err.name === 'AbortError' || err.message?.includes('aborted')) {
+      throw new Error('Connection timed out: Backend server is not responding. Please make sure the backend service is live on Render.');
+    }
     throw err;
   }
 }
@@ -106,10 +109,10 @@ export const authApi = {
       const isPages = typeof window !== 'undefined' && window.location.hostname.endsWith('github.io');
       if (isPages && !configuredApiBase) {
         throw new Error(
-          'GitHub Pages par live backend server connect nahi hai. Real email OTP ke liye Render.com par backend deploy karein.'
+          'Backend server is not connected to GitHub Pages. Please deploy the backend on Render.com or configure VITE_API_BASE_URL.'
         );
       }
-      throw new Error(err.message || 'Server se connect nahi ho paya. Kripya check karein ki server live hai.');
+      throw new Error(err.message || 'Unable to connect to the server. Please check your network or server status.');
     }
   },
 
@@ -125,7 +128,7 @@ export const authApi = {
       saveUserSession(res);
       return res;
     } catch (err: any) {
-      throw new Error(err.message || 'OTP verification failed. Kripya sahi OTP enter karein.');
+      throw new Error(err.message || 'OTP verification failed. Please enter a valid 6-digit verification code.');
     }
   },
 

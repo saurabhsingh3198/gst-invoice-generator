@@ -35,7 +35,7 @@ function emailOtpPlugin(): Plugin {
               if (!clean) {
                 res.statusCode = 400;
                 res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify({ error: 'Kripya mobile number ya email darj karein' }));
+                res.end(JSON.stringify({ error: 'Please enter a valid mobile number or email address' }));
                 return;
               }
 

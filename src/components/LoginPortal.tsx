@@ -50,7 +50,7 @@ export const LoginPortal: React.FC<LoginPortalProps> = ({
     try {
       const res = await authApi.sendOtp(identifier.trim());
       setOtpSent(true);
-      setSuccessMsg(res.message || 'OTP sent successfully! (Demo OTP: 123456)');
+      setSuccessMsg(res.message || 'OTP sent successfully to your email/phone.');
     } catch (err: any) {
       setError(err.message || 'Failed to send OTP. Please try again.');
     } finally {
@@ -70,7 +70,7 @@ export const LoginPortal: React.FC<LoginPortalProps> = ({
       const session = await authApi.verifyOtp(identifier.trim(), otpCode.trim());
       onLoginSuccess(session);
     } catch (err: any) {
-      setError(err.message || 'Invalid OTP code. Please enter 123456 or request a new code.');
+      setError(err.message || 'Invalid OTP code. Please enter the valid OTP sent to your device.');
     } finally {
       setLoading(false);
     }

@@ -1,13 +1,8 @@
 // Spring Boot Backend REST API Client
 // Handles Multi-Shop Tenant Isolation, OTP Authentication, and Daily Sales Analytics
 
-const isStaticGitHubPages =
-  typeof window !== 'undefined' &&
-  (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
-
 const configuredApiBase = (import.meta.env.VITE_API_BASE_URL as string)?.trim();
-// Do not use relative /api/v1 on GitHub Pages as static hosts reject POST with 405 Method Not Allowed
-const API_BASE_URL = configuredApiBase || (isStaticGitHubPages ? '' : '/api/v1');
+const API_BASE_URL = configuredApiBase || '/api/v1';
 
 export interface UserSession {
   token: string;
@@ -60,12 +55,8 @@ export const saveUserSession = (session: UserSession | null) => {
   }
 };
 
-// Request wrapper with JWT header & offline simulation fallback
+// Request wrapper with JWT header & error propagation
 async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  if (!API_BASE_URL) {
-    throw new Error('Static host without backend proxy. Running in client mode.');
-  }
-
   const token = getStoredAuthToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -76,10 +67,10 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
 
+  try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       headers,
@@ -89,88 +80,53 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.error || `Request failed with status ${response.status}`);
+      throw new Error(errData.error || `Server responded with status ${response.status}`);
     }
 
     return await response.json();
   } catch (err: any) {
-    console.warn(`Backend API unreachable at ${endpoint}, using seamless client simulation:`, err.message);
+    clearTimeout(timeoutId);
+    console.error(`API request error on ${endpoint}:`, err);
     throw err;
   }
 }
 
 export const authApi = {
-  sendOtp: async (identifier: string): Promise<{ message: string; demoOtp: string }> => {
-    if (API_BASE_URL) {
-      try {
-        const res = await apiRequest<{ message: string; demoOtp: string; token?: string }>('/auth/send-otp', {
-          method: 'POST',
-          body: JSON.stringify({ identifier }),
-        });
-        if (res.token) {
-          try { sessionStorage.setItem('gst_otp_token', res.token); } catch {}
-        }
-        return res;
-      } catch (err: any) {
-        console.warn('Backend send-otp failed, falling back to client mode:', err.message);
-      }
-    }
-
-    // Static GitHub Pages / Offline fallback:
-    // Generate a secure session token and supply demo OTP
-    const clean = identifier.trim().toLowerCase();
-    const isEmail = clean.includes('@');
-    const demoCode = '123456';
-
+  sendOtp: async (identifier: string): Promise<{ message: string; demoOtp?: string }> => {
     try {
-      sessionStorage.setItem('gst_otp_token', 'local_otp_' + Date.now());
-      sessionStorage.setItem('gst_otp_code', demoCode);
-      sessionStorage.setItem('gst_otp_identifier', clean);
-    } catch {}
-
-    return {
-      message: isEmail
-        ? `Verification code sent to ${clean}. Please check your inbox or spam folder.`
-        : `Verification code sent to ${clean}.`,
-      demoOtp: '',
-    };
+      const res = await apiRequest<{ message: string; demoOtp?: string; token?: string }>('/auth/send-otp', {
+        method: 'POST',
+        body: JSON.stringify({ identifier }),
+      });
+      if (res.token) {
+        try { sessionStorage.setItem('gst_otp_token', res.token); } catch {}
+      }
+      return res;
+    } catch (err: any) {
+      const isPages = typeof window !== 'undefined' && window.location.hostname.endsWith('github.io');
+      if (isPages && !configuredApiBase) {
+        throw new Error(
+          'GitHub Pages par live backend server connect nahi hai. Real email OTP ke liye Render.com par backend deploy karein.'
+        );
+      }
+      throw new Error(err.message || 'Server se connect nahi ho paya. Kripya check karein ki server live hai.');
+    }
   },
 
   verifyOtp: async (identifier: string, otpCode: string): Promise<UserSession> => {
     let token = '';
     try { token = sessionStorage.getItem('gst_otp_token') || ''; } catch {}
 
-    if (API_BASE_URL) {
-      try {
-        const res = await apiRequest<UserSession>('/auth/verify-otp', {
-          method: 'POST',
-          body: JSON.stringify({ identifier, otpCode, token }),
-        });
-        saveUserSession(res);
-        return res;
-      } catch (err: any) {
-        console.warn('Backend verify-otp failed, falling back to client verification:', err.message);
-      }
+    try {
+      const res = await apiRequest<UserSession>('/auth/verify-otp', {
+        method: 'POST',
+        body: JSON.stringify({ identifier, otpCode, token }),
+      });
+      saveUserSession(res);
+      return res;
+    } catch (err: any) {
+      throw new Error(err.message || 'OTP verification failed. Kripya sahi OTP enter karein.');
     }
-
-    // Static GitHub Pages / Offline verification:
-    const clean = identifier.trim().toLowerCase();
-    const cleanOtp = otpCode.trim();
-
-    if (cleanOtp === '123456' || cleanOtp.length === 6) {
-      const mockSession: UserSession = {
-        token: 'mock_jwt_token_' + Date.now(),
-        userId: 101,
-        shopId: 501,
-        shopName: clean.includes('saurabh') ? 'SAURABH.SINGH TRADERS' : clean.includes('98') ? 'Bhanu Traders' : 'My GST Shop',
-        phone: clean.replace(/[^0-9]/g, '') || '9876543210',
-        email: clean.includes('@') ? clean : undefined,
-        gstin: '09FELPS8884L1ZE',
-      };
-      saveUserSession(mockSession);
-      return mockSession;
-    }
-    throw new Error('Invalid OTP. Please enter 123456 or request a new OTP.');
   },
 
   signup: async (data: {

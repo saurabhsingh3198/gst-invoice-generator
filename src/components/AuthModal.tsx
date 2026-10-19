@@ -46,7 +46,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     try {
       const res = await authApi.sendOtp(identifier.trim());
       setOtpSent(true);
-      setSuccessMsg(res.message || 'OTP sent successfully! (Demo code: 123456)');
+      setSuccessMsg(res.message || 'OTP sent successfully to your email/phone.');
     } catch (err: any) {
       setError(err.message || 'Failed to send OTP');
     } finally {

@@ -8,7 +8,6 @@ import {
   AlertCircle,
   Building2,
   ArrowRight,
-  Sparkles,
 } from 'lucide-react';
 import { authApi } from '../services/api';
 import type { UserSession } from '../services/api';
@@ -199,13 +198,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                   </p>
                 </div>
 
-                <div className="bg-blue-50/80 p-3 rounded-xl border border-blue-200/60 flex items-center gap-2 text-xs text-blue-900">
-                  <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
-                  <span>
-                    <strong>Fast Testing:</strong> Enter any 10-digit number; default test OTP is <strong className="text-blue-950 font-mono">123456</strong>.
-                  </span>
-                </div>
-
                 <button
                   type="submit"
                   disabled={loading}
@@ -232,8 +224,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                     type="text"
                     maxLength={6}
                     value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value)}
-                    placeholder="123456"
+                    onChange={(e) => setOtpCode(e.target.value.replace(/[^0-9]/g, ''))}
+                    placeholder="● ● ● ● ● ●"
                     className="w-full px-3 py-2 text-center tracking-widest text-lg font-mono font-bold bg-white text-slate-900 border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none shadow-2xs"
                     autoFocus
                   />
@@ -241,10 +233,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                     <span>Sent to: <strong className="text-slate-700">{identifier}</strong></span>
                     <button
                       type="button"
-                      onClick={() => setOtpCode('123456')}
-                      className="text-blue-600 font-semibold hover:underline cursor-pointer"
+                      onClick={handleSendOtp}
+                      disabled={loading}
+                      className="text-blue-600 font-semibold hover:underline cursor-pointer disabled:opacity-50"
                     >
-                      Fill Demo OTP (123456)
+                      Resend Code
                     </button>
                   </div>
                 </div>

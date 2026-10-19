@@ -100,16 +100,6 @@ export const LoginPortal: React.FC<LoginPortalProps> = ({
     }
   };
 
-  const handleQuickDemoFill = () => {
-    if (!identifier) {
-      setIdentifier('9876543210');
-    }
-    setOtpSent(true);
-    setOtpCode('123456');
-    setError('');
-    setSuccessMsg('Demo credentials populated! Click "Verify & Open My Shop" to proceed.');
-  };
-
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between selection:bg-blue-600 selection:text-white relative overflow-x-hidden font-sans">
       {/* Background ambient accents in classic executive tones */}
@@ -168,21 +158,6 @@ export const LoginPortal: React.FC<LoginPortalProps> = ({
         {/* Auth Card: Placed FIRST on mobile for instant access */}
         <div className="w-full max-w-md lg:max-w-none lg:w-[460px] order-1 lg:order-2 shrink-0">
           <div className="bg-white text-slate-900 border border-slate-200 rounded-2xl p-4 sm:p-7 lg:p-8 shadow-2xl relative">
-            {/* Quick Demo Helper Ribbon */}
-            <div className="mb-4 sm:mb-5 p-2.5 sm:p-3 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5 text-blue-900 font-semibold text-[11px] sm:text-xs">
-                <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>Test Demo Login?</span>
-              </div>
-              <button
-                type="button"
-                onClick={handleQuickDemoFill}
-                className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[11px] transition shadow-xs cursor-pointer active:scale-95"
-              >
-                1-Click Auto Fill
-              </button>
-            </div>
-
             {/* Tab Switcher: Login vs Register */}
             <div className="flex p-1 rounded-xl bg-slate-100 border border-slate-200 mb-5 sm:mb-6 gap-1">
               <button
@@ -298,23 +273,22 @@ export const LoginPortal: React.FC<LoginPortalProps> = ({
                           type="text"
                           maxLength={6}
                           value={otpCode}
-                          onChange={(e) => setOtpCode(e.target.value)}
-                          placeholder="123456"
+                          onChange={(e) => setOtpCode(e.target.value.replace(/[^0-9]/g, ''))}
+                          placeholder="● ● ● ● ● ●"
                           className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl text-slate-900 text-lg font-mono tracking-widest text-center transition outline-none shadow-2xs"
                           autoFocus
                         />
                       </div>
 
-                      <div className="mt-2 flex items-center justify-between">
-                        <span className="text-[11px] text-slate-500">
-                          Demo OTP: <strong className="text-slate-800 font-mono">123456</strong>
-                        </span>
+                      <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500">
+                        <span>Didn't receive OTP?</span>
                         <button
                           type="button"
-                          onClick={() => setOtpCode('123456')}
-                          className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 underline cursor-pointer"
+                          onClick={handleSendOtp}
+                          disabled={loading}
+                          className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer disabled:opacity-50"
                         >
-                          Auto-fill 123456
+                          Resend Code
                         </button>
                       </div>
                     </div>
@@ -430,7 +404,7 @@ export const LoginPortal: React.FC<LoginPortalProps> = ({
                 className="text-xs text-slate-500 hover:text-slate-800 transition flex items-center justify-center gap-1 mx-auto cursor-pointer"
               >
                 <span>Want to test invoice generation first?</span>
-                <span className="text-blue-600 font-semibold underline">Guest Demo Mode</span>
+                <span className="text-blue-600 font-semibold underline">Guest Preview</span>
               </button>
             </div>
           </div>

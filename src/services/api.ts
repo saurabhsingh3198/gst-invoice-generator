@@ -130,9 +130,9 @@ export const authApi = {
 
     return {
       message: isEmail
-        ? `Demo Mode on GitHub Pages: Enter Demo OTP 123456 to open workspace! (Connect Spring Boot on Render for live Gmail delivery).`
-        : `OTP sent successfully to mobile (${clean})! (Demo code: ${demoCode})`,
-      demoOtp: demoCode,
+        ? `Verification code sent to ${clean}. Please check your inbox or spam folder.`
+        : `Verification code sent to ${clean}.`,
+      demoOtp: '',
     };
   },
 

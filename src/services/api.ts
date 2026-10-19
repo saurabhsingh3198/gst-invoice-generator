@@ -1,7 +1,13 @@
 // Spring Boot Backend REST API Client
 // Handles Multi-Shop Tenant Isolation, OTP Authentication, and Daily Sales Analytics
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string) || '/api/v1';
+const isStaticGitHubPages =
+  typeof window !== 'undefined' &&
+  (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
+
+const configuredApiBase = (import.meta.env.VITE_API_BASE_URL as string)?.trim();
+// Do not use relative /api/v1 on GitHub Pages as static hosts reject POST with 405 Method Not Allowed
+const API_BASE_URL = configuredApiBase || (isStaticGitHubPages ? '' : '/api/v1');
 
 export interface UserSession {
   token: string;
@@ -56,6 +62,10 @@ export const saveUserSession = (session: UserSession | null) => {
 
 // Request wrapper with JWT header & offline simulation fallback
 async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  if (!API_BASE_URL) {
+    throw new Error('Static host without backend proxy. Running in client mode.');
+  }
+
   const token = getStoredAuthToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -84,7 +94,6 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
 
     return await response.json();
   } catch (err: any) {
-    // If backend is not currently running, provide intelligent local mock/offline fallback
     console.warn(`Backend API unreachable at ${endpoint}, using seamless client simulation:`, err.message);
     throw err;
   }
@@ -92,52 +101,76 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
 
 export const authApi = {
   sendOtp: async (identifier: string): Promise<{ message: string; demoOtp: string }> => {
-    try {
-      const res = await apiRequest<{ message: string; demoOtp: string; token?: string }>('/auth/send-otp', {
-        method: 'POST',
-        body: JSON.stringify({ identifier }),
-      });
-      if (res.token) {
-        try { sessionStorage.setItem('gst_otp_token', res.token); } catch {}
+    if (API_BASE_URL) {
+      try {
+        const res = await apiRequest<{ message: string; demoOtp: string; token?: string }>('/auth/send-otp', {
+          method: 'POST',
+          body: JSON.stringify({ identifier }),
+        });
+        if (res.token) {
+          try { sessionStorage.setItem('gst_otp_token', res.token); } catch {}
+        }
+        return res;
+      } catch (err: any) {
+        console.warn('Backend send-otp failed, falling back to client mode:', err.message);
       }
-      return res;
-    } catch {
-      // Offline fallback: Demo OTP
-      return {
-        message: `OTP sent to ${identifier}`,
-        demoOtp: '123456',
-      };
     }
+
+    // Static GitHub Pages / Offline fallback:
+    // Generate a secure session token and supply demo OTP
+    const clean = identifier.trim().toLowerCase();
+    const isEmail = clean.includes('@');
+    const demoCode = '123456';
+
+    try {
+      sessionStorage.setItem('gst_otp_token', 'local_otp_' + Date.now());
+      sessionStorage.setItem('gst_otp_code', demoCode);
+      sessionStorage.setItem('gst_otp_identifier', clean);
+    } catch {}
+
+    return {
+      message: isEmail
+        ? `Demo Mode on GitHub Pages: Enter Demo OTP 123456 to open workspace! (Connect Spring Boot on Render for live Gmail delivery).`
+        : `OTP sent successfully to mobile (${clean})! (Demo code: ${demoCode})`,
+      demoOtp: demoCode,
+    };
   },
 
   verifyOtp: async (identifier: string, otpCode: string): Promise<UserSession> => {
     let token = '';
     try { token = sessionStorage.getItem('gst_otp_token') || ''; } catch {}
 
-    try {
-      const res = await apiRequest<UserSession>('/auth/verify-otp', {
-        method: 'POST',
-        body: JSON.stringify({ identifier, otpCode, token }),
-      });
-      saveUserSession(res);
-      return res;
-    } catch {
-      // Offline / Local Simulation
-      if (otpCode.trim() === '123456' || otpCode.trim().length === 6) {
-        const mockSession: UserSession = {
-          token: 'mock_jwt_token_' + Date.now(),
-          userId: 101,
-          shopId: 501,
-          shopName: identifier.includes('98') ? 'Bhanu Traders' : 'My GST Shop',
-          phone: identifier.replace(/[^0-9]/g, '') || '9876543210',
-          email: identifier.includes('@') ? identifier : undefined,
-          gstin: '09FELPS8884L1ZE',
-        };
-        saveUserSession(mockSession);
-        return mockSession;
+    if (API_BASE_URL) {
+      try {
+        const res = await apiRequest<UserSession>('/auth/verify-otp', {
+          method: 'POST',
+          body: JSON.stringify({ identifier, otpCode, token }),
+        });
+        saveUserSession(res);
+        return res;
+      } catch (err: any) {
+        console.warn('Backend verify-otp failed, falling back to client verification:', err.message);
       }
-      throw new Error('Invalid OTP. Please enter 123456 or request a new OTP.');
     }
+
+    // Static GitHub Pages / Offline verification:
+    const clean = identifier.trim().toLowerCase();
+    const cleanOtp = otpCode.trim();
+
+    if (cleanOtp === '123456' || cleanOtp.length === 6) {
+      const mockSession: UserSession = {
+        token: 'mock_jwt_token_' + Date.now(),
+        userId: 101,
+        shopId: 501,
+        shopName: clean.includes('saurabh') ? 'SAURABH.SINGH TRADERS' : clean.includes('98') ? 'Bhanu Traders' : 'My GST Shop',
+        phone: clean.replace(/[^0-9]/g, '') || '9876543210',
+        email: clean.includes('@') ? clean : undefined,
+        gstin: '09FELPS8884L1ZE',
+      };
+      saveUserSession(mockSession);
+      return mockSession;
+    }
+    throw new Error('Invalid OTP. Please enter 123456 or request a new OTP.');
   },
 
   signup: async (data: {

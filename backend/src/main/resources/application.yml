@@ -7,25 +7,12 @@ spring:
 
   # Default: In-Memory / File-based H2 Database for 0-setup instant run
   datasource:
-    url: jdbc:h2:file:./data/gst_invoicedb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=TRUE
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:file:/tmp/gst_invoicedb;DB_CLOSE_DELAY=-1}
     driverClassName: org.h2.Driver
     username: sa
     password: password
 
-  # For PostgreSQL production, uncomment below:
-  # datasource:
-  #   url: jdbc:postgresql://localhost:5432/gst_invoicedb
-  #   username: postgres
-  #   password: your_password
-
-  # For MySQL production, uncomment below:
-  # datasource:
-  #   url: jdbc:mysql://localhost:3306/gst_invoicedb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-  #   username: root
-  #   password: your_password
-
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
     show-sql: false

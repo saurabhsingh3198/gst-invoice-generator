@@ -107,13 +107,7 @@ export const authApi = {
       }
       return res;
     } catch (err: any) {
-      const isPages = typeof window !== 'undefined' && window.location.hostname.endsWith('github.io');
-      if (isPages && !configuredApiBase) {
-        throw new Error(
-          'Backend server is not connected to GitHub Pages. Please deploy the backend on Render.com or configure VITE_API_BASE_URL.'
-        );
-      }
-      throw new Error(err.message || 'Unable to connect to the server. Please check your network or server status.');
+      throw new Error(err.message || 'Unable to connect to the backend server. Please verify your internet connection or try again in a few moments.');
     }
   },
 

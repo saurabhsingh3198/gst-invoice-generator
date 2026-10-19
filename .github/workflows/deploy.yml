@@ -35,7 +35,7 @@ jobs:
 
       - name: Build project
         env:
-          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || secrets.VITE_API_BASE_URL }}
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || secrets.VITE_API_BASE_URL || 'https://gst-invoice-studio.onrender.com/api/v1' }}
         run: npm run build
 
       - name: Setup Pages

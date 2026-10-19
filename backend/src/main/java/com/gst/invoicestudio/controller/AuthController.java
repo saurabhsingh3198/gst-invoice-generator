@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
@@ -31,8 +32,7 @@ public class AuthController {
         }
         authService.requestOtp(req.getIdentifier());
         return ResponseEntity.ok(Map.of(
-                "message", "OTP sent successfully to " + req.getIdentifier(),
-                "demoOtp", "123456"
+                "message", "Verification OTP sent successfully to " + req.getIdentifier()
         ));
     }
 

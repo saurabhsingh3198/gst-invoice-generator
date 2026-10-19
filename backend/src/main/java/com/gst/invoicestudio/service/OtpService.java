@@ -22,7 +22,7 @@ public class OtpService {
     @Value("${app.otp.expiration-minutes:10}")
     private int expirationMinutes;
 
-    @Value("${app.otp.demo-bypass:true}")
+    @Value("${app.otp.demo-bypass:false}")
     private boolean demoBypass;
 
     private final SecureRandom random = new SecureRandom();

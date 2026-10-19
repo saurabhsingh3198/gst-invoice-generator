@@ -53,7 +53,7 @@ app:
     expiration-ms: 86400000 # 24 hours
   otp:
     expiration-minutes: 10
-    demo-bypass: true # Allows testing with default OTP 123456 in dev mode
+    demo-bypass: false
 
 cors:
   allowed-origins:

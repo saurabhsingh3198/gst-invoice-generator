@@ -93,10 +93,14 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
 export const authApi = {
   sendOtp: async (identifier: string): Promise<{ message: string; demoOtp: string }> => {
     try {
-      return await apiRequest('/auth/send-otp', {
+      const res = await apiRequest<{ message: string; demoOtp: string; token?: string }>('/auth/send-otp', {
         method: 'POST',
         body: JSON.stringify({ identifier }),
       });
+      if (res.token) {
+        try { sessionStorage.setItem('gst_otp_token', res.token); } catch {}
+      }
+      return res;
     } catch {
       // Offline fallback: Demo OTP
       return {
@@ -107,10 +111,13 @@ export const authApi = {
   },
 
   verifyOtp: async (identifier: string, otpCode: string): Promise<UserSession> => {
+    let token = '';
+    try { token = sessionStorage.getItem('gst_otp_token') || ''; } catch {}
+
     try {
       const res = await apiRequest<UserSession>('/auth/verify-otp', {
         method: 'POST',
-        body: JSON.stringify({ identifier, otpCode }),
+        body: JSON.stringify({ identifier, otpCode, token }),
       });
       saveUserSession(res);
       return res;

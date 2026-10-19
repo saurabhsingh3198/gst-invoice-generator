@@ -100,8 +100,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
-      <div className="bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in overflow-y-auto">
+      <div className="bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden flex flex-col my-auto max-h-[92vh]">
         {/* Header */}
         <div className="bg-slate-50 p-4 sm:p-5 flex items-center justify-between border-b border-slate-200">
           <div className="flex items-center gap-3">
@@ -161,7 +161,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
         </div>
 
         {/* Content Body */}
-        <div className="p-4 sm:p-6 space-y-4">
+        <div className="p-4 sm:p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-120px)]">
           {error && (
             <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
@@ -190,7 +190,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                       value={identifier}
                       onChange={(e) => setIdentifier(e.target.value)}
                       placeholder="e.g. 9876543210 or shop@gmail.com"
-                      className="w-full pl-9 pr-3 py-2 text-sm bg-white text-slate-900 border border-slate-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium outline-none placeholder:text-slate-400 shadow-2xs"
+                      className="w-full pl-9 pr-3 py-2.5 text-base sm:text-sm bg-white text-slate-900 border border-slate-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium outline-none placeholder:text-slate-400 shadow-2xs"
                       autoFocus
                     />
                   </div>

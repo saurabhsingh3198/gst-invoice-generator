@@ -111,25 +111,25 @@ export const LoginPortal: React.FC<LoginPortalProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between selection:bg-blue-600 selection:text-white relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between selection:bg-blue-600 selection:text-white relative overflow-x-hidden font-sans">
       {/* Background ambient accents in classic executive tones */}
       <div className="absolute top-[-10%] left-[-10%] w-[550px] h-[550px] rounded-full bg-blue-600/10 blur-[130px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[550px] h-[550px] rounded-full bg-indigo-600/10 blur-[140px] pointer-events-none" />
       <div className="absolute top-[40%] right-[30%] w-[350px] h-[350px] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none" />
 
       {/* Top Navbar */}
-      <header className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between border-b border-slate-800/80 backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-            <FileSpreadsheet className="w-5 h-5" />
+      <header className="relative z-10 max-w-7xl mx-auto w-full px-3.5 sm:px-6 py-3.5 sm:py-5 flex items-center justify-between border-b border-slate-800/80 backdrop-blur-md">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 shrink-0">
+            <FileSpreadsheet className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="font-extrabold text-base sm:text-xl tracking-tight text-white">
                 GST Invoice Studio
               </span>
-              <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-blue-950/80 text-blue-300 border border-blue-800/60">
-                Cloud SaaS
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-blue-950/80 text-blue-300 border border-blue-800/60">
+                Cloud
               </span>
             </div>
             <p className="text-[11px] text-slate-400 hidden sm:block">
@@ -142,93 +142,36 @@ export const LoginPortal: React.FC<LoginPortalProps> = ({
         <button
           type="button"
           onClick={onContinueAsGuest}
-          className="text-xs sm:text-sm font-semibold text-slate-300 hover:text-white bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer backdrop-blur-md shadow-2xs"
+          className="text-xs sm:text-sm font-semibold text-slate-300 hover:text-white bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl transition flex items-center gap-1 sm:gap-1.5 cursor-pointer backdrop-blur-md shadow-2xs shrink-0"
         >
-          <span>Demo / Guest Mode</span>
+          <span>Demo Mode</span>
           <ArrowRight className="w-3.5 h-3.5 text-blue-400" />
         </button>
       </header>
 
       {/* Main Content Hero + Auth Card */}
-      <main className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12 flex-1 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16">
-        {/* Left Side: Value Proposition & Highlights */}
-        <div className="w-full lg:w-1/2 flex flex-col items-start space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-950/60 border border-blue-800/50 text-blue-400 text-xs font-semibold backdrop-blur-md">
-            <Sparkles className="w-3.5 h-3.5 text-blue-400 animate-spin" />
-            <span>Multi-Shop Secure Cloud Billing Portal</span>
+      <main className="relative z-10 max-w-7xl mx-auto w-full px-3.5 sm:px-6 py-4 sm:py-10 flex-1 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-6 lg:gap-14">
+        {/* Mobile Hero Brief */}
+        <div className="w-full lg:hidden text-center pt-1 pb-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/70 border border-blue-800/50 text-blue-400 text-[11px] font-semibold mb-2">
+            <Sparkles className="w-3 h-3 text-blue-400" />
+            <span>Multi-Shop Cloud Portal</span>
           </div>
-
-          <h1 className="text-3xl sm:text-5xl lg:text-[46px] font-black tracking-tight leading-[1.15] text-white">
-            Smart Cloud <br />
-            <span className="bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">
-              GST Billing Studio
-            </span>{' '}
-            & Inventory Manager
+          <h1 className="text-2xl font-black text-white tracking-tight">
+            Smart Cloud <span className="text-blue-400">GST Studio</span>
           </h1>
-
-          <p className="text-sm sm:text-base text-slate-400 max-w-xl leading-relaxed">
-            A multi-tenant cloud billing platform for modern businesses. Securely manage GST tax invoices, customer directories, inventory, and daily sales reports with complete data privacy and isolation.
+          <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+            Login with your mobile number or email to open your shop workspace.
           </p>
-
-          {/* Key Value Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 w-full max-w-xl pt-2">
-            <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-start gap-3 hover:border-slate-700 transition">
-              <div className="p-2 rounded-lg bg-blue-600/15 text-blue-400 shrink-0">
-                <Store className="w-4 h-4" />
-              </div>
-              <div>
-                <h2 className="text-xs font-bold text-slate-200">100% Multi-Shop Isolation</h2>
-                <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">
-                  Each shop retains an independent, encrypted workspace.
-                </p>
-              </div>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-start gap-3 hover:border-slate-700 transition">
-              <div className="p-2 rounded-lg bg-blue-600/15 text-blue-400 shrink-0">
-                <TrendingUp className="w-4 h-4" />
-              </div>
-              <div>
-                <h2 className="text-xs font-bold text-slate-200">Daily Sales & Stock Report</h2>
-                <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">
-                  Date-wise items, quantity, tax split, and turnover analytics.
-                </p>
-              </div>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-start gap-3 hover:border-slate-700 transition">
-              <div className="p-2 rounded-lg bg-blue-600/15 text-blue-400 shrink-0">
-                <Receipt className="w-4 h-4" />
-              </div>
-              <div>
-                <h2 className="text-xs font-bold text-slate-200">Tally A4 Vector Invoices</h2>
-                <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">
-                  Standard Indian GST format, QR code, and dynamic words.
-                </p>
-              </div>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-start gap-3 hover:border-slate-700 transition">
-              <div className="p-2 rounded-lg bg-blue-600/15 text-blue-400 shrink-0">
-                <Phone className="w-4 h-4" />
-              </div>
-              <div>
-                <h2 className="text-xs font-bold text-slate-200">Mobile & Email OTP Login</h2>
-                <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">
-                  Passwordless authentication via verified Mobile / Email OTP.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* Right Side: High-contrast Crisp Classic Login / Signup Card */}
-        <div className="w-full lg:w-[460px] shrink-0">
-          <div className="bg-white text-slate-900 border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-2xl relative">
+        {/* Auth Card: Placed FIRST on mobile for instant access */}
+        <div className="w-full max-w-md lg:max-w-none lg:w-[460px] order-1 lg:order-2 shrink-0">
+          <div className="bg-white text-slate-900 border border-slate-200 rounded-2xl p-4 sm:p-7 lg:p-8 shadow-2xl relative">
             {/* Quick Demo Helper Ribbon */}
-            <div className="mb-5 p-3 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5 text-blue-900 font-semibold">
-                <Sparkles className="w-4 h-4 text-blue-600" />
+            <div className="mb-4 sm:mb-5 p-2.5 sm:p-3 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-1.5 text-blue-900 font-semibold text-[11px] sm:text-xs">
+                <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                 <span>Test Demo Login?</span>
               </div>
               <button
@@ -241,7 +184,7 @@ export const LoginPortal: React.FC<LoginPortalProps> = ({
             </div>
 
             {/* Tab Switcher: Login vs Register */}
-            <div className="flex p-1 rounded-xl bg-slate-100 border border-slate-200 mb-6 gap-1">
+            <div className="flex p-1 rounded-xl bg-slate-100 border border-slate-200 mb-5 sm:mb-6 gap-1">
               <button
                 type="button"
                 onClick={() => {
@@ -250,7 +193,7 @@ export const LoginPortal: React.FC<LoginPortalProps> = ({
                 }}
                 className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg transition cursor-pointer ${
                   activeTab === 'login'
-                    ? 'bg-white text-blue-700 shadow-2xs border border-slate-200/80'
+                    ? 'bg-white text-blue-700 shadow-2xs border border-slate-200/80 font-bold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -264,11 +207,11 @@ export const LoginPortal: React.FC<LoginPortalProps> = ({
                 }}
                 className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg transition cursor-pointer ${
                   activeTab === 'signup'
-                    ? 'bg-white text-blue-700 shadow-2xs border border-slate-200/80'
+                    ? 'bg-white text-blue-700 shadow-2xs border border-slate-200/80 font-bold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                🏬 Register New Shop
+                🏬 Register Shop
               </button>
             </div>
 
@@ -489,6 +432,82 @@ export const LoginPortal: React.FC<LoginPortalProps> = ({
                 <span>Want to test invoice generation first?</span>
                 <span className="text-blue-600 font-semibold underline">Guest Demo Mode</span>
               </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Value Proposition & Highlights (Order 2 on mobile, Order 1 on desktop) */}
+        <div className="w-full lg:w-1/2 order-2 lg:order-1 flex flex-col items-start space-y-4 sm:space-y-6 pt-4 lg:pt-0">
+          <div className="hidden lg:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-950/60 border border-blue-800/50 text-blue-400 text-xs font-semibold backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5 text-blue-400 animate-spin" />
+            <span>Multi-Shop Secure Cloud Billing Portal</span>
+          </div>
+
+          <h2 className="hidden lg:block text-3xl sm:text-5xl lg:text-[44px] font-black tracking-tight leading-[1.15] text-white">
+            Smart Cloud <br />
+            <span className="bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">
+              GST Billing Studio
+            </span>{' '}
+            & Inventory Manager
+          </h2>
+
+          <p className="hidden lg:block text-sm sm:text-base text-slate-400 max-w-xl leading-relaxed">
+            A multi-tenant cloud billing platform for modern businesses. Securely manage GST tax invoices, customer directories, inventory, and daily sales reports with complete data privacy and isolation.
+          </p>
+
+          <div className="w-full pt-1">
+            <div className="lg:hidden text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2.5 px-0.5">
+              Platform Features & Cloud Security
+            </div>
+            {/* Key Value Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 w-full max-w-xl">
+              <div className="p-3 sm:p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-start gap-3 hover:border-slate-700 transition">
+                <div className="p-2 rounded-lg bg-blue-600/15 text-blue-400 shrink-0">
+                  <Store className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-slate-200">100% Multi-Shop Isolation</h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">
+                    Each shop retains an independent, encrypted workspace.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-3 sm:p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-start gap-3 hover:border-slate-700 transition">
+                <div className="p-2 rounded-lg bg-blue-600/15 text-blue-400 shrink-0">
+                  <TrendingUp className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-slate-200">Daily Sales & Stock Report</h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">
+                    Date-wise items, quantity, tax split, and turnover analytics.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-3 sm:p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-start gap-3 hover:border-slate-700 transition">
+                <div className="p-2 rounded-lg bg-blue-600/15 text-blue-400 shrink-0">
+                  <Receipt className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-slate-200">Tally A4 Vector Invoices</h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">
+                    Standard Indian GST format, QR code, and dynamic words.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-3 sm:p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-start gap-3 hover:border-slate-700 transition">
+                <div className="p-2 rounded-lg bg-blue-600/15 text-blue-400 shrink-0">
+                  <Phone className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-slate-200">Mobile & Email OTP Login</h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">
+                    Passwordless authentication via verified Mobile / Email OTP.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

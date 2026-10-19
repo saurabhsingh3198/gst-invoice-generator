@@ -1,12 +1,12 @@
 services:
   - type: web
-    name: gst-invoice-studio-backend
+    name: gst-invoice-studio
     runtime: docker
-    dockerfilePath: backend/Dockerfile
-    dockerContext: backend
+    dockerfilePath: Dockerfile
+    dockerContext: .
     plan: free
     region: oregon
-    healthCheckPath: /api/v1/auth/health
+    healthCheckPath: /
     envVars:
       - key: PORT
         value: 8080

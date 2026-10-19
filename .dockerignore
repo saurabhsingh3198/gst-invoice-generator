@@ -1,0 +1,10 @@
+node_modules
+.git
+.github
+.idea
+.vscode
+dist
+backend/target
+backend/data
+*.log
+.DS_Store

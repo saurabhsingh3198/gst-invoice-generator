@@ -24,9 +24,25 @@ import {
   History,
   DownloadCloud,
   Zap,
+  TrendingUp,
+  Store,
+  LogIn,
+  LogOut,
+  ChevronDown,
+  MoreVertical,
+  Menu,
+  X,
+  Sparkles,
+  RotateCcw,
+  MessageSquare,
 } from 'lucide-react';
 import { getNextInvoiceNo, recordLastInvoiceNo } from './utils/invoiceSequence';
 import { usePwa } from './utils/usePwa';
+import { AuthModal } from './components/AuthModal';
+import { DailySalesModal } from './components/DailySalesModal';
+import { LoginPortal } from './components/LoginPortal';
+import { getStoredUserSession, authApi } from './services/api';
+import type { UserSession } from './services/api';
 
 const DRAFT_STORAGE_KEY = 'gst_invoice_current_draft_v1';
 
@@ -67,6 +83,54 @@ export const App: React.FC = () => {
   });
 
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState<boolean>(false);
+  const [userSession, setUserSession] = useState<UserSession | null>(() => getStoredUserSession());
+  const [isGuestMode, setIsGuestMode] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [isDailySalesModalOpen, setIsDailySalesModalOpen] = useState<boolean>(false);
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState<boolean>(false);
+  const [isShopMenuOpen, setIsShopMenuOpen] = useState<boolean>(false);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState<boolean>(false);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('#shop-menu-container')) {
+        setIsShopMenuOpen(false);
+      }
+      if (!target.closest('#more-menu-container')) {
+        setIsMoreMenuOpen(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  const handleLoginSuccess = (session: UserSession) => {
+    setUserSession(session);
+    setIsGuestMode(false);
+    if (session.shopName) {
+      setInvoiceData((prev) => ({
+        ...prev,
+        seller: {
+          ...prev.seller,
+          name: session.shopName,
+          gstin: session.gstin || prev.seller.gstin,
+          phone: session.phone || prev.seller.phone,
+        },
+        signatoryCompany: session.shopName,
+      }));
+    }
+  };
+
+  const handleLogout = () => {
+    authApi.logout();
+    setUserSession(null);
+    setIsGuestMode(false);
+    setIsShopMenuOpen(false);
+    setIsMoreMenuOpen(false);
+    setIsMobileDrawerOpen(false);
+  };
 
   const [viewMode, setViewMode] = useState<'split' | 'editor' | 'preview'>(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
@@ -236,6 +300,37 @@ export const App: React.FC = () => {
 
       setDownloadSuccess(true);
       setTimeout(() => setDownloadSuccess(false), 3500);
+
+      // Auto-save generated invoice to history records so reports & backups are immediately updated
+      try {
+        const rawHistory = localStorage.getItem('gst_invoices_history_records');
+        const list = rawHistory ? JSON.parse(rawHistory) : [];
+        const invNo = invoiceData.dispatch.invoiceNo || 'Draft';
+        const rawTotal = invoiceData.items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+        const rounded = invoiceData.enableRoundOff !== false ? Math.round(rawTotal) : rawTotal;
+        const newRecord = {
+          id: `inv-${Date.now()}`,
+          invoiceNo: invNo,
+          invoiceDate: invoiceData.dispatch.invoiceDate || new Date().toLocaleDateString('en-GB'),
+          buyerName: invoiceData.buyer.name || 'Unnamed Buyer',
+          sellerName: invoiceData.seller.name || 'Seller',
+          totalAmount: rounded,
+          itemCount: invoiceData.items.length,
+          savedAt: new Date().toLocaleString('en-IN'),
+          data: JSON.parse(JSON.stringify(invoiceData)),
+        };
+        const existingIdx = list.findIndex(
+          (r: any) => (r.invoiceNo || '').trim().toLowerCase() === invNo.trim().toLowerCase()
+        );
+        if (existingIdx >= 0) {
+          list[existingIdx] = newRecord;
+        } else {
+          list.unshift(newRecord);
+        }
+        localStorage.setItem('gst_invoices_history_records', JSON.stringify(list));
+      } catch (saveHistoryErr) {
+        console.warn('Auto-save to history failed', saveHistoryErr);
+      }
     } catch (err) {
       console.error('PDF generation error:', err);
       // Fallback
@@ -244,6 +339,47 @@ export const App: React.FC = () => {
     } finally {
       setIsGeneratingPdf(false);
     }
+  };
+
+  // 1-Click WhatsApp Invoice Share
+  const handleShareWhatsApp = () => {
+    const rawNo = invoiceData.dispatch?.invoiceNo || 'Draft';
+    const totalFormatted = formatIndianCurrency(totalAmount);
+    const seller = invoiceData.seller?.name || userSession?.shopName || 'Our Shop';
+    const buyer = invoiceData.buyer?.name || 'Valued Customer';
+    const itemsCount = invoiceData.items.length;
+
+    const text = 
+`🧾 *TAX INVOICE - ${seller}*
+---------------------------------------
+*Invoice No:* #${rawNo}
+*Date:* ${invoiceData.dispatch.invoiceDate || 'Today'}
+*Billed To:* ${buyer}
+*Total Items:* ${itemsCount}
+*Grand Total:* ₹ ${totalFormatted}
+---------------------------------------
+Your GST Tax Invoice has been generated.
+Thank you for your business! 🙏`;
+
+    let phone = '';
+    const nameMatch = invoiceData.buyer?.name?.match(/\b[6-9]\d{9}\b/);
+    if (nameMatch) {
+      phone = nameMatch[0];
+    } else {
+      const input = window.prompt(
+        'Please enter Customer\'s 10-digit WhatsApp number:',
+        ''
+      );
+      if (input === null) return;
+      phone = input.replace(/[^0-9]/g, '');
+    }
+
+    const encoded = encodeURIComponent(text);
+    const url = phone && phone.length >= 10
+      ? `https://api.whatsapp.com/send?phone=91${phone.slice(-10)}&text=${encoded}`
+      : `https://api.whatsapp.com/send?text=${encoded}`;
+
+    window.open(url, '_blank');
   };
 
   // Live Auto-Save to localStorage
@@ -266,7 +402,7 @@ export const App: React.FC = () => {
       setInvoiceData(JSON.parse(JSON.stringify(sampleInvoiceData)));
       try {
         localStorage.removeItem(DRAFT_STORAGE_KEY);
-      } catch (e) {}
+      } catch (e) { }
     }
   };
 
@@ -302,7 +438,7 @@ export const App: React.FC = () => {
           if (parsed.bankDetails) defaultBankDetails = parsed.bankDetails;
           if (parsed.signatoryCompany) defaultSignatory = parsed.signatoryCompany;
         }
-      } catch (e) {}
+      } catch (e) { }
 
       // Automatically compute next sequence invoice number (e.g. 74 -> 75, or INV/089 -> INV/090)
       const currentNo = invoiceData.dispatch?.invoiceNo;
@@ -376,7 +512,7 @@ export const App: React.FC = () => {
       });
       try {
         localStorage.removeItem(DRAFT_STORAGE_KEY);
-      } catch (e) {}
+      } catch (e) { }
     }
   };
 
@@ -400,22 +536,22 @@ export const App: React.FC = () => {
 
     return (
       <div className="w-full h-full flex flex-col">
-        {/* Preview Toolbar - Studio Grade Glassmorphism */}
-        <div className="no-print w-full flex items-center justify-between bg-white/95 backdrop-blur-md px-3.5 sm:px-4 py-2.5 rounded-t-2xl border border-slate-200/90 border-b-0 shadow-2xs shrink-0">
+        {/* Preview Toolbar - Classic Executive Styling */}
+        <div className="no-print w-full flex items-center justify-between bg-white text-slate-800 px-3.5 sm:px-4 py-2.5 rounded-t-2xl border border-slate-200 border-b-0 shadow-xs shrink-0">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-xs shadow-emerald-500/50"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse shadow-xs shadow-blue-500/50"></span>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs sm:text-sm font-extrabold text-slate-800 tracking-tight">
+              <span className="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight">
                 A4 Document Studio
               </span>
-              <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full hidden sm:inline border border-slate-200/70">
+              <span className="text-[10px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full hidden sm:inline border border-slate-200">
                 210 × 297 mm • Vector Exact
               </span>
             </div>
           </div>
 
           {/* Zoom controls - Pill Segmented Stepper */}
-          <div className="flex items-center gap-1 bg-slate-100/90 rounded-xl p-1 border border-slate-200/80 shadow-2xs">
+          <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1 border border-slate-200 shadow-2xs">
             <button
               type="button"
               onClick={() => setZoomLevel((z) => Math.max(0.35, Math.round((z - 0.08) * 100) / 100))}
@@ -438,15 +574,15 @@ export const App: React.FC = () => {
               <ZoomIn className="w-3.5 h-3.5" />
             </button>
 
-            <div className="h-3 w-px bg-slate-300 mx-0.5"></div>
+            <div className="h-3 w-px bg-slate-200 mx-0.5"></div>
 
             <button
               type="button"
               onClick={handleFitScreen}
-              className="px-2 py-1 hover:bg-white rounded-lg text-indigo-700 text-[10px] font-bold transition flex items-center gap-1 border border-indigo-100 bg-white shadow-2xs cursor-pointer active:scale-95"
+              className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold rounded-lg transition flex items-center gap-1 shadow-xs cursor-pointer active:scale-95"
               title="Fit to Screen"
             >
-              <Maximize2 className="w-3 h-3 text-indigo-600" />
+              <Maximize2 className="w-3 h-3 text-white" />
               <span>Fit</span>
             </button>
 
@@ -463,9 +599,8 @@ export const App: React.FC = () => {
 
         {/* Scrollable canvas container with bulletproof centered scale wrapper & Studio Canvas */}
         <div
-          className={`w-full flex-1 bg-studio-canvas p-3 sm:p-6 rounded-b-2xl border border-slate-200/90 overflow-auto flex flex-col items-center shadow-inner ${
-            isSplitLayout ? '' : 'min-h-[520px] sm:min-h-[880px]'
-          }`}
+          className={`w-full flex-1 bg-studio-canvas p-3 sm:p-6 rounded-b-2xl border border-slate-200 overflow-auto flex flex-col items-center shadow-inner ${isSplitLayout ? '' : 'min-h-[520px] sm:min-h-[880px]'
+            }`}
         >
           {/* Scaled bounding container with realistic paper shadow */}
           <div
@@ -497,102 +632,152 @@ export const App: React.FC = () => {
     );
   };
 
+  // Gatekeeper: If user is not logged in and not in guest mode, show the Login Portal
+  if (!userSession && !isGuestMode) {
+    return (
+      <LoginPortal
+        onLoginSuccess={(session) => {
+          handleLoginSuccess(session);
+          setIsGuestMode(false);
+        }}
+        onContinueAsGuest={() => setIsGuestMode(true)}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col text-slate-800 font-sans pb-16 lg:pb-0">
-      {/* ================= TOP RESPONSIVE HEADER ================= */}
-      <header className="no-print sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
-        <div className="max-w-[1780px] mx-auto px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-4">
-          {/* Brand Logo & Name */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-violet-700 flex items-center justify-center text-white shadow-md shadow-indigo-600/25 shrink-0">
-              <FileSpreadsheet className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-            </div>
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="font-extrabold text-sm sm:text-base tracking-tight text-slate-900 whitespace-nowrap">
-                GST Invoice Studio
-              </span>
-              <span className="text-[9px] sm:text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 border border-emerald-200/80 shrink-0 shadow-2xs">
-                Tally A4
-              </span>
-              {isOffline && (
-                <span
-                  className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1 shrink-0 animate-pulse"
-                  title="Offline Mode Active - You can create, calculate and print invoices without internet"
-                >
-                  <Zap className="w-2.5 h-2.5 text-amber-600" />
-                  <span>Offline</span>
+    <div className="min-h-screen bg-slate-100 flex flex-col text-slate-900 font-sans pb-16 lg:pb-0">
+      {/* Guest Mode Banner */}
+      {isGuestMode && !userSession && (
+        <div className="no-print bg-amber-500/10 border-b border-amber-200 px-4 py-2 flex items-center justify-between text-xs text-amber-900">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+            <span className="font-semibold">Guest Demo Mode: Invoices are not synced to cloud shop database.</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsGuestMode(false)}
+            className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] shadow-xs transition cursor-pointer"
+          >
+            Shop Login / Signup
+          </button>
+        </div>
+      )}
+
+      {/* ================= TOP MODERN CLEAN HEADER ================= */}
+      <header className="no-print sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 shadow-md">
+        <div className="max-w-[1780px] mx-auto px-3 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between gap-3">
+
+          {/* ZONE 1 (LEFT): BRAND IDENTITY & ACTIVE SHOP BADGE */}
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/30 shrink-0">
+                <FileSpreadsheet className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-extrabold text-sm sm:text-base tracking-tight text-white whitespace-nowrap">
+                  GST Studio
                 </span>
-              )}
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hidden sm:inline">
+                  Tally A4
+                </span>
+                {isOffline && (
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                    <Zap className="w-2.5 h-2.5 text-amber-400" />
+                    <span className="hidden md:inline">Offline</span>
+                  </span>
+                )}
+              </div>
             </div>
+
+            {/* Shop Badge & Dropdown */}
+            {userSession ? (
+              <div className="relative" id="shop-menu-container">
+                <button
+                  type="button"
+                  onClick={() => setIsShopMenuOpen(!isShopMenuOpen)}
+                  className="flex items-center gap-1.5 sm:gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl px-2.5 py-1 text-xs transition cursor-pointer shadow-2xs group text-white"
+                  title="Shop Details & Profile"
+                >
+                  <Store className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                  <span className="font-bold text-white max-w-[110px] sm:max-w-[160px] truncate">
+                    {userSession.shopName}
+                  </span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+                  <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-white transition" />
+                </button>
+
+                {/* Shop Menu Dropdown */}
+                {isShopMenuOpen && (
+                  <div className="absolute left-0 mt-2 w-64 bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/80 mb-1.5">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Shop Profile</p>
+                      <p className="font-extrabold text-sm text-white truncate mt-0.5">{userSession.shopName}</p>
+                      <p className="text-xs text-blue-400 font-mono mt-0.5">📞 +91 {userSession.phone}</p>
+                      {userSession.gstin && (
+                        <p className="text-[11px] text-slate-300 font-mono mt-0.5">GST: {userSession.gstin}</p>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsDailySalesModalOpen(true);
+                        setIsShopMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white rounded-xl transition flex items-center gap-2 cursor-pointer"
+                    >
+                      <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                      <span>Daily Sales & Stock Report</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsHistoryModalOpen(true);
+                        setIsShopMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white rounded-xl transition flex items-center gap-2 cursor-pointer"
+                    >
+                      <History className="w-3.5 h-3.5 text-blue-400" />
+                      <span>Invoice History & Backups</span>
+                    </button>
+
+                    <div className="border-t border-slate-800 my-1"></div>
+
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="w-full text-left px-3 py-2 text-xs font-bold text-rose-300 hover:bg-rose-500/20 rounded-xl transition flex items-center gap-2 cursor-pointer"
+                    >
+                      <LogOut className="w-3.5 h-3.5 text-rose-400" />
+                      <span>Logout Shop</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsGuestMode(false)}
+                className="text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Shop Login</span>
+              </button>
+            )}
           </div>
 
-          {/* Quick Metrics Badge (Desktop / Tablet >= 768px) */}
-          <div className="hidden md:flex items-center gap-3 bg-slate-50/90 px-3.5 py-1.5 rounded-xl border border-slate-200/80 text-xs shadow-2xs">
-            <div>
-              <span className="text-slate-400 font-medium">Inv: </span>
-              <span className="font-mono font-bold text-slate-900">
-                #{invoiceData.dispatch.invoiceNo || '—'}
-              </span>
-            </div>
-            <div className="h-3 w-px bg-slate-300"></div>
-            <div>
-              <span className="text-slate-400 font-medium">Items: </span>
-              <span className="font-bold text-slate-900">{invoiceData.items.length}</span>
-            </div>
-            <div className="h-3 w-px bg-slate-300"></div>
-            <div>
-              <span className="text-slate-400 font-medium">Gross: </span>
-              <span className="font-extrabold text-indigo-700">
-                ₹ {formatIndianCurrency(totalAmount)}
-              </span>
-            </div>
-            <div className="h-3 w-px bg-slate-300"></div>
-            <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 font-semibold" title="Changes auto-saved to browser storage">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="hidden xl:inline font-bold">Auto-Saved</span>
-            </div>
-          </div>
-
-          {/* View Mode & Actions */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {/* Install App Button (PWA) */}
-            <button
-              id="btn-install-app"
-              type="button"
-              onClick={installApp}
-              className={`p-1.5 sm:px-3 sm:py-1.5 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95 ${
-                isInstallable
-                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white font-bold animate-pulse shadow-emerald-600/30'
-                  : 'bg-slate-100/90 hover:bg-slate-200 text-slate-700 border border-slate-300/80'
-              }`}
-              title="Install GST Invoice Studio App on this device for 100% offline billing"
-            >
-              <DownloadCloud className={`w-3.5 h-3.5 ${isInstallable ? 'text-white' : 'text-slate-600'}`} />
-              <span className="hidden sm:inline">Install</span>
-            </button>
-
-            {/* History Button */}
-            <button
-              id="btn-invoice-history"
-              type="button"
-              onClick={() => setIsHistoryModalOpen(true)}
-              className="p-1.5 sm:px-3 sm:py-1.5 text-xs font-semibold rounded-xl bg-indigo-50/80 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 flex items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95"
-              title="Open Invoice History & Backups"
-            >
-              <History className="w-3.5 h-3.5 text-indigo-600" />
-              <span className="hidden sm:inline">History</span>
-            </button>
-
-            {/* Desktop View Mode Toggle */}
-            <div className="hidden lg:flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 text-xs font-medium shadow-2xs">
+          {/* ZONE 2 (CENTER): CLEAN VIEW SWITCHER (LG+ SCREENS) */}
+          <div className="hidden lg:flex items-center gap-3">
+            <div className="flex items-center bg-slate-950/70 p-1 rounded-xl border border-slate-800 text-xs font-medium shadow-inner">
               <button
                 type="button"
                 onClick={() => setViewMode('split')}
-                className={`px-3 py-1 rounded-lg flex items-center gap-1.5 transition cursor-pointer ${
-                  viewMode === 'split'
-                    ? 'bg-white text-indigo-700 shadow-xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
+                className={`px-3 py-1 rounded-lg flex items-center gap-1.5 transition cursor-pointer ${viewMode === 'split'
+                    ? 'bg-blue-600 text-white shadow-xs font-bold'
+                    : 'text-slate-400 hover:text-white'
+                  }`}
                 title="Split View: Side-by-side Editor & Preview"
               >
                 <Columns className="w-3.5 h-3.5" />
@@ -601,12 +786,11 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setViewMode('editor')}
-                className={`px-3 py-1 rounded-lg flex items-center gap-1.5 transition cursor-pointer ${
-                  viewMode === 'editor'
-                    ? 'bg-white text-indigo-700 shadow-xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="Editor Only"
+                className={`px-3 py-1 rounded-lg flex items-center gap-1.5 transition cursor-pointer ${viewMode === 'editor'
+                    ? 'bg-blue-600 text-white shadow-xs font-bold'
+                    : 'text-slate-400 hover:text-white'
+                  }`}
+                title="Editor View Only"
               >
                 <FileSpreadsheet className="w-3.5 h-3.5" />
                 <span>Editor</span>
@@ -614,50 +798,69 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setViewMode('preview')}
-                className={`px-3 py-1 rounded-lg flex items-center gap-1.5 transition cursor-pointer ${
-                  viewMode === 'preview'
-                    ? 'bg-white text-indigo-700 shadow-xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="Preview Only"
+                className={`px-3 py-1 rounded-lg flex items-center gap-1.5 transition cursor-pointer ${viewMode === 'preview'
+                    ? 'bg-blue-600 text-white shadow-xs font-bold'
+                    : 'text-slate-400 hover:text-white'
+                  }`}
+                title="Preview View Only"
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span>Preview</span>
               </button>
             </div>
 
-            {/* Print Button */}
+            {/* Gross total pill */}
+            <div className="hidden xl:flex items-center gap-2 bg-slate-800/80 border border-slate-700 px-3 py-1 rounded-xl text-xs font-medium text-slate-300">
+              <span>Gross:</span>
+              <span className="font-extrabold text-emerald-400">₹ {formatIndianCurrency(totalAmount)}</span>
+            </div>
+          </div>
+
+          {/* ZONE 3 (RIGHT): PRIMARY ACTIONS */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Sales Report Button */}
             <button
-              id="btn-print-invoice"
+              id="btn-daily-sales"
               type="button"
-              onClick={handlePrint}
-              className="p-1.5 sm:px-3 sm:py-1.5 text-xs font-semibold rounded-xl bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95"
-              title="Print directly or save as PDF via browser"
+              onClick={() => setIsDailySalesModalOpen(true)}
+              className="px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95"
+              title="Daily Sales & Product Turnover Analytics"
             >
-              <Printer className="w-3.5 h-3.5 text-slate-300" />
-              <span className="hidden sm:inline">Print</span>
+              <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+              <span className="hidden sm:inline">Sales Report</span>
             </button>
 
-            {/* View PDF Button (Desktop / Tablet) */}
+            {/* History Button */}
             <button
-              id="btn-view-pdf"
+              id="btn-invoice-history"
               type="button"
-              onClick={() => handleDownloadPdf('open')}
-              disabled={isGeneratingPdf}
-              className="hidden sm:flex px-2.5 py-1.5 text-xs font-semibold rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 items-center gap-1.5 border border-slate-200/90 transition shadow-2xs disabled:opacity-50 cursor-pointer active:scale-95"
-              title="Open generated PDF in new tab"
+              onClick={() => setIsHistoryModalOpen(true)}
+              className="hidden sm:flex px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95"
+              title="Open Invoice History & Backups"
             >
-              <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
-              <span>View</span>
+              <History className="w-3.5 h-3.5 text-blue-400" />
+              <span>History</span>
             </button>
 
-            {/* Download PDF Button */}
+            {/* WhatsApp Share Button */}
+            <button
+              id="btn-whatsapp-share"
+              type="button"
+              onClick={handleShareWhatsApp}
+              className="hidden xs:flex sm:flex px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white items-center gap-1.5 shadow-sm shadow-emerald-600/30 transition cursor-pointer active:scale-95"
+              title="Share Invoice summary with customer on WhatsApp"
+            >
+              <MessageSquare className="w-3.5 h-3.5 text-white" />
+              <span className="hidden md:inline">WhatsApp</span>
+            </button>
+
+            {/* Primary Action: Download PDF */}
             <button
               id="btn-download-pdf"
               type="button"
               onClick={() => handleDownloadPdf('download')}
               disabled={isGeneratingPdf}
-              className="px-3 sm:px-4 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white flex items-center gap-1.5 shadow-md shadow-indigo-600/25 hover:shadow-indigo-600/35 transition disabled:opacity-50 cursor-pointer active:scale-95"
+              className="px-3 sm:px-4 py-1.5 text-xs font-extrabold rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 shadow-md shadow-blue-500/25 transition disabled:opacity-50 cursor-pointer active:scale-95"
               title="Download PDF"
             >
               {isGeneratingPdf ? (
@@ -665,33 +868,129 @@ export const App: React.FC = () => {
               ) : downloadSuccess ? (
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
               ) : (
-                <Download className="w-3.5 h-3.5" />
+                <Download className="w-3.5 h-3.5 text-white" />
               )}
-              <span className="hidden xs:inline sm:inline">
-                {isGeneratingPdf ? 'Saving...' : downloadSuccess ? 'Saved!' : 'Download PDF'}
-              </span>
-              <span className="inline xs:hidden sm:hidden">
-                {isGeneratingPdf ? '...' : downloadSuccess ? 'Done' : 'PDF'}
-              </span>
+              <span>{isGeneratingPdf ? 'Saving...' : downloadSuccess ? 'Saved!' : 'Download PDF'}</span>
+            </button>
+
+            {/* Clean More Actions Dropdown */}
+            <div className="relative" id="more-menu-container">
+              <button
+                type="button"
+                onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
+                className="p-1.5 sm:p-2 text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition cursor-pointer active:scale-95 shadow-2xs"
+                title="More Options (Print, View, Install, Reset)"
+              >
+                <MoreVertical className="w-4 h-4" />
+              </button>
+
+              {isMoreMenuOpen && (
+                <div className="absolute right-0 mt-2 w-52 bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleShareWhatsApp();
+                      setIsMoreMenuOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white rounded-xl transition flex items-center gap-2 cursor-pointer"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Share on WhatsApp</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handlePrint();
+                      setIsMoreMenuOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white rounded-xl transition flex items-center gap-2 cursor-pointer"
+                  >
+                    <Printer className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Print Direct A4</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDownloadPdf('open');
+                      setIsMoreMenuOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white rounded-xl transition flex items-center gap-2 cursor-pointer"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Open PDF in Tab</span>
+                  </button>
+
+                  {isInstallable && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        installApp();
+                        setIsMoreMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white rounded-xl transition flex items-center gap-2 cursor-pointer"
+                    >
+                      <DownloadCloud className="w-3.5 h-3.5 text-blue-400" />
+                      <span>Install Offline App</span>
+                    </button>
+                  )}
+
+                  <div className="border-t border-slate-800 my-1"></div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleLoadSample();
+                      setIsMoreMenuOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white rounded-xl transition flex items-center gap-2 cursor-pointer"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Load Sample Invoice</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleReset();
+                      setIsMoreMenuOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs font-medium text-rose-300 hover:bg-rose-500/20 rounded-xl transition flex items-center gap-2 cursor-pointer"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-rose-400" />
+                    <span>Reset Blank Invoice</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Hamburger Drawer Trigger (< lg screens) */}
+            <button
+              type="button"
+              onClick={() => setIsMobileDrawerOpen(true)}
+              className="lg:hidden p-1.5 text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition cursor-pointer active:scale-95"
+              title="Open Navigation Menu"
+            >
+              <Menu className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* ================= MOBILE VIEW SWITCHER (VISIBLE ON SCREENS < 1024px) ================= */}
-        <div className="lg:hidden border-t border-slate-200/80 bg-slate-50/95 px-3 py-1.5 flex items-center justify-center gap-2">
-          <div className="w-full max-w-md grid grid-cols-2 bg-slate-200/80 p-0.5 rounded-xl text-xs font-semibold shadow-inner">
+        {/* MOBILE VIEW SWITCHER (< 1024px) */}
+        <div className="lg:hidden border-t border-slate-800 bg-slate-900 px-3 py-1.5 flex items-center justify-center gap-2">
+          <div className="w-full max-w-md grid grid-cols-2 bg-slate-950 p-0.5 rounded-xl text-xs font-semibold border border-slate-800 shadow-inner">
             <button
               type="button"
               onClick={() => setViewMode('editor')}
-              className={`py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${
-                viewMode === 'editor'
-                  ? 'bg-white text-indigo-700 shadow-xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+              className={`py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${viewMode === 'editor'
+                  ? 'bg-blue-600 text-white shadow-xs font-bold'
+                  : 'text-slate-400 hover:text-white'
+                }`}
             >
               <Edit3 className="w-3.5 h-3.5" />
               <span>Edit Invoice</span>
-              <span className="text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.2 rounded-full font-bold">
+              <span className="text-[10px] bg-slate-800 text-blue-300 border border-slate-700 px-1.5 py-0.2 rounded-full font-bold">
                 {invoiceData.items.length}
               </span>
             </button>
@@ -699,11 +998,10 @@ export const App: React.FC = () => {
             <button
               type="button"
               onClick={() => setViewMode('preview')}
-              className={`py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${
-                viewMode === 'preview'
-                  ? 'bg-white text-indigo-700 shadow-xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+              className={`py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${viewMode === 'preview'
+                  ? 'bg-blue-600 text-white shadow-xs font-bold'
+                  : 'text-slate-400 hover:text-white'
+                }`}
             >
               <Eye className="w-3.5 h-3.5" />
               <span>A4 Preview</span>
@@ -711,6 +1009,153 @@ export const App: React.FC = () => {
           </div>
         </div>
       </header>
+
+      {/* MOBILE SLIDE-OVER DRAWER */}
+      {isMobileDrawerOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex justify-end animate-in fade-in duration-200">
+          <div className="w-72 bg-slate-900 text-white border-l border-slate-800 h-full shadow-2xl p-5 flex flex-col justify-between overflow-y-auto">
+            <div>
+              <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
+                    <FileSpreadsheet className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="font-bold text-sm text-white">GST Studio</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileDrawerOpen(false)}
+                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Shop info if logged in */}
+              {userSession ? (
+                <div className="my-4 p-3 rounded-xl bg-slate-800 border border-slate-700">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Logged in Shop</p>
+                  <p className="font-extrabold text-sm text-white truncate mt-0.5">{userSession.shopName}</p>
+                  <p className="text-xs text-blue-400 font-mono mt-0.5">📞 +91 {userSession.phone}</p>
+                </div>
+              ) : (
+                <div className="my-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsGuestMode(false);
+                      setIsMobileDrawerOpen(false);
+                    }}
+                    className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                  >
+                    <LogIn className="w-4 h-4 text-white" />
+                    <span>Shop Login / Register</span>
+                  </button>
+                </div>
+              )}
+
+              <div className="space-y-1 mt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsDailySalesModalOpen(true);
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-2.5 cursor-pointer"
+                >
+                  <TrendingUp className="w-4 h-4 text-blue-400" />
+                  <span>Daily Sales Report</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleShareWhatsApp();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 flex items-center gap-2.5 cursor-pointer shadow-xs"
+                >
+                  <MessageSquare className="w-4 h-4 text-white" />
+                  <span>Share on WhatsApp</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsHistoryModalOpen(true);
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-2.5 cursor-pointer"
+                >
+                  <History className="w-4 h-4 text-blue-400" />
+                  <span>Invoice History & Backups</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    handlePrint();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-2.5 cursor-pointer"
+                >
+                  <Printer className="w-4 h-4 text-blue-400" />
+                  <span>Print Invoice</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleDownloadPdf('open');
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-2.5 cursor-pointer"
+                >
+                  <ExternalLink className="w-4 h-4 text-blue-400" />
+                  <span>View PDF in New Tab</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleLoadSample();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-2.5 cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <span>Load Sample Invoice</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleReset();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-rose-300 hover:bg-rose-500/20 flex items-center gap-2.5 cursor-pointer"
+                >
+                  <RotateCcw className="w-4 h-4 text-rose-400" />
+                  <span>Reset to Blank Invoice</span>
+                </button>
+              </div>
+            </div>
+
+            {userSession && (
+              <div className="pt-4 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-300 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4 text-rose-400" />
+                  <span>Logout Shop</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ================= WORKSPACE BODY ================= */}
       <main className="flex-1 max-w-[1780px] w-full mx-auto p-2.5 sm:p-4 flex flex-col">
@@ -755,10 +1200,10 @@ export const App: React.FC = () => {
       </main>
 
       {/* ================= MOBILE STICKY BOTTOM ACTION BAR (VISIBLE ON SCREENS < 1024px) ================= */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-3.5 py-2.5 shadow-xl flex items-center justify-between gap-3">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-3.5 py-2.5 shadow-2xl flex items-center justify-between gap-3 text-white">
         <div className="flex flex-col min-w-0">
-          <span className="text-[10px] text-slate-500 font-semibold tracking-wide uppercase">Gross Total</span>
-          <span className="text-base font-extrabold text-indigo-700 truncate">
+          <span className="text-[10px] text-slate-400 font-semibold tracking-wide uppercase">Gross Total</span>
+          <span className="text-base font-extrabold text-emerald-400 truncate">
             ₹ {formatIndianCurrency(totalAmount)}
           </span>
         </div>
@@ -771,19 +1216,19 @@ export const App: React.FC = () => {
                 setViewMode('preview');
                 handleFitScreen();
               }}
-              className="px-3.5 py-2 text-xs font-bold rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 flex items-center gap-1.5 shadow-2xs hover:bg-indigo-100 transition cursor-pointer active:scale-95"
+              className="px-3.5 py-2 text-xs font-bold rounded-xl bg-slate-800 border border-slate-700 text-slate-200 flex items-center gap-1.5 shadow-2xs hover:bg-slate-700 transition cursor-pointer active:scale-95"
             >
-              <Eye className="w-3.5 h-3.5" />
+              <Eye className="w-3.5 h-3.5 text-blue-400" />
               <span>A4 Proof</span>
-              <ArrowRight className="w-3 h-3" />
+              <ArrowRight className="w-3 h-3 text-slate-400" />
             </button>
           ) : (
             <button
               type="button"
               onClick={() => setViewMode('editor')}
-              className="px-3.5 py-2 text-xs font-bold rounded-xl bg-slate-100 border border-slate-200 text-slate-700 flex items-center gap-1.5 shadow-2xs hover:bg-slate-200 transition cursor-pointer active:scale-95"
+              className="px-3.5 py-2 text-xs font-bold rounded-xl bg-slate-800 border border-slate-700 text-slate-200 flex items-center gap-1.5 shadow-2xs hover:bg-slate-700 transition cursor-pointer active:scale-95"
             >
-              <Edit3 className="w-3.5 h-3.5" />
+              <Edit3 className="w-3.5 h-3.5 text-blue-400" />
               <span>Edit Form</span>
             </button>
           )}
@@ -792,12 +1237,12 @@ export const App: React.FC = () => {
             type="button"
             onClick={() => handleDownloadPdf('download')}
             disabled={isGeneratingPdf}
-            className="px-4 py-2 text-xs font-extrabold rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white flex items-center gap-1.5 shadow-md shadow-indigo-600/30 transition disabled:opacity-50 cursor-pointer active:scale-95"
+            className="px-4 py-2 text-xs font-extrabold rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 shadow-md shadow-blue-500/30 transition disabled:opacity-50 cursor-pointer active:scale-95"
           >
             {isGeneratingPdf ? (
               <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 text-white" />
             )}
             <span>PDF</span>
           </button>
@@ -837,6 +1282,19 @@ export const App: React.FC = () => {
           onLoadInvoice={(loadedData) => setInvoiceData(loadedData)}
         />
       )}
+
+      {/* Shop Owner Authentication Modal (Mobile OTP & Shop Register) */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
+
+      {/* Daily Sales & Stock Breakdown Modal */}
+      <DailySalesModal
+        isOpen={isDailySalesModalOpen}
+        onClose={() => setIsDailySalesModalOpen(false)}
+      />
     </div>
   );
 };

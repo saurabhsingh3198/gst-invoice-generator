@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b" />
+      <stop offset="50%" stop-color="#312e81" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#4f46e5" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- Background App Tile -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+  <rect width="508" height="508" x="2" y="2" rx="110" fill="none" stroke="#6366f1" stroke-width="3" stroke-opacity="0.4" />
+
+  <!-- Main Invoice Document Shape -->
+  <g filter="url(#dropShadow)">
+    <!-- Document Body -->
+    <path d="M128 88 H320 L384 152 V424 C384 437.25 373.25 448 360 448 H128 C114.75 448 104 437.25 104 424 V112 C104 98.75 114.75 88 128 88 Z" fill="#ffffff" />
+    
+    <!-- Folded Corner -->
+    <path d="M320 88 V152 H384 Z" fill="#e2e8f0" />
+    <path d="M320 152 L384 88" stroke="#cbd5e1" stroke-width="2" />
+  </g>
+
+  <!-- Document Header Bar -->
+  <rect x="136" y="128" width="156" height="18" rx="4" fill="url(#accentGrad)" />
+
+  <!-- GST Badge Pill on top right of document -->
+  <rect x="256" y="180" width="104" height="28" rx="6" fill="url(#goldGrad)" />
+  <text x="308" y="199" font-family="Arial, sans-serif" font-size="14" font-weight="900" fill="#78350f" text-anchor="middle" letter-spacing="1">GST A4</text>
+
+  <!-- Invoice Lines -->
+  <rect x="136" y="184" width="96" height="10" rx="3" fill="#94a3b8" />
+  <rect x="136" y="206" width="70" height="8" rx="3" fill="#cbd5e1" />
+
+  <!-- Invoice Items Table Simulation -->
+  <rect x="128" y="232" width="232" height="24" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1.5" />
+  <rect x="140" y="240" width="56" height="8" rx="2" fill="#64748b" />
+  <rect x="312" y="240" width="36" height="8" rx="2" fill="#475569" />
+
+  <!-- Table Rows -->
+  <line x1="128" y1="284" x2="360" y2="284" stroke="#f1f5f9" stroke-width="2" />
+  <rect x="140" y="268" width="80" height="7" rx="2" fill="#cbd5e1" />
+  <rect x="316" y="268" width="32" height="7" rx="2" fill="#94a3b8" />
+
+  <line x1="128" y1="312" x2="360" y2="312" stroke="#f1f5f9" stroke-width="2" />
+  <rect x="140" y="296" width="96" height="7" rx="2" fill="#cbd5e1" />
+  <rect x="316" y="296" width="32" height="7" rx="2" fill="#94a3b8" />
+
+  <!-- Total Row -->
+  <rect x="128" y="328" width="232" height="28" rx="4" fill="#eef2ff" />
+  <rect x="140" y="338" width="48" height="8" rx="2" fill="#4f46e5" />
+  <rect x="296" y="336" width="52" height="12" rx="3" fill="url(#emeraldGrad)" />
+
+  <!-- Floating Live Rupee Badge (Bottom Right) -->
+  <g filter="url(#dropShadow)">
+    <circle cx="376" cy="380" r="56" fill="url(#emeraldGrad)" stroke="#ffffff" stroke-width="5" />
+    <!-- Rupee Sign Symbol ₹ -->
+    <text x="376" y="402" font-family="Arial, sans-serif" font-size="52" font-weight="900" fill="#ffffff" text-anchor="middle">₹</text>
+  </g>
+</svg>

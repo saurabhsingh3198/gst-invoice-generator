@@ -32,6 +32,9 @@ import { analyzeGstin } from '../utils/gstUtils';
 import { ProductMasterModal } from './ProductMasterModal';
 import { saveProductToLibrary } from '../utils/productMaster';
 import type { ProductTemplate } from '../utils/productMaster';
+import { CustomerMasterModal } from './CustomerMasterModal';
+import { saveCustomerToDirectory } from '../utils/customerMaster';
+import type { CustomerTemplate } from '../utils/customerMaster';
 import { getNextInvoiceNo, recordLastInvoiceNo } from '../utils/invoiceSequence';
 
 interface InvoiceFormProps {
@@ -50,6 +53,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
   const [activeTab, setActiveTab] = useState<'items' | 'seller' | 'parties' | 'dispatch' | 'tax' | 'settings'>('items');
   const [showAdvancedColumns, setShowAdvancedColumns] = useState<boolean>(false);
   const [showProductMaster, setShowProductMaster] = useState<boolean>(false);
+  const [showCustomerMaster, setShowCustomerMaster] = useState<boolean>(false);
   const [savedProductToast, setSavedProductToast] = useState<string>('');
   const [profileToast, setProfileToast] = useState<string>('');
   const [itemsViewMode, setItemsViewMode] = useState<'cards' | 'table'>(() => {
@@ -164,6 +168,44 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
         ...data.consignee,
       },
     });
+  };
+
+  const handleSelectCustomer = (c: CustomerTemplate) => {
+    onChange({
+      ...data,
+      buyer: {
+        ...data.buyer,
+        name: c.name,
+        address: c.address,
+        gstin: c.gstin || '',
+        stateName: c.stateName,
+        stateCode: c.stateCode,
+      },
+      consignee: {
+        ...data.consignee,
+        name: c.name,
+        address: c.address,
+        gstin: c.gstin || '',
+        stateName: c.stateName,
+        stateCode: c.stateCode,
+      },
+    });
+    setProfileToast(`Customer "${c.name}" loaded into invoice!`);
+    setTimeout(() => setProfileToast(''), 3000);
+  };
+
+  const handleSaveBuyerToDirectory = () => {
+    if (!data.buyer.name.trim()) return;
+    saveCustomerToDirectory({
+      name: data.buyer.name.trim(),
+      address: data.buyer.address || '',
+      gstin: data.buyer.gstin || '',
+      stateName: data.buyer.stateName || 'Uttar Pradesh',
+      stateCode: data.buyer.stateCode || '09',
+      partyType: data.buyer.gstin ? 'B2B' : 'B2C',
+    });
+    setProfileToast(`Customer "${data.buyer.name}" saved to Party Directory!`);
+    setTimeout(() => setProfileToast(''), 3000);
   };
 
   const updateBankDetails = (key: keyof NonNullable<InvoiceData['bankDetails']>, val: any) => {
@@ -443,24 +485,29 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col h-full overflow-hidden">
-      {/* Top Header Card - Executive Dark Aesthetic */}
-      <div className="bg-slate-900 text-white px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-b border-slate-800">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-xs shrink-0">
-            <Receipt className="w-4 h-4" />
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col h-full overflow-hidden text-slate-800">
+      {/* Top Header Card - Unique Classic SaaS Header */}
+      <div className="bg-slate-50/90 backdrop-blur-xs text-slate-900 px-3.5 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between border-b border-slate-200/90">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white shadow-xs shadow-blue-500/20 shrink-0">
+            <Receipt className="w-4 h-4 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xs sm:text-sm font-extrabold text-white tracking-tight">
+              <h2 className="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight">
                 Invoice Studio Editor
               </h2>
-              <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded-full font-bold border border-emerald-500/30 flex items-center gap-1 shadow-2xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-[9px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-bold border border-emerald-200/80 flex items-center gap-1 shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 Live Sync
               </span>
+              <span className="hidden sm:inline-flex text-[10px] font-mono font-bold bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded-md">
+                #{data.dispatch?.invoiceNo || 'INV-001'}
+              </span>
             </div>
-            <p className="text-[10px] text-slate-400 hidden xs:block sm:block">Tally Exact GST Tax Invoice Designer</p>
+            <p className="text-[10px] text-slate-500 hidden xs:block sm:block">
+              Tally Exact GST Tax Invoice Designer & Real-time Live Sync
+            </p>
           </div>
         </div>
 
@@ -468,119 +515,119 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
           <button
             type="button"
             onClick={onLoadSample}
-            className="px-2.5 sm:px-3 py-1 text-[11px] font-bold bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-400 hover:to-violet-500 text-white rounded-lg flex items-center gap-1 transition shadow-xs cursor-pointer active:scale-95"
+            className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 rounded-lg flex items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95"
             title="Load sample invoice data"
           >
-            <Sparkles className="w-3 h-3 text-indigo-100" />
+            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
             <span>Sample</span>
           </button>
           <button
             type="button"
             onClick={onReset}
-            className="px-2.5 sm:px-3 py-1 text-[11px] font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg flex items-center gap-1 transition border border-slate-700 cursor-pointer active:scale-95"
+            className="px-2.5 sm:px-3 py-1.5 text-xs font-medium bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 rounded-lg flex items-center gap-1.5 transition border border-slate-200 cursor-pointer active:scale-95 shadow-2xs"
             title="Clear all fields"
           >
-            <RotateCcw className="w-3 h-3 text-slate-400" />
+            <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
             <span>Reset</span>
           </button>
         </div>
       </div>
 
-      {/* Tabs Navigation Bar - Smart Semantic Color Accents */}
-      <div className="bg-slate-50/90 border-b border-slate-200/90 px-2 py-1.5 flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar">
-        {/* Items Tab - Indigo */}
+      {/* Tabs Navigation Bar - Classic Floating Segmented Slider */}
+      <div className="bg-slate-50/70 border-b border-slate-200/90 px-2 sm:px-3 py-1.5 flex items-center gap-1 overflow-x-auto text-xs no-scrollbar scroll-smooth">
+        {/* Items Tab */}
         <button
           type="button"
           onClick={() => setActiveTab('items')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer border ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'items'
-              ? 'bg-indigo-50/90 text-indigo-700 border-indigo-200 shadow-2xs font-bold'
-              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-white text-blue-700 border-slate-200/90 shadow-2xs font-bold'
+              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium'
           }`}
         >
-          <Package className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'items' ? 'text-indigo-600' : 'text-slate-400'}`} />
+          <Package className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'items' ? 'text-blue-600' : 'text-slate-400'}`} />
           <span>Items</span>
           <span
             className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold leading-none ${
               activeTab === 'items'
-                ? 'bg-indigo-600 text-white'
-                : 'bg-slate-200 text-slate-600'
+                ? 'bg-blue-50 text-blue-700 border border-blue-200/80'
+                : 'bg-slate-200/80 text-slate-600'
             }`}
           >
             {data.items.length}
           </span>
         </button>
 
-        {/* Seller Tab - Emerald */}
+        {/* Seller Tab */}
         <button
           type="button"
           onClick={() => setActiveTab('seller')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer border ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'seller'
-              ? 'bg-emerald-50 text-emerald-800 border-emerald-200 shadow-2xs font-bold'
-              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-white text-blue-700 border-slate-200/90 shadow-2xs font-bold'
+              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium'
           }`}
         >
-          <Building2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'seller' ? 'text-emerald-600' : 'text-slate-400'}`} />
+          <Building2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'seller' ? 'text-blue-600' : 'text-slate-400'}`} />
           <span>Seller</span>
         </button>
 
-        {/* Buyer Tab - Sky */}
+        {/* Buyer Tab */}
         <button
           type="button"
           onClick={() => setActiveTab('parties')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer border ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'parties'
-              ? 'bg-sky-50 text-sky-800 border-sky-200 shadow-2xs font-bold'
-              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-white text-blue-700 border-slate-200/90 shadow-2xs font-bold'
+              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium'
           }`}
         >
-          <Users className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'parties' ? 'text-sky-600' : 'text-slate-400'}`} />
+          <Users className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'parties' ? 'text-blue-600' : 'text-slate-400'}`} />
           <span>Buyer</span>
         </button>
 
-        {/* Dispatch Tab - Amber */}
+        {/* Dispatch Tab */}
         <button
           type="button"
           onClick={() => setActiveTab('dispatch')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer border ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'dispatch'
-              ? 'bg-amber-50 text-amber-800 border-amber-200 shadow-2xs font-bold'
-              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-white text-blue-700 border-slate-200/90 shadow-2xs font-bold'
+              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium'
           }`}
         >
-          <Truck className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'dispatch' ? 'text-amber-600' : 'text-slate-400'}`} />
+          <Truck className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'dispatch' ? 'text-blue-600' : 'text-slate-400'}`} />
           <span>Dispatch</span>
         </button>
 
-        {/* Tax Tab - Purple */}
+        {/* Tax Tab */}
         <button
           type="button"
           onClick={() => setActiveTab('tax')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer border ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'tax'
-              ? 'bg-purple-50 text-purple-800 border-purple-200 shadow-2xs font-bold'
-              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-white text-blue-700 border-slate-200/90 shadow-2xs font-bold'
+              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium'
           }`}
         >
-          <Percent className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'tax' ? 'text-purple-600' : 'text-slate-400'}`} />
+          <Percent className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'tax' ? 'text-blue-600' : 'text-slate-400'}`} />
           <span>Tax & GST</span>
           {data.showTaxSummary && (
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Tax Table Active"></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" title="Tax Table Active"></span>
           )}
         </button>
 
-        {/* Settings Tab - Slate */}
+        {/* Settings Tab */}
         <button
           type="button"
           onClick={() => setActiveTab('settings')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer border ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'settings'
-              ? 'bg-slate-100 text-slate-900 border-slate-300 shadow-2xs font-bold'
-              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-white text-blue-700 border-slate-200/90 shadow-2xs font-bold'
+              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium'
           }`}
         >
-          <Settings className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'settings' ? 'text-slate-700' : 'text-slate-400'}`} />
+          <Settings className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'settings' ? 'text-blue-600' : 'text-slate-400'}`} />
           <span>Settings</span>
         </button>
       </div>
@@ -590,28 +637,28 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
         {/* ================= 1. LINE ITEMS TAB ================= */}
         {activeTab === 'items' && (
           <div className="space-y-3">
-            {/* Classic Action Bar: Zero Jagged Wrapping, Symmetrical & Sleek */}
-            <div className="bg-slate-50/90 p-2.5 sm:p-3 rounded-xl border border-slate-200/90 shadow-2xs space-y-2.5 sm:space-y-0 sm:flex sm:items-center sm:justify-between gap-3">
+            {/* Classic Action Bar */}
+            <div className="bg-slate-50/90 p-2.5 sm:p-3 rounded-xl border border-slate-200/90 shadow-2xs space-y-2.5 sm:space-y-0 sm:flex sm:items-center sm:justify-between gap-3 text-slate-800">
               {/* Row 1 on mobile, Left on desktop */}
               <div className="flex items-center justify-between sm:justify-start gap-2.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
-                  <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                  <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
                     Product Items
                   </h3>
-                  <span className="text-[10px] font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200/70">
-                    {data.items.length}
+                  <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/80">
+                    {data.items.length} items
                   </span>
                 </div>
 
                 {/* View Switcher: Cards vs Table */}
-                <div className="flex items-center bg-slate-200/70 p-0.5 rounded-lg border border-slate-300/80 text-[11px] font-medium">
+                <div className="flex items-center bg-slate-200/60 p-0.5 rounded-lg border border-slate-200 text-[11px] font-medium">
                   <button
                     type="button"
                     onClick={() => setItemsViewMode('cards')}
                     className={`px-2 py-1 rounded-md flex items-center gap-1 transition cursor-pointer ${
                       itemsViewMode === 'cards'
-                        ? 'bg-white text-indigo-700 font-bold shadow-2xs'
+                        ? 'bg-white text-blue-700 font-bold shadow-2xs'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                     title="Card View (best for mobile screens)"
@@ -624,7 +671,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onClick={() => setItemsViewMode('table')}
                     className={`px-2 py-1 rounded-md flex items-center gap-1 transition cursor-pointer ${
                       itemsViewMode === 'table'
-                        ? 'bg-white text-indigo-700 font-bold shadow-2xs'
+                        ? 'bg-white text-blue-700 font-bold shadow-2xs'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                     title="Spreadsheet Table View"
@@ -636,23 +683,23 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               </div>
 
               {/* Row 2 on mobile, Right on desktop: Symmetrical Action Buttons */}
-              <div className="grid grid-cols-3 sm:flex sm:items-center gap-2 pt-1.5 sm:pt-0 border-t sm:border-t-0 border-slate-200">
+              <div className="grid grid-cols-3 sm:flex sm:items-center gap-2 pt-1.5 sm:pt-0 border-t sm:border-t-0 border-slate-200/80">
                 <button
                   type="button"
                   onClick={() => setShowProductMaster(true)}
-                  className="px-2.5 py-1.5 text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95 shadow-2xs"
+                  className="px-2.5 py-1.5 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95 shadow-2xs"
                   title="Choose from saved Product Library"
                 >
-                  <Package className="w-3.5 h-3.5 text-indigo-600" />
+                  <Package className="w-3.5 h-3.5 text-blue-600" />
                   <span>Library</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowAdvancedColumns(!showAdvancedColumns)}
-                  className={`px-2.5 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer text-center flex items-center justify-center gap-1 shadow-2xs ${
+                  className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition cursor-pointer text-center flex items-center justify-center gap-1 shadow-2xs ${
                     showAdvancedColumns
-                      ? 'bg-indigo-50 border-indigo-300 text-indigo-700 font-bold'
-                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                      ? 'bg-slate-900 border-slate-900 text-white font-bold'
+                      : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
                   }`}
                   title="Toggle Tax Rate and Discount columns"
                 >
@@ -661,9 +708,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <button
                   type="button"
                   onClick={addItem}
-                  className="px-3 py-1.5 text-xs font-bold bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-lg flex items-center justify-center gap-1.5 shadow-sm shadow-indigo-600/25 transition cursor-pointer active:scale-95"
+                  className="px-3.5 py-1.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1.5 shadow-sm shadow-blue-500/20 transition cursor-pointer active:scale-95"
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-3.5 h-3.5 text-white" />
                   <span>Add Item</span>
                 </button>
               </div>
@@ -685,12 +732,12 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   return (
                     <div
                       key={item.id || index}
-                      className="bg-white rounded-xl border border-slate-200/90 shadow-2xs hover:border-slate-300 transition overflow-hidden"
+                      className="bg-white rounded-xl border border-slate-200 shadow-2xs hover:border-slate-300 transition overflow-hidden"
                     >
                       {/* Card Header Bar */}
-                      <div className="bg-slate-50/90 px-3 py-2 border-b border-slate-200 flex items-center justify-between gap-2">
+                      <div className="bg-slate-50 px-3 py-2.5 border-b border-slate-200 flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
-                          <span className="w-5 h-5 rounded-full bg-indigo-600 text-white font-bold text-[11px] flex items-center justify-center shrink-0">
+                          <span className="w-5 h-5 rounded-md bg-blue-600 text-white font-bold text-[11px] flex items-center justify-center shrink-0 shadow-2xs">
                             {index + 1}
                           </span>
                           <span className="font-bold text-xs text-slate-800 truncate">
@@ -698,13 +745,13 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                           </span>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          <span className="font-extrabold text-xs text-indigo-700 bg-indigo-50/80 border border-indigo-200/70 px-2 py-0.5 rounded-md">
+                          <span className="font-extrabold text-xs text-blue-700 bg-blue-50 border border-blue-200/80 px-2 py-0.5 rounded-md font-mono">
                             ₹ {(Number(item.amount) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                           </span>
                           <button
                             type="button"
                             onClick={() => handleSaveItemToLibrary(item)}
-                            className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition cursor-pointer"
+                            className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition cursor-pointer"
                             title="Save this item to Product Library"
                           >
                             <Bookmark className="w-3.5 h-3.5" />
@@ -733,7 +780,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                             value={item.description}
                             onChange={(e) => updateItem(index, 'description', e.target.value)}
                             placeholder="e.g. TATA TISCON 550 SD 8MM"
-                            className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg font-semibold text-slate-800 bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+                            className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg font-semibold text-slate-800 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
                           />
                         </div>
 
@@ -748,7 +795,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                               value={item.hsnSac}
                               onChange={(e) => updateItem(index, 'hsnSac', e.target.value)}
                               placeholder="721420"
-                              className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg font-mono text-slate-700 focus:border-indigo-500 outline-none"
+                              className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg font-mono text-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
                             />
                           </div>
                           <div>
@@ -760,7 +807,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                               value={item.altQuantity}
                               onChange={(e) => updateItem(index, 'altQuantity', e.target.value)}
                               placeholder="208.560 KG"
-                              className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg text-slate-800 font-medium focus:border-indigo-500 outline-none"
+                              className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg text-slate-800 font-medium focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
                             />
                           </div>
                         </div>
@@ -776,7 +823,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                               value={item.quantity}
                               onChange={(e) => updateItem(index, 'quantity', e.target.value)}
                               placeholder="1"
-                              className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg font-bold text-slate-900 focus:border-indigo-500 outline-none"
+                              className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg font-bold text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
                             />
                           </div>
                           <div>
@@ -791,7 +838,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                 updateItem(index, 'per', e.target.value);
                               }}
                               placeholder="PC"
-                              className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg text-center uppercase font-bold text-slate-800 focus:border-indigo-500 outline-none"
+                              className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg text-center uppercase font-bold text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
                             />
                           </div>
                           <div>
@@ -803,7 +850,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                               value={item.rate}
                               onChange={(e) => updateItem(index, 'rate', e.target.value)}
                               placeholder="100"
-                              className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg font-semibold text-slate-900 focus:border-indigo-500 outline-none"
+                              className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg font-semibold text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
                             />
                           </div>
                         </div>
@@ -820,7 +867,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                 value={item.gstRate !== undefined ? item.gstRate : (data.defaultGstRate ?? 18)}
                                 onChange={(e) => updateItem(index, 'gstRate', Number(e.target.value) || 0)}
                                 placeholder="18"
-                                className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none focus:border-indigo-500"
+                                className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
                               />
                             </div>
                             <div>
@@ -832,7 +879,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                 value={item.rateInclTax || ''}
                                 onChange={(e) => updateItem(index, 'rateInclTax', e.target.value)}
                                 placeholder="3,956.00"
-                                className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg text-slate-600 outline-none focus:border-indigo-500"
+                                className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg text-slate-600 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
                               />
                             </div>
                             <div>
@@ -844,15 +891,15 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                 value={item.discountPercent || ''}
                                 onChange={(e) => updateItem(index, 'discountPercent', e.target.value)}
                                 placeholder="%"
-                                className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg text-center text-slate-600 outline-none focus:border-indigo-500"
+                                className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg text-center text-slate-600 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
                               />
                             </div>
                           </div>
                         )}
 
                         {/* Amount summary row */}
-                        <div className="bg-slate-50/80 p-2 rounded-lg flex items-center justify-between border border-slate-200/70">
-                          <span className="text-[11px] font-medium text-slate-500">
+                        <div className="bg-slate-50 p-2.5 rounded-lg flex items-center justify-between border border-slate-200/80">
+                          <span className="text-[11px] font-semibold text-slate-600">
                             Amount (Qty × Rate):
                           </span>
                           <div className="flex items-center gap-1.5">
@@ -861,7 +908,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                               type="number"
                               value={item.amount}
                               onChange={(e) => updateItem(index, 'amount', Number(e.target.value) || 0)}
-                              className="w-32 text-right font-extrabold text-xs sm:text-sm text-indigo-700 bg-white border border-indigo-200 rounded px-2 py-1 focus:border-indigo-500 outline-none"
+                              className="w-32 text-right font-extrabold text-xs sm:text-sm text-blue-900 bg-white border border-blue-200 rounded-md px-2 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none font-mono"
                             />
                           </div>
                         </div>
@@ -874,9 +921,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <button
                   type="button"
                   onClick={addItem}
-                  className="w-full py-3 border-2 border-dashed border-indigo-300 hover:border-indigo-500 bg-indigo-50/50 hover:bg-indigo-50 text-indigo-700 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition cursor-pointer active:scale-[0.99]"
+                  className="w-full py-3 border-2 border-dashed border-blue-200 hover:border-blue-400 bg-blue-50/40 hover:bg-blue-50 text-blue-700 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition cursor-pointer active:scale-[0.99]"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-4 h-4 text-blue-600" />
                   <span>+ Add Another Line Item</span>
                 </button>
               </div>
@@ -884,26 +931,26 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
 
             {/* DUAL-MODE 2: SPREADSHEET DATA GRID (FOR TABLET / LAPTOP / DESKTOP) */}
             {itemsViewMode === 'table' && (
-              <div className="border border-slate-200 rounded-lg overflow-x-auto shadow-2xs bg-white">
+              <div className="border border-slate-200 rounded-xl overflow-x-auto shadow-2xs bg-white">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-100/80 text-slate-700 border-b border-slate-200 text-[11px] font-semibold">
-                      <th className="p-2 w-7 text-center">#</th>
-                      <th className="p-2 min-w-[140px]">Description of Goods</th>
-                      <th className="p-2 w-20">HSN/SAC</th>
-                      <th className="p-2 w-24">Alt. Qty</th>
-                      <th className="p-2 w-16">Qty</th>
-                      <th className="p-2 w-14">Unit</th>
-                      <th className="p-2 w-20">Rate (₹)</th>
+                    <tr className="bg-slate-50 text-slate-600 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wider">
+                      <th className="p-2.5 w-8 text-center">#</th>
+                      <th className="p-2.5 min-w-[140px]">Description of Goods</th>
+                      <th className="p-2.5 w-20 text-center">HSN/SAC</th>
+                      <th className="p-2.5 w-24">Alt. Qty</th>
+                      <th className="p-2.5 w-16 text-center">Qty</th>
+                      <th className="p-2.5 w-14 text-center">Unit</th>
+                      <th className="p-2.5 w-20 text-right">Rate (₹)</th>
                       {showAdvancedColumns && (
                         <>
-                          <th className="p-2 w-16 text-center">GST %</th>
-                          <th className="p-2 w-24">Rate(Incl.Tax)</th>
-                          <th className="p-2 w-16">Disc%</th>
+                          <th className="p-2.5 w-16 text-center">GST %</th>
+                          <th className="p-2.5 w-24 text-right">Rate(Incl.Tax)</th>
+                          <th className="p-2.5 w-16 text-center">Disc%</th>
                         </>
                       )}
-                      <th className="p-2 w-24 text-right font-bold text-indigo-700">Amount (₹)</th>
-                      <th className="p-2 w-9 text-center"></th>
+                      <th className="p-2.5 w-24 text-right font-extrabold text-slate-800">Amount (₹)</th>
+                      <th className="p-2.5 w-12 text-center"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -924,7 +971,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                             value={item.description}
                             onChange={(e) => updateItem(index, 'description', e.target.value)}
                             placeholder="e.g. TATA TISCON 550 SD 8MM"
-                            className="w-full text-xs p-1.5 border border-slate-200 rounded font-semibold text-slate-800 bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-y"
+                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg font-semibold text-slate-900 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 resize-y outline-none transition"
                           />
                         </td>
 
@@ -935,7 +982,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                             value={item.hsnSac}
                             onChange={(e) => updateItem(index, 'hsnSac', e.target.value)}
                             placeholder="721420"
-                            className="w-full text-xs p-1.5 border border-slate-200 rounded font-mono text-slate-700 focus:border-indigo-500"
+                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg font-mono text-center text-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
                           />
                         </td>
 
@@ -946,7 +993,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                             value={item.altQuantity}
                             onChange={(e) => updateItem(index, 'altQuantity', e.target.value)}
                             placeholder="208.560 KG"
-                            className="w-full text-xs p-1.5 border border-slate-200 rounded text-slate-800 font-medium focus:border-indigo-500"
+                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg text-slate-800 font-medium focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
                           />
                         </td>
 
@@ -957,7 +1004,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                             value={item.quantity}
                             onChange={(e) => updateItem(index, 'quantity', e.target.value)}
                             placeholder="1"
-                            className="w-full text-xs p-1.5 border border-slate-200 rounded font-bold text-slate-900 focus:border-indigo-500"
+                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg font-bold text-center text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
                           />
                         </td>
 
@@ -971,7 +1018,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                               updateItem(index, 'per', e.target.value);
                             }}
                             placeholder="PC"
-                            className="w-full text-xs p-1.5 border border-slate-200 rounded text-center uppercase font-medium focus:border-indigo-500"
+                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg text-center uppercase font-semibold text-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
                           />
                         </td>
 
@@ -982,7 +1029,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                             value={item.rate}
                             onChange={(e) => updateItem(index, 'rate', e.target.value)}
                             placeholder="100"
-                            className="w-full text-xs p-1.5 border border-slate-200 rounded font-semibold text-slate-900 focus:border-indigo-500"
+                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg font-mono font-semibold text-right text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
                           />
                         </td>
 
@@ -995,7 +1042,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                 value={item.gstRate !== undefined ? item.gstRate : (data.defaultGstRate ?? 18)}
                                 onChange={(e) => updateItem(index, 'gstRate', Number(e.target.value) || 0)}
                                 placeholder="18"
-                                className="w-full text-xs p-1.5 border border-slate-200 rounded text-center font-bold text-slate-800 focus:border-indigo-500"
+                                className="w-full text-xs p-1.5 border border-slate-200 rounded-lg text-center font-bold text-slate-800 focus:border-blue-500 outline-none transition"
                               />
                             </td>
                             <td className="p-1.5">
@@ -1004,7 +1051,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                 value={item.rateInclTax || ''}
                                 onChange={(e) => updateItem(index, 'rateInclTax', e.target.value)}
                                 placeholder="3,956.00"
-                                className="w-full text-xs p-1.5 border border-slate-200 rounded text-slate-600 focus:border-indigo-500"
+                                className="w-full text-xs p-1.5 border border-slate-200 rounded-lg text-right text-slate-600 focus:border-blue-500 outline-none transition"
                               />
                             </td>
                             <td className="p-1.5">
@@ -1013,7 +1060,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                 value={item.discountPercent || ''}
                                 onChange={(e) => updateItem(index, 'discountPercent', e.target.value)}
                                 placeholder="%"
-                                className="w-full text-xs p-1.5 border border-slate-200 rounded text-center text-slate-600 focus:border-indigo-500"
+                                className="w-full text-xs p-1.5 border border-slate-200 rounded-lg text-center text-slate-600 focus:border-blue-500 outline-none transition"
                               />
                             </td>
                           </>
@@ -1026,7 +1073,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                             value={item.amount}
                             onChange={(e) => updateItem(index, 'amount', Number(e.target.value) || 0)}
                             placeholder="100"
-                            className="w-full text-xs p-1.5 border border-indigo-200 bg-indigo-50/40 rounded font-bold text-right text-indigo-900 focus:border-indigo-500"
+                            className="w-full text-xs p-1.5 border border-blue-200 bg-blue-50/40 focus:bg-white rounded-lg font-mono font-bold text-right text-blue-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
                           />
                         </td>
 
@@ -1036,7 +1083,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                             <button
                               type="button"
                               onClick={() => handleSaveItemToLibrary(item)}
-                              className="p-1 text-slate-400 hover:text-indigo-600 rounded transition cursor-pointer"
+                              className="p-1 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-md transition cursor-pointer"
                               title="Save to Product Library"
                             >
                               <Bookmark className="w-3.5 h-3.5" />
@@ -1045,7 +1092,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                               type="button"
                               onClick={() => removeItem(index)}
                               disabled={data.items.length <= 1}
-                              className="p-1 text-slate-400 hover:text-rose-600 rounded transition disabled:opacity-20 cursor-pointer"
+                              className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition disabled:opacity-20 cursor-pointer"
                               title="Delete line"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -1056,19 +1103,19 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     ))}
                   </tbody>
                   <tfoot>
-                    <tr className="bg-slate-100 font-bold text-slate-800 border-t border-slate-200 text-xs">
-                      <td colSpan={2} className="p-2.5 text-slate-600">
+                    <tr className="bg-slate-50 font-bold text-slate-800 border-t border-slate-200 text-xs">
+                      <td colSpan={2} className="p-2.5 text-slate-600 font-semibold">
                         Total ({data.items.length} items)
                       </td>
                       <td></td>
-                      <td className="p-2.5 text-slate-700 whitespace-nowrap">
+                      <td className="p-2.5 text-slate-700 whitespace-nowrap font-mono">
                         {totalAltQtyFormatted}
                       </td>
-                      <td className="p-2.5 text-slate-800">
+                      <td className="p-2.5 text-center text-slate-800 font-bold">
                         {totalQuantityCount}
                       </td>
                       <td colSpan={showAdvancedColumns ? 4 : 2}></td>
-                      <td className="p-2.5 text-right font-extrabold text-indigo-700 text-sm whitespace-nowrap">
+                      <td className="p-2.5 text-right font-extrabold text-blue-900 text-sm whitespace-nowrap font-mono">
                         ₹ {totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                       <td></td>
@@ -1078,51 +1125,54 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               </div>
             )}
 
-            {/* Total Summary Banner (Shared between Card & Table view) - Classic Balanced Layout */}
-            <div className="bg-slate-900 text-white rounded-xl p-3 sm:p-4 shadow-sm border border-slate-800 space-y-3">
+            {/* Total Summary Banner (Shared between Card & Table view) - Classic Executive Financial Card */}
+            <div className="bg-slate-900 text-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-800 space-y-3.5">
               {/* Row 1: 3 balanced metric columns */}
-              <div className="grid grid-cols-3 gap-2 text-center pb-2.5 border-b border-slate-800">
-                <div className="bg-slate-800/60 rounded-lg py-2 px-1 border border-slate-700/50">
-                  <span className="text-slate-400 block text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">
+              <div className="grid grid-cols-3 gap-2.5 text-center pb-3 border-b border-slate-800">
+                <div className="bg-slate-800/70 rounded-xl py-2 px-2 border border-slate-700/60">
+                  <span className="text-slate-400 block text-[9px] sm:text-[10px] font-bold uppercase tracking-wider mb-0.5">
                     Total Items
                   </span>
-                  <span className="font-extrabold text-white text-xs sm:text-sm">
+                  <span className="font-extrabold text-white text-xs sm:text-sm font-mono">
                     {data.items.length}
                   </span>
                 </div>
 
-                <div className="bg-slate-800/60 rounded-lg py-2 px-1 border border-slate-700/50">
-                  <span className="text-slate-400 block text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">
+                <div className="bg-slate-800/70 rounded-xl py-2 px-2 border border-slate-700/60">
+                  <span className="text-slate-400 block text-[9px] sm:text-[10px] font-bold uppercase tracking-wider mb-0.5">
                     Total Qty
                   </span>
-                  <span className="font-extrabold text-white text-xs sm:text-sm">
+                  <span className="font-extrabold text-white text-xs sm:text-sm font-mono">
                     {totalQuantityCount}
                   </span>
                 </div>
 
-                <div className="bg-slate-800/60 rounded-lg py-2 px-1 border border-slate-700/50">
-                  <span className="text-slate-400 block text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">
+                <div className="bg-slate-800/70 rounded-xl py-2 px-2 border border-slate-700/60">
+                  <span className="text-slate-400 block text-[9px] sm:text-[10px] font-bold uppercase tracking-wider mb-0.5">
                     Total Weight
                   </span>
-                  <span className="font-extrabold text-indigo-300 text-xs sm:text-sm truncate block">
+                  <span className="font-extrabold text-blue-300 text-xs sm:text-sm truncate block font-mono">
                     {totalAltQtyFormatted}
                   </span>
                 </div>
               </div>
 
               {/* Row 2: Gross Total full width, balanced left and right */}
-              <div className="flex items-center justify-between px-1">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 px-1">
                 <div>
                   <span className="text-slate-400 block text-[10px] font-bold uppercase tracking-wider">
                     Gross Invoice Total
                   </span>
-                  <span className="text-[11px] text-slate-500 font-medium">
-                    All Taxes & Charges Incl.
+                  <span className="text-[11px] text-slate-400 font-normal">
+                    All Taxes & Charges Included
                   </span>
                 </div>
-                <div className="text-right">
-                  <span className="font-black text-emerald-400 text-base sm:text-xl tracking-tight">
+                <div className="text-left sm:text-right">
+                  <span className="font-black text-emerald-400 text-lg sm:text-2xl tracking-tight font-mono block">
                     ₹ {totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-medium line-clamp-1">
+                    {numberToIndianWords(totalAmount)}
                   </span>
                 </div>
               </div>
@@ -1146,7 +1196,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <button
                   type="button"
                   onClick={saveCompanyProfile}
-                  className="px-2.5 py-1 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded-md flex items-center gap-1 font-semibold transition cursor-pointer active:scale-95 shadow-2xs"
+                  className="px-2.5 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-1 font-semibold transition cursor-pointer active:scale-95 shadow-2xs"
                   title="Save current details as permanent company profile"
                 >
                   <Save className="w-3.5 h-3.5" />
@@ -1158,7 +1208,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   className="px-2.5 py-1 text-xs bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-md flex items-center gap-1 font-semibold transition cursor-pointer active:scale-95 shadow-2xs"
                   title="Load your saved permanent company profile"
                 >
-                  <FolderOpen className="w-3.5 h-3.5 text-indigo-600" />
+                  <FolderOpen className="w-3.5 h-3.5 text-blue-600" />
                   <span>Load Saved Profile</span>
                 </button>
               </div>
@@ -1181,7 +1231,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.seller.name}
                   onChange={(e) => updateSeller('name', e.target.value)}
                   placeholder="e.g. ACME Enterprise / Your Company Name"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-900 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none"
                 />
               </div>
 
@@ -1194,7 +1244,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.seller.addressLine1}
                   onChange={(e) => updateSeller('addressLine1', e.target.value)}
                   placeholder="e.g. 101, Business Park, M.G. Road"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none"
                 />
               </div>
 
@@ -1207,7 +1257,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.seller.addressLine2}
                   onChange={(e) => updateSeller('addressLine2', e.target.value)}
                   placeholder="e.g. Andheri East, Mumbai"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none"
                 />
               </div>
 
@@ -1216,7 +1266,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   <label className="block text-xs font-semibold text-slate-700">
                     GSTIN / UIN Number
                   </label>
-                  <span className="text-[10px] text-indigo-600 font-medium">
+                  <span className="text-[10px] text-blue-600 font-medium">
                     ⚡ Auto-detects State
                   </span>
                 </div>
@@ -1225,7 +1275,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.seller.gstin}
                   onChange={(e) => updateSeller('gstin', e.target.value)}
                   placeholder="e.g. 27ABCDE1234F1Z5"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold uppercase focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none"
                 />
                 {data.seller.gstin && (() => {
                   const info = analyzeGstin(data.seller.gstin);
@@ -1239,7 +1289,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   }
                   if (info.stateName) {
                     return (
-                      <p className="text-[10px] text-indigo-600 font-medium mt-1">
+                      <p className="text-[10px] text-blue-600 font-medium mt-1">
                         Auto-detected: <strong>{info.stateName} ({info.stateCode})</strong>
                       </p>
                     );
@@ -1261,7 +1311,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.seller.email}
                   onChange={(e) => updateSeller('email', e.target.value)}
                   placeholder="e.g. billing@yourcompany.com"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none"
                 />
               </div>
 
@@ -1274,7 +1324,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.seller.stateName}
                   onChange={(e) => updateSeller('stateName', e.target.value)}
                   placeholder="Uttar Pradesh"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none"
                 />
               </div>
 
@@ -1287,7 +1337,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.seller.stateCode}
                   onChange={(e) => updateSeller('stateCode', e.target.value)}
                   placeholder="09"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none"
                 />
               </div>
             </div>
@@ -1297,7 +1347,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               <div className="flex items-center justify-between pb-2 mb-3">
                 <div>
                   <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-indigo-600 inline-block"></span>
+                    <span className="w-2 h-2 rounded-full bg-blue-600 inline-block"></span>
                     Company&apos;s Bank Details & Payment QR
                   </h4>
                   <p className="text-[11px] text-slate-500">
@@ -1312,7 +1362,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onChange={(e) => updateBankDetails('showBankDetails', e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                  <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
 
@@ -1327,7 +1377,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.bankName || ''}
                       onChange={(e) => updateBankDetails('bankName', e.target.value)}
                       placeholder="e.g. State Bank of India, HDFC Bank"
-                      className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none bg-white"
+                      className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none bg-white"
                     />
                   </div>
 
@@ -1340,7 +1390,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.accountNo || ''}
                       onChange={(e) => updateBankDetails('accountNo', e.target.value)}
                       placeholder="e.g. 381928371928"
-                      className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none bg-white"
+                      className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold text-slate-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none bg-white"
                     />
                   </div>
 
@@ -1353,7 +1403,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.branchAndIfsc || ''}
                       onChange={(e) => updateBankDetails('branchAndIfsc', e.target.value)}
                       placeholder="e.g. Main Branch & SBIN0001234"
-                      className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none bg-white"
+                      className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none bg-white"
                     />
                   </div>
 
@@ -1366,7 +1416,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.upiId || ''}
                       onChange={(e) => updateBankDetails('upiId', e.target.value)}
                       placeholder="e.g. yourbusiness@upi"
-                      className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold text-indigo-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none bg-white"
+                      className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold text-blue-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none bg-white"
                     />
                   </div>
 
@@ -1383,7 +1433,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       type="checkbox"
                       checked={data.bankDetails?.showQrCode !== false}
                       onChange={(e) => updateBankDetails('showQrCode', e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer"
+                      className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
                     />
                   </div>
                 </div>
@@ -1408,7 +1458,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               <button
                 type="button"
                 onClick={copyConsigneeToBuyer}
-                className="px-2.5 py-1.5 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-md flex items-center gap-1.5 transition font-semibold cursor-pointer active:scale-95"
+                className="px-2.5 py-1.5 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-md flex items-center gap-1.5 transition font-semibold cursor-pointer active:scale-95"
                 title="Copy Consignee details to Buyer"
               >
                 <Copy className="w-3.5 h-3.5" />
@@ -1420,7 +1470,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               {/* Consignee (Ship to) */}
               <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs space-y-2.5">
                 <div className="flex items-center gap-1.5 pb-1 border-b border-slate-100">
-                  <Truck className="w-4 h-4 text-indigo-600 shrink-0" />
+                  <Truck className="w-4 h-4 text-blue-600 shrink-0" />
                   <span className="text-xs font-bold text-slate-800">
                     Consignee (Ship to)
                   </span>
@@ -1435,7 +1485,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     value={data.consignee.name}
                     onChange={(e) => updateConsignee('name', e.target.value)}
                     placeholder="e.g. M/s ABC Enterprises / Client Name"
-                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-semibold text-slate-900 outline-none focus:border-indigo-500"
+                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-semibold text-slate-900 outline-none focus:border-blue-500"
                   />
                 </div>
 
@@ -1448,7 +1498,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     value={data.consignee.address}
                     onChange={(e) => updateConsignee('address', e.target.value)}
                     placeholder="e.g. Plot No. 45, Industrial Area, Phase-2"
-                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg text-slate-800 outline-none focus:border-indigo-500"
+                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg text-slate-800 outline-none focus:border-blue-500"
                   />
                 </div>
 
@@ -1457,14 +1507,14 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     <label className="block text-[11px] font-semibold text-slate-600">
                       GSTIN / UIN (Optional)
                     </label>
-                    <span className="text-[10px] text-indigo-600 font-medium">⚡ Auto State</span>
+                    <span className="text-[10px] text-blue-600 font-medium">⚡ Auto State</span>
                   </div>
                   <input
                     type="text"
                     value={data.consignee.gstin || ''}
                     onChange={(e) => updateConsignee('gstin', e.target.value)}
                     placeholder="e.g. 09AABCM1234F1Z5"
-                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-mono uppercase font-bold text-slate-800 outline-none focus:border-indigo-500"
+                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-mono uppercase font-bold text-slate-800 outline-none focus:border-blue-500"
                   />
                   {data.consignee.gstin && (() => {
                     const info = analyzeGstin(data.consignee.gstin);
@@ -1489,7 +1539,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.consignee.stateName}
                       onChange={(e) => updateConsignee('stateName', e.target.value)}
                       placeholder="e.g. Uttar Pradesh"
-                      className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg outline-none focus:border-indigo-500"
+                      className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -1501,7 +1551,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.consignee.stateCode}
                       onChange={(e) => updateConsignee('stateCode', e.target.value)}
                       placeholder="09"
-                      className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-mono font-bold outline-none focus:border-indigo-500"
+                      className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-mono font-bold outline-none focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -1509,11 +1559,33 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
 
               {/* Buyer (Bill to) */}
               <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs space-y-2.5">
-                <div className="flex items-center gap-1.5 pb-1 border-b border-slate-100">
-                  <Building2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span className="text-xs font-bold text-slate-800">
-                    Buyer (Bill to)
-                  </span>
+                <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                  <div className="flex items-center gap-1.5">
+                    <Building2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span className="text-xs font-bold text-slate-800">
+                      Buyer (Bill to)
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setShowCustomerMaster(true)}
+                      className="px-2.5 py-1 text-[11px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200/80 rounded-lg transition flex items-center gap-1 cursor-pointer shadow-2xs"
+                    >
+                      <Users className="w-3 h-3 text-blue-600" />
+                      <span>Party Directory</span>
+                    </button>
+                    {data.buyer.name && (
+                      <button
+                        type="button"
+                        onClick={handleSaveBuyerToDirectory}
+                        className="px-2 py-1 text-[11px] font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-lg transition cursor-pointer"
+                        title="Save to Customer Directory"
+                      >
+                        <span>Save Party</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div>
@@ -1525,7 +1597,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     value={data.buyer.name}
                     onChange={(e) => updateBuyer('name', e.target.value)}
                     placeholder="e.g. M/s ABC Enterprises / Client Name"
-                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-semibold text-slate-900 outline-none focus:border-indigo-500"
+                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-semibold text-slate-900 outline-none focus:border-blue-500"
                   />
                 </div>
 
@@ -1538,7 +1610,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     value={data.buyer.address}
                     onChange={(e) => updateBuyer('address', e.target.value)}
                     placeholder="e.g. Plot No. 45, Industrial Area, Phase-2"
-                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg text-slate-800 outline-none focus:border-indigo-500"
+                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg text-slate-800 outline-none focus:border-blue-500"
                   />
                 </div>
 
@@ -1547,14 +1619,14 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     <label className="block text-[11px] font-semibold text-slate-600">
                       GSTIN / UIN (Optional)
                     </label>
-                    <span className="text-[10px] text-indigo-600 font-medium">⚡ Auto State</span>
+                    <span className="text-[10px] text-blue-600 font-medium">⚡ Auto State</span>
                   </div>
                   <input
                     type="text"
                     value={data.buyer.gstin || ''}
                     onChange={(e) => updateBuyer('gstin', e.target.value)}
                     placeholder="09AABCM1234F1Z5"
-                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-mono uppercase font-bold text-slate-800 outline-none focus:border-indigo-500"
+                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-mono uppercase font-bold text-slate-800 outline-none focus:border-blue-500"
                   />
                   {data.buyer.gstin && (() => {
                     const info = analyzeGstin(data.buyer.gstin);
@@ -1579,7 +1651,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.buyer.stateName}
                       onChange={(e) => updateBuyer('stateName', e.target.value)}
                       placeholder="Uttar Pradesh"
-                      className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg outline-none focus:border-indigo-500"
+                      className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -1591,7 +1663,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.buyer.stateCode}
                       onChange={(e) => updateBuyer('stateCode', e.target.value)}
                       placeholder="09"
-                      className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-mono font-bold outline-none focus:border-indigo-500"
+                      className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-mono font-bold outline-none focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -1624,10 +1696,10 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       const next = getNextInvoiceNo(data.dispatch.invoiceNo);
                       updateDispatch('invoiceNo', next);
                     }}
-                    className="text-[11px] font-bold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200/80 px-2 py-0.5 rounded flex items-center gap-1 transition cursor-pointer active:scale-95"
+                    className="text-[11px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200/80 px-2 py-0.5 rounded flex items-center gap-1 transition cursor-pointer active:scale-95"
                     title="Automatically increment sequence number preserving prefix (e.g. INV/089 → INV/090)"
                   >
-                    <Plus className="w-3 h-3 text-indigo-600" />
+                    <Plus className="w-3 h-3 text-blue-600" />
                     <span>Auto Next (#{getNextInvoiceNo(data.dispatch.invoiceNo)})</span>
                   </button>
                 </div>
@@ -1636,7 +1708,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.dispatch.invoiceNo}
                   onChange={(e) => updateDispatch('invoiceNo', e.target.value)}
                   placeholder="e.g. 74 or INV-001 or INV/24-25/089"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-900 outline-none focus:border-indigo-500 font-mono"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-900 outline-none focus:border-blue-500 font-mono"
                 />
                 <p className="text-[10px] text-slate-500 mt-1">
                   Auto-Sequence preserves prefixes & zeros (e.g. INV/089 → INV/090)
@@ -1652,7 +1724,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.dispatch.invoiceDate}
                   onChange={(e) => updateDispatch('invoiceDate', e.target.value)}
                   placeholder="e.g. 14-Oct-26"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-semibold text-slate-900 outline-none focus:border-indigo-500"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-semibold text-slate-900 outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -1665,7 +1737,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.dispatch.dispatchedThrough}
                   onChange={(e) => updateDispatch('dispatchedThrough', e.target.value)}
                   placeholder="e.g. By Road / Transport / Courier"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg uppercase font-bold text-slate-900 outline-none focus:border-indigo-500"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg uppercase font-bold text-slate-900 outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -1678,7 +1750,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.dispatch.destination}
                   onChange={(e) => updateDispatch('destination', e.target.value)}
                   placeholder="e.g. Site / Destination City"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg uppercase font-bold text-slate-900 outline-none focus:border-indigo-500"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg uppercase font-bold text-slate-900 outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -1691,7 +1763,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.dispatch.dispatchDocNo}
                   onChange={(e) => updateDispatch('dispatchDocNo', e.target.value)}
                   placeholder="e.g. LR-1024 or Doc No"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold outline-none focus:border-indigo-500"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -1704,7 +1776,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.dispatch.deliveryNoteDate}
                   onChange={(e) => updateDispatch('deliveryNoteDate', e.target.value)}
                   placeholder=""
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg outline-none focus:border-indigo-500"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -1717,7 +1789,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.dispatch.buyersOrderNo}
                   onChange={(e) => updateDispatch('buyersOrderNo', e.target.value)}
                   placeholder=""
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg outline-none focus:border-indigo-500"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -1730,7 +1802,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.dispatch.orderDate}
                   onChange={(e) => updateDispatch('orderDate', e.target.value)}
                   placeholder=""
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg outline-none focus:border-indigo-500"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -1743,7 +1815,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.dispatch.termsOfDelivery}
                   onChange={(e) => updateDispatch('termsOfDelivery', e.target.value)}
                   placeholder="Delivery terms..."
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg outline-none focus:border-indigo-500"
+                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500"
                 />
               </div>
             </div>
@@ -1754,9 +1826,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
         {activeTab === 'tax' && (
           <div className="space-y-3.5 sm:space-y-4">
             {/* Main Header / Enable Tax Table Switch */}
-            <div className="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-3 sm:p-4 rounded-xl border border-slate-800 shadow-sm flex items-start sm:items-center justify-between gap-3">
+            <div className="bg-gradient-to-r from-slate-900 to-slate-900 text-white p-3 sm:p-4 rounded-xl border border-slate-800 shadow-sm flex items-start sm:items-center justify-between gap-3">
               <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 min-w-0">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 shrink-0 mt-0.5 sm:mt-0">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 shrink-0 mt-0.5 sm:mt-0">
                   <Percent className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div className="min-w-0">
@@ -1788,7 +1860,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   onChange={(e) => onChange({ ...data, showTaxSummary: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-10 sm:w-11 h-5 sm:h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 sm:after:h-5 after:w-4 sm:after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                <div className="w-10 sm:w-11 h-5 sm:h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 sm:after:h-5 after:w-4 sm:after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
 
@@ -1805,7 +1877,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onClick={() => onChange({ ...data, taxMode: 'auto', taxSummary: [] })}
                     className={`py-1.5 px-1.5 rounded-md transition cursor-pointer text-center text-[11px] sm:text-xs ${
                       data.taxMode !== 'manual'
-                        ? 'bg-white text-indigo-700 shadow-2xs font-bold'
+                        ? 'bg-white text-blue-700 shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -1816,7 +1888,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onClick={() => onChange({ ...data, taxMode: 'manual', taxSummary: effectiveTaxRows })}
                     className={`py-1.5 px-1.5 rounded-md transition cursor-pointer text-center text-[11px] sm:text-xs ${
                       data.taxMode === 'manual'
-                        ? 'bg-white text-indigo-700 shadow-2xs font-bold'
+                        ? 'bg-white text-blue-700 shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -1841,7 +1913,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onClick={() => onChange({ ...data, taxType: 'cgst_sgst' })}
                     className={`py-1.5 px-1 rounded-md transition cursor-pointer text-center text-[10px] xs:text-[11px] truncate ${
                       data.taxType === 'cgst_sgst' || !data.taxType
-                        ? 'bg-white text-indigo-700 shadow-2xs font-bold'
+                        ? 'bg-white text-blue-700 shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                     title="Central GST + State GST (Intra-state, e.g. UP to UP)"
@@ -1853,7 +1925,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onClick={() => onChange({ ...data, taxType: 'igst' })}
                     className={`py-1.5 px-1 rounded-md transition cursor-pointer text-center text-[10px] xs:text-[11px] truncate ${
                       data.taxType === 'igst'
-                        ? 'bg-white text-indigo-700 shadow-2xs font-bold'
+                        ? 'bg-white text-blue-700 shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                     title="Integrated GST (Inter-state sales)"
@@ -1865,7 +1937,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onClick={() => onChange({ ...data, taxType: 'auto' })}
                     className={`py-1.5 px-1 rounded-md transition cursor-pointer text-center text-[10px] xs:text-[11px] truncate ${
                       data.taxType === 'auto'
-                        ? 'bg-white text-indigo-700 shadow-2xs font-bold'
+                        ? 'bg-white text-blue-700 shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                     title="Auto-detect based on state codes"
@@ -1889,7 +1961,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onClick={() => onChange({ ...data, pricingMode: 'inclusive' })}
                     className={`py-1.5 px-1.5 rounded-md transition cursor-pointer text-center text-[11px] sm:text-xs ${
                       data.pricingMode === 'inclusive' || !data.pricingMode
-                        ? 'bg-white text-indigo-700 shadow-2xs font-bold'
+                        ? 'bg-white text-blue-700 shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -1900,7 +1972,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onClick={() => onChange({ ...data, pricingMode: 'exclusive' })}
                     className={`py-1.5 px-1.5 rounded-md transition cursor-pointer text-center text-[11px] sm:text-xs ${
                       data.pricingMode === 'exclusive'
-                        ? 'bg-white text-indigo-700 shadow-2xs font-bold'
+                        ? 'bg-white text-blue-700 shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -1935,7 +2007,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onClick={() => onChange({ ...data, defaultGstRate: tier.val })}
                     className={`px-2.5 py-1 text-xs rounded-lg font-semibold transition cursor-pointer ${
                       (data.defaultGstRate ?? 18) === tier.val
-                        ? 'bg-indigo-600 text-white shadow-2xs font-bold'
+                        ? 'bg-blue-600 text-white shadow-2xs font-bold'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
                     }`}
                   >
@@ -1949,7 +2021,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
             <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
               <div className="bg-slate-50 px-3 sm:px-4 py-2.5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0"></span>
+                  <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
                   <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
                     HSN/SAC Breakdown Entries
                   </h4>
@@ -1965,14 +2037,14 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     className="flex-1 sm:flex-initial px-2.5 py-1 text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 rounded-lg border border-slate-300 flex items-center justify-center gap-1.5 transition cursor-pointer shadow-2xs active:scale-95"
                     title="Recalculate summary live from items table"
                   >
-                    <RefreshCw className="w-3 h-3 text-indigo-600 shrink-0" />
+                    <RefreshCw className="w-3 h-3 text-blue-600 shrink-0" />
                     <span>Sync from Items</span>
                   </button>
                   {data.taxMode === 'manual' && (
                     <button
                       type="button"
                       onClick={addTaxRow}
-                      className="px-2.5 py-1 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg flex items-center justify-center gap-1 transition cursor-pointer shadow-2xs active:scale-95"
+                      className="px-2.5 py-1 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1 transition cursor-pointer shadow-2xs active:scale-95"
                     >
                       <Plus className="w-3 h-3 shrink-0" />
                       <span>Add HSN Row</span>
@@ -1982,7 +2054,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               </div>
 
               {/* Mobile Swipe Hint */}
-              <div className="sm:hidden px-3 py-1 bg-indigo-50/70 border-b border-indigo-100/60 text-[10px] text-indigo-700 flex items-center justify-between">
+              <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-100/60 text-[10px] text-blue-700 flex items-center justify-between">
                 <span>Swipe table horizontally for all tax columns</span>
                 <span className="font-bold">⇄</span>
               </div>
@@ -2007,7 +2079,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                           <th className="p-2 text-right min-w-[95px]">SGST Amt (₹)</th>
                         </>
                       )}
-                      <th className="p-2 text-right min-w-[110px] font-bold text-indigo-700">Total Tax (₹)</th>
+                      <th className="p-2 text-right min-w-[110px] font-bold text-blue-700">Total Tax (₹)</th>
                       {data.taxMode === 'manual' && <th className="p-2 w-10 text-center"></th>}
                     </tr>
                   </thead>
@@ -2022,7 +2094,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                               value={row.hsnSac}
                               onChange={(e) => updateTaxItem(idx, 'hsnSac', e.target.value)}
                               placeholder="721420"
-                              className="w-full p-1 border border-slate-200 rounded font-mono font-bold text-slate-800 text-xs outline-none focus:border-indigo-500"
+                              className="w-full p-1 border border-slate-200 rounded font-mono font-bold text-slate-800 text-xs outline-none focus:border-blue-500"
                             />
                           ) : (
                             <span className="font-mono font-bold text-slate-800">{row.hsnSac}</span>
@@ -2037,7 +2109,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                               step="0.01"
                               value={row.taxableValue}
                               onChange={(e) => updateTaxItem(idx, 'taxableValue', e.target.value)}
-                              className="w-full p-1 border border-slate-200 rounded text-right font-semibold text-slate-800 text-xs outline-none focus:border-indigo-500"
+                              className="w-full p-1 border border-slate-200 rounded text-right font-semibold text-slate-800 text-xs outline-none focus:border-blue-500"
                             />
                           ) : (
                             <span className="font-semibold text-slate-800">
@@ -2054,7 +2126,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                   type="number"
                                   value={row.igstRate || 0}
                                   onChange={(e) => updateTaxItem(idx, 'igstRate', e.target.value)}
-                                  className="w-14 p-1 border border-slate-200 rounded text-center text-xs outline-none focus:border-indigo-500"
+                                  className="w-14 p-1 border border-slate-200 rounded text-center text-xs outline-none focus:border-blue-500"
                                 />
                               ) : (
                                 <span>{row.igstRate || 0}%</span>
@@ -2067,7 +2139,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                   step="0.01"
                                   value={row.igstAmount || row.totalTaxAmount}
                                   onChange={(e) => updateTaxItem(idx, 'igstAmount', e.target.value)}
-                                  className="w-full p-1 border border-slate-200 rounded text-right text-xs outline-none focus:border-indigo-500"
+                                  className="w-full p-1 border border-slate-200 rounded text-right text-xs outline-none focus:border-blue-500"
                                 />
                               ) : (
                                 <span>₹ {formatIndianCurrency(row.igstAmount || row.totalTaxAmount)}</span>
@@ -2082,7 +2154,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                   type="number"
                                   value={row.cgstRate}
                                   onChange={(e) => updateTaxItem(idx, 'cgstRate', e.target.value)}
-                                  className="w-14 p-1 border border-slate-200 rounded text-center text-xs outline-none focus:border-indigo-500"
+                                  className="w-14 p-1 border border-slate-200 rounded text-center text-xs outline-none focus:border-blue-500"
                                 />
                               ) : (
                                 <span>{row.cgstRate}%</span>
@@ -2095,7 +2167,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                   step="0.01"
                                   value={row.cgstAmount}
                                   onChange={(e) => updateTaxItem(idx, 'cgstAmount', e.target.value)}
-                                  className="w-full p-1 border border-slate-200 rounded text-right text-xs outline-none focus:border-indigo-500"
+                                  className="w-full p-1 border border-slate-200 rounded text-right text-xs outline-none focus:border-blue-500"
                                 />
                               ) : (
                                 <span>₹ {formatIndianCurrency(row.cgstAmount)}</span>
@@ -2107,7 +2179,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                   type="number"
                                   value={row.sgstRate}
                                   onChange={(e) => updateTaxItem(idx, 'sgstRate', e.target.value)}
-                                  className="w-14 p-1 border border-slate-200 rounded text-center text-xs outline-none focus:border-indigo-500"
+                                  className="w-14 p-1 border border-slate-200 rounded text-center text-xs outline-none focus:border-blue-500"
                                 />
                               ) : (
                                 <span>{row.sgstRate}%</span>
@@ -2120,7 +2192,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                   step="0.01"
                                   value={row.sgstAmount}
                                   onChange={(e) => updateTaxItem(idx, 'sgstAmount', e.target.value)}
-                                  className="w-full p-1 border border-slate-200 rounded text-right text-xs outline-none focus:border-indigo-500"
+                                  className="w-full p-1 border border-slate-200 rounded text-right text-xs outline-none focus:border-blue-500"
                                 />
                               ) : (
                                 <span>₹ {formatIndianCurrency(row.sgstAmount)}</span>
@@ -2130,7 +2202,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                         )}
 
                         {/* Total Tax Amount */}
-                        <td className="p-2 text-right font-bold text-indigo-700">
+                        <td className="p-2 text-right font-bold text-blue-700">
                           ₹ {formatIndianCurrency(row.totalTaxAmount)}
                         </td>
 
@@ -2170,7 +2242,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                           <td className="p-2 text-right">₹ {formatIndianCurrency(taxTotals.totalSgstAmount)}</td>
                         </>
                       )}
-                      <td className="p-2 text-right text-indigo-700 font-extrabold text-sm">
+                      <td className="p-2 text-right text-blue-700 font-extrabold text-sm">
                         ₹ {formatIndianCurrency(taxTotals.totalTaxAmount)}
                       </td>
                       {data.taxMode === 'manual' && <td></td>}
@@ -2183,7 +2255,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               <div className="sm:hidden bg-slate-50 p-3 border-t border-slate-200 space-y-2">
                 <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
                   <span>Tax Summary At A Glance</span>
-                  <span className="text-indigo-700 font-mono font-extrabold">₹ {formatIndianCurrency(taxTotals.totalTaxAmount)} Tax</span>
+                  <span className="text-blue-700 font-mono font-extrabold">₹ {formatIndianCurrency(taxTotals.totalTaxAmount)} Tax</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="bg-white p-2 rounded-lg border border-slate-200">
@@ -2193,17 +2265,17 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   {isInterState ? (
                     <div className="bg-white p-2 rounded-lg border border-slate-200">
                       <span className="text-[10px] text-slate-500 block">Total IGST</span>
-                      <span className="font-bold text-indigo-700">₹ {formatIndianCurrency(taxTotals.totalIgstAmount || taxTotals.totalTaxAmount)}</span>
+                      <span className="font-bold text-blue-700">₹ {formatIndianCurrency(taxTotals.totalIgstAmount || taxTotals.totalTaxAmount)}</span>
                     </div>
                   ) : (
                     <>
                       <div className="bg-white p-2 rounded-lg border border-slate-200">
                         <span className="text-[10px] text-slate-500 block">CGST (9%)</span>
-                        <span className="font-bold text-indigo-700">₹ {formatIndianCurrency(taxTotals.totalCgstAmount)}</span>
+                        <span className="font-bold text-blue-700">₹ {formatIndianCurrency(taxTotals.totalCgstAmount)}</span>
                       </div>
                       <div className="bg-white p-2 rounded-lg border border-slate-200">
                         <span className="text-[10px] text-slate-500 block">SGST (9%)</span>
-                        <span className="font-bold text-indigo-700">₹ {formatIndianCurrency(taxTotals.totalSgstAmount)}</span>
+                        <span className="font-bold text-blue-700">₹ {formatIndianCurrency(taxTotals.totalSgstAmount)}</span>
                       </div>
                     </>
                   )}
@@ -2238,7 +2310,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   onChange={(e) => onChange({ ...data, enableRoundOff: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
 
@@ -2249,7 +2321,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <label className="block text-xs font-bold text-slate-800">
                   Tax Amount (in words)
                 </label>
-                <div className="p-2.5 bg-white rounded-lg border border-slate-200 text-xs font-bold text-indigo-900 break-words leading-relaxed">
+                <div className="p-2.5 bg-white rounded-lg border border-slate-200 text-xs font-bold text-slate-900 break-words leading-relaxed">
                   {autoTaxWords}
                 </div>
                 <input
@@ -2257,7 +2329,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.customTaxAmountInWords || ''}
                   onChange={(e) => onChange({ ...data, customTaxAmountInWords: e.target.value })}
                   placeholder="Custom override (Leave blank for automatic)"
-                  className="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 bg-white"
+                  className="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-blue-500 bg-white"
                 />
                 <p className="text-[10px] text-slate-500">
                   Matches: "INR Six Thousand Thirty Four and Fifty Eight paise Only"
@@ -2277,7 +2349,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.customAmountInWords || ''}
                   onChange={(e) => onChange({ ...data, customAmountInWords: e.target.value })}
                   placeholder="Custom override (Leave blank for automatic)"
-                  className="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 bg-white"
+                  className="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-blue-500 bg-white"
                 />
                 <p className="text-[10px] text-slate-500">
                   Matches: "INR Thirty Nine Thousand Five Hundred Sixty Only"
@@ -2295,7 +2367,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   rows={3}
                   value={data.declaration}
                   onChange={(e) => onChange({ ...data, declaration: e.target.value })}
-                  className="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 bg-white"
+                  className="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-blue-500 bg-white"
                 />
               </div>
 
@@ -2308,7 +2380,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.signatoryCompany || ''}
                   onChange={(e) => onChange({ ...data, signatoryCompany: e.target.value })}
                   placeholder={`Defaults to seller name (${data.seller.name || 'BHANU TRADERS'})`}
-                  className="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 bg-white font-bold"
+                  className="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-blue-500 bg-white font-bold"
                 />
                 <p className="text-[10px] text-slate-500">
                   Appears as: <span className="font-bold">for {data.signatoryCompany?.trim() || data.seller.name || 'BHANU TRADERS'}</span>
@@ -2335,7 +2407,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onChange={(e) => updateBankDetails('showBankDetails', e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                  <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
 
@@ -2350,7 +2422,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.bankName || ''}
                       onChange={(e) => updateBankDetails('bankName', e.target.value)}
                       placeholder="e.g. State Bank of India, HDFC Bank"
-                      className="w-full text-xs p-2 border border-slate-300 rounded-lg font-bold text-slate-800 outline-none focus:border-indigo-500 bg-white"
+                      className="w-full text-xs p-2 border border-slate-300 rounded-lg font-bold text-slate-800 outline-none focus:border-blue-500 bg-white"
                     />
                   </div>
 
@@ -2363,7 +2435,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.accountNo || ''}
                       onChange={(e) => updateBankDetails('accountNo', e.target.value)}
                       placeholder="e.g. 381928371928"
-                      className="w-full text-xs p-2 border border-slate-300 rounded-lg font-mono font-bold text-slate-800 outline-none focus:border-indigo-500 bg-white"
+                      className="w-full text-xs p-2 border border-slate-300 rounded-lg font-mono font-bold text-slate-800 outline-none focus:border-blue-500 bg-white"
                     />
                   </div>
 
@@ -2376,7 +2448,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.branchAndIfsc || ''}
                       onChange={(e) => updateBankDetails('branchAndIfsc', e.target.value)}
                       placeholder="e.g. Main Branch & SBIN0001234"
-                      className="w-full text-xs p-2 border border-slate-300 rounded-lg font-bold text-slate-800 outline-none focus:border-indigo-500 bg-white"
+                      className="w-full text-xs p-2 border border-slate-300 rounded-lg font-bold text-slate-800 outline-none focus:border-blue-500 bg-white"
                     />
                   </div>
 
@@ -2389,7 +2461,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.upiId || ''}
                       onChange={(e) => updateBankDetails('upiId', e.target.value)}
                       placeholder="e.g. yourbusiness@upi"
-                      className="w-full text-xs p-2 border border-slate-300 rounded-lg font-mono font-bold text-indigo-700 outline-none focus:border-indigo-500 bg-white"
+                      className="w-full text-xs p-2 border border-slate-300 rounded-lg font-mono font-bold text-blue-700 outline-none focus:border-blue-500 bg-white"
                     />
                   </div>
 
@@ -2406,7 +2478,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       type="checkbox"
                       checked={data.bankDetails?.showQrCode !== false}
                       onChange={(e) => updateBankDetails('showQrCode', e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer"
+                      className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
                     />
                   </div>
                 </div>
@@ -2436,7 +2508,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 value={data.title}
                 onChange={(e) => onChange({ ...data, title: e.target.value })}
                 placeholder="Tax Invoice"
-                className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold outline-none focus:border-indigo-500"
+                className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold outline-none focus:border-blue-500"
               />
             </div>
 
@@ -2449,7 +2521,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 value={data.customAmountInWords || ''}
                 onChange={(e) => onChange({ ...data, customAmountInWords: e.target.value })}
                 placeholder="e.g. INR Forty-Four Thousand Two Hundred Ninety Only"
-                className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono text-[11px] outline-none focus:border-indigo-500"
+                className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono text-[11px] outline-none focus:border-blue-500"
               />
               <p className="text-[10px] text-slate-500 mt-1">
                 By default, the Indian numbering system automatically writes out the amount in words.
@@ -2470,7 +2542,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 id="showTaxSummary"
                 checked={data.showTaxSummary}
                 onChange={(e) => onChange({ ...data, showTaxSummary: e.target.checked })}
-                className="w-5 h-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer"
+                className="w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
               />
             </div>
 
@@ -2482,7 +2554,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 rows={3}
                 value={data.declaration}
                 onChange={(e) => onChange({ ...data, declaration: e.target.value })}
-                className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg outline-none focus:border-indigo-500"
+                className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500"
               />
             </div>
           </div>
@@ -2495,6 +2567,16 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
           isOpen={showProductMaster}
           onClose={() => setShowProductMaster(false)}
           onSelectItem={handleSelectFromLibrary}
+        />
+      )}
+
+      {/* Customer / Party Master Directory Modal */}
+      {showCustomerMaster && (
+        <CustomerMasterModal
+          isOpen={showCustomerMaster}
+          onClose={() => setShowCustomerMaster(false)}
+          onSelectCustomer={handleSelectCustomer}
+          currentBuyerName={data.buyer.name}
         />
       )}
     </div>

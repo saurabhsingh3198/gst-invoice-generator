@@ -1,0 +1,74 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: gst-invoice-studio-backend
+
+  # Default: In-Memory / File-based H2 Database for 0-setup instant run
+  datasource:
+    url: jdbc:h2:file:./data/gst_invoicedb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=TRUE
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+
+  # For PostgreSQL production, uncomment below:
+  # datasource:
+  #   url: jdbc:postgresql://localhost:5432/gst_invoicedb
+  #   username: postgres
+  #   password: your_password
+
+  # For MySQL production, uncomment below:
+  # datasource:
+  #   url: jdbc:mysql://localhost:3306/gst_invoicedb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+  #   username: root
+  #   password: your_password
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+
+  # Gmail SMTP Mail Service Configuration
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: Saurabh.antworksmoney@gmail.com
+    password: udwqymfgugqaleoo
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+        transport:
+          protocol: smtp
+
+# JWT Secret & OTP Configurations
+app:
+  jwt:
+    secret: 9a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b
+    expiration-ms: 86400000 # 24 hours
+  otp:
+    expiration-minutes: 10
+    demo-bypass: true # Allows testing with default OTP 123456 in dev mode
+
+cors:
+  allowed-origins:
+    - "http://localhost:5173"
+    - "http://127.0.0.1:5173"
+    - "http://localhost:3000"
+    - "https://saurabhsingh3198.github.io"
+    - "https://gst-invoice-generator.vercel.app"

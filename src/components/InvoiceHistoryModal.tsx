@@ -100,38 +100,37 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
       (sum, item) => sum + (Number(item.amount) || 0),
       0
     );
-    const rounded = currentInvoice.enableRoundOff !== false ? Math.round(rawTotal) : rawTotal;
 
-    const invNo = currentInvoice.dispatch.invoiceNo || 'Draft';
-    if (currentInvoice.dispatch.invoiceNo) {
-      recordLastInvoiceNo(currentInvoice.dispatch.invoiceNo);
-    }
+    const now = new Date();
+    const formattedSavedAt = `${now.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    })} ${now.toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })}`;
+
     const newRecord: SavedInvoiceRecord = {
-      id: `inv-${Date.now()}`,
-      invoiceNo: invNo,
-      invoiceDate: currentInvoice.dispatch.invoiceDate || new Date().toLocaleDateString('en-GB'),
-      buyerName: currentInvoice.buyer.name || 'Unnamed Buyer',
-      sellerName: currentInvoice.seller.name || 'Seller',
-      totalAmount: rounded,
+      id: `inv_rec_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      invoiceNo: currentInvoice.dispatch.invoiceNo || 'DRAFT',
+      invoiceDate: currentInvoice.dispatch.invoiceDate || new Date().toISOString().split('T')[0],
+      buyerName: currentInvoice.buyer.name || 'Unnamed Customer',
+      sellerName: currentInvoice.seller.name || 'My Business',
+      totalAmount: rawTotal,
       itemCount: currentInvoice.items.length,
-      savedAt: new Date().toLocaleString('en-IN'),
+      savedAt: formattedSavedAt,
       data: JSON.parse(JSON.stringify(currentInvoice)),
     };
 
-    const existingIndex = records.findIndex(
-      (r) => r.invoiceNo.trim().toLowerCase() === invNo.trim().toLowerCase()
-    );
-
-    let updated: SavedInvoiceRecord[];
-    if (existingIndex >= 0) {
-      updated = [...records];
-      updated[existingIndex] = newRecord;
-    } else {
-      updated = [newRecord, ...records];
+    // Keep highest sequence tracked
+    if (currentInvoice.dispatch.invoiceNo) {
+      recordLastInvoiceNo(currentInvoice.dispatch.invoiceNo);
     }
 
+    const updated = [newRecord, ...records.filter((r) => r.invoiceNo !== newRecord.invoiceNo || r.invoiceDate !== newRecord.invoiceDate)];
     saveRecordsToStorage(updated);
-    setSaveSuccessMessage(`Invoice #${invNo} saved to history!`);
+    setSaveSuccessMessage(`Invoice #${newRecord.invoiceNo} saved to history!`);
     setTimeout(() => setSaveSuccessMessage(''), 3000);
   };
 
@@ -143,50 +142,63 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
     }
   };
 
+  // Export all saved invoices as a single JSON file
   const handleExportJson = () => {
     if (records.length === 0) {
-      alert('No invoice history to export!');
+      alert('No invoice records to export!');
       return;
     }
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(records, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `gst_invoices_backup_${new Date().toISOString().slice(0, 10)}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+    const dataStr = JSON.stringify(records, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `gst_invoices_backup_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
+  // Import JSON backup
   const handleImportJson = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const fileReader = new FileReader();
-    if (e.target.files && e.target.files[0]) {
-      fileReader.readAsText(e.target.files[0], 'UTF-8');
-      fileReader.onload = (event) => {
-        try {
-          const parsed = JSON.parse(event.target?.result as string);
-          if (Array.isArray(parsed)) {
-            // Merge with existing avoiding duplicate IDs
-            const existingIds = new Set(records.map((r) => r.id));
-            const newRecords = parsed.filter((r) => r && r.id && !existingIds.has(r.id));
-            const combined = [...newRecords, ...records];
-            saveRecordsToStorage(combined);
-            alert(`Successfully imported ${newRecords.length} invoices!`);
-          } else {
-            alert('Invalid backup JSON format.');
-          }
-        } catch (err) {
-          alert('Failed to parse backup JSON file.');
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string;
+        const imported = JSON.parse(content);
+        if (Array.isArray(imported)) {
+          // Merge avoiding exact duplicates by id
+          const existingIds = new Set(records.map((r) => r.id));
+          const newOnes = imported.filter((item: any) => item && item.id && !existingIds.has(item.id));
+          const merged = [...newOnes, ...records];
+          saveRecordsToStorage(merged);
+          setSaveSuccessMessage(`Successfully imported ${newOnes.length} invoices!`);
+          setTimeout(() => setSaveSuccessMessage(''), 3000);
+        } else {
+          alert('Invalid backup file format. Expected a JSON array of invoice records.');
         }
-      };
-    }
+      } catch (err) {
+        console.error('Import error:', err);
+        alert('Could not parse the selected backup file.');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
   };
 
-  const filtered = records.filter(
-    (r) =>
-      r.invoiceNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      r.buyerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      r.invoiceDate.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filtered = records.filter((rec) => {
+    const q = searchTerm.toLowerCase();
+    return (
+      rec.invoiceNo.toLowerCase().includes(q) ||
+      rec.buyerName.toLowerCase().includes(q) ||
+      rec.invoiceDate.includes(q) ||
+      rec.sellerName.toLowerCase().includes(q)
+    );
+  });
 
   const modalContent = (
     <div
@@ -195,15 +207,15 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[92vh] sm:max-h-[85vh] border border-slate-200 overflow-hidden relative z-[101]">
+      <div className="bg-white text-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[92vh] sm:max-h-[85vh] border border-slate-200 overflow-hidden relative z-[101]">
         {/* Header */}
-        <div className="px-3 sm:px-5 py-3 sm:py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 gap-2">
-          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-            <div className="p-1.5 sm:p-2 bg-indigo-100 text-indigo-700 rounded-lg shrink-0">
-              <History className="w-4 h-4 sm:w-5 sm:h-5" />
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 gap-2">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="p-2 bg-blue-600 text-white rounded-xl shrink-0">
+              <History className="w-5 h-5 text-white" />
             </div>
             <div className="min-w-0">
-              <h3 className="font-bold text-slate-800 text-sm sm:text-base truncate">Invoice History & Backups</h3>
+              <h3 className="font-extrabold text-slate-900 text-sm sm:text-base truncate">Invoice History & Backups</h3>
               <p className="text-[11px] sm:text-xs text-slate-500 hidden xs:block truncate">
                 Save, recall, and export/import previous GST invoices
               </p>
@@ -211,33 +223,33 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200 transition shrink-0 cursor-pointer"
+            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-200 transition shrink-0 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Action Bar */}
-        <div className="p-3 sm:p-4 border-b border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-white">
+        <div className="p-3 sm:p-4 border-b border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-slate-50/50">
           <button
             onClick={handleSaveCurrent}
-            className="px-3.5 py-2 text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg flex items-center justify-center gap-1.5 transition shadow-sm cursor-pointer active:scale-95"
+            className="px-3.5 py-2 text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 text-white" />
             <span>Save Current (#{currentInvoice.dispatch.invoiceNo || 'New'})</span>
           </button>
 
           <div className="flex items-center justify-end gap-2">
             <button
               onClick={handleExportJson}
-              className="flex-1 sm:flex-initial px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer"
+              className="flex-1 sm:flex-initial px-3 py-2 text-xs bg-white hover:bg-slate-100 text-slate-700 font-semibold border border-slate-200 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-2xs"
               title="Download backup file"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export</span>
             </button>
 
-            <label className="flex-1 sm:flex-initial px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer">
+            <label className="flex-1 sm:flex-initial px-3 py-2 text-xs bg-white hover:bg-slate-100 text-slate-700 font-semibold border border-slate-200 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-2xs">
               <Upload className="w-3.5 h-3.5" />
               <span>Import</span>
               <input
@@ -252,8 +264,8 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
 
         {/* Notifications */}
         {saveSuccessMessage && (
-          <div className="mx-3 sm:mx-4 mt-2 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-xs flex items-center gap-2 animate-in fade-in">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
+          <div className="mx-3 sm:mx-4 mt-2 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2 animate-in fade-in">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>{saveSuccessMessage}</span>
           </div>
         )}
@@ -267,7 +279,7 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by invoice number, buyer name, or date..."
-              className="w-full text-xs pl-9 pr-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+              className="w-full text-xs pl-9 pr-4 py-2 bg-white text-slate-900 border border-slate-300 rounded-xl outline-none focus:border-blue-500 placeholder-slate-400"
             />
           </div>
         </div>
@@ -277,8 +289,8 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
           {filtered.length === 0 ? (
             <div className="text-center py-12 text-slate-400 space-y-2">
               <FolderOpen className="w-10 h-10 mx-auto opacity-50" />
-              <p className="text-xs font-semibold">No saved invoices found</p>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-xs font-semibold text-slate-700">No saved invoices found</p>
+              <p className="text-[11px] text-slate-500">
                 Click &quot;Save Current&quot; to store your invoice in history.
               </p>
             </div>
@@ -296,14 +308,14 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
                     onClose();
                   }
                 }}
-                className="group p-3 sm:p-3.5 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40 transition cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 bg-white shadow-2xs"
+                className="group p-3 sm:p-3.5 rounded-2xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50/40 transition cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 bg-white shadow-2xs"
               >
                 <div className="space-y-1 flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 font-mono shrink-0">
+                    <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-lg font-mono shrink-0">
                       #{record.invoiceNo}
                     </span>
-                    <span className="text-xs font-bold text-slate-800 break-words">
+                    <span className="text-xs font-bold text-slate-900 break-words">
                       {record.buyerName}
                     </span>
                   </div>
@@ -325,14 +337,14 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
                     <div className="text-xs font-bold text-slate-900 font-mono">
                       ₹ {formatIndianCurrency(record.totalAmount)}
                     </div>
-                    <span className="text-[10px] text-indigo-600 font-semibold group-hover:underline">
+                    <span className="text-[10px] text-blue-600 font-semibold group-hover:underline">
                       Click to Open →
                     </span>
                   </div>
 
                   <button
                     onClick={(e) => handleDelete(record.id, e)}
-                    className="p-1.5 sm:p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                    className="p-1.5 sm:p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition cursor-pointer"
                     title="Delete invoice from history"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -348,7 +360,7 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
           <span>Total Saved: {records.length} invoices</span>
           <button
             onClick={onClose}
-            className="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-100 transition text-xs cursor-pointer"
+            className="px-3.5 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-xl transition text-xs cursor-pointer shadow-2xs"
           >
             Close
           </button>

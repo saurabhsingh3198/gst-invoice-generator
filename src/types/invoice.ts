@@ -6,6 +6,7 @@ export interface SellerInfo {
   stateName: string;
   stateCode: string;
   email: string;
+  phone?: string;
 }
 
 export interface PartyInfo {

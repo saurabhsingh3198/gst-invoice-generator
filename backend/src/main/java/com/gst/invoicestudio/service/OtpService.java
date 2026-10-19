@@ -19,6 +19,12 @@ public class OtpService {
     @Autowired(required = false)
     private org.springframework.mail.javamail.JavaMailSender mailSender;
 
+    @Value("${app.mail.resend-api-key:${RESEND_API_KEY:}}")
+    private String resendApiKey;
+
+    @Value("${app.mail.brevo-api-key:${BREVO_API_KEY:}}")
+    private String brevoApiKey;
+
     @Value("${app.otp.expiration-minutes:10}")
     private int expirationMinutes;
 
@@ -37,31 +43,77 @@ public class OtpService {
         OtpToken token = new OtpToken(cleanIdentifier, otpCode, expiresAt);
         otpTokenRepository.save(token);
 
-        // Real Email Delivery via Gmail SMTP
-        // Real Email Delivery via Gmail SMTP (asynchronous to avoid blocking HTTP response)
-        if (cleanIdentifier.contains("@") && mailSender != null) {
+        System.out.println("=================================================");
+        System.out.println("  OTP GENERATED FOR [" + cleanIdentifier + "]: " + otpCode);
+        System.out.println("=================================================");
+
+        // Email Delivery: Prioritizes HTTPS REST API (Port 443 - never blocked by Render)
+        if (cleanIdentifier.contains("@")) {
             final String recipient = cleanIdentifier;
             final String code = otpCode;
             java.util.concurrent.CompletableFuture.runAsync(() -> {
-                try {
-                    org.springframework.mail.SimpleMailMessage message = new org.springframework.mail.SimpleMailMessage();
-                    message.setFrom("Saurabh.antworksmoney@gmail.com");
-                    message.setTo(recipient);
-                    message.setSubject("🔑 Your GST Invoice Studio OTP: " + code);
-                    message.setText("Hello Business Owner,\n\nYour one-time verification code (OTP) for GST Invoice Studio is:\n\n" 
-                            + code + "\n\nThis OTP is valid for the next 10 minutes. Please do not share this code with anyone.\n\nThank you,\nGST Invoice Studio SaaS Platform");
-                    mailSender.send(message);
-                    System.out.println("=================================================");
-                    System.out.println("  REAL EMAIL OTP SENT TO [" + recipient + "]: " + code);
-                    System.out.println("=================================================");
-                } catch (Exception e) {
-                    System.err.println("  [EMAIL FAILED] Could not send email: " + e.getMessage());
+                boolean sent = false;
+
+                // 1. Resend HTTPS REST API (Port 443)
+                if (resendApiKey != null && !resendApiKey.trim().isEmpty()) {
+                    try {
+                        String payload = "{\"from\":\"GST Studio <onboarding@resend.dev>\",\"to\":[\"" + recipient + "\"],\"subject\":\"🔑 Your GST Studio OTP: " + code + "\",\"html\":\"<h2>GST Invoice Studio Verification</h2><p>Your 6-digit verification code is: <strong style='font-size:24px;color:#2563eb;'>" + code + "</strong></p><p>Valid for 10 minutes.</p>\"}";
+                        java.net.http.HttpRequest req = java.net.http.HttpRequest.newBuilder()
+                                .uri(java.net.URI.create("https://api.resend.com/emails"))
+                                .header("Authorization", "Bearer " + resendApiKey.trim())
+                                .header("Content-Type", "application/json")
+                                .POST(java.net.http.HttpRequest.BodyPublishers.ofString(payload))
+                                .build();
+                        java.net.http.HttpResponse<String> resp = java.net.http.HttpClient.newHttpClient().send(req, java.net.http.HttpResponse.BodyHandlers.ofString());
+                        if (resp.statusCode() >= 200 && resp.statusCode() < 300) {
+                            System.out.println("  [EMAIL SUCCESS] OTP delivered via Resend HTTPS API to: " + recipient);
+                            sent = true;
+                        } else {
+                            System.err.println("  [RESEND API ERROR] Status " + resp.statusCode() + ": " + resp.body());
+                        }
+                    } catch (Exception e) {
+                        System.err.println("  [RESEND FAILED] " + e.getMessage());
+                    }
+                }
+
+                // 2. Brevo HTTPS REST API (Port 443)
+                if (!sent && brevoApiKey != null && !brevoApiKey.trim().isEmpty()) {
+                    try {
+                        String payload = "{\"sender\":{\"name\":\"GST Studio\",\"email\":\"Saurabh.antworksmoney@gmail.com\"},\"to\":[{\"email\":\"" + recipient + "\"}],\"subject\":\"🔑 Your GST Studio OTP: " + code + "\",\"htmlContent\":\"<h2>GST Invoice Studio Verification</h2><p>Your 6-digit verification code is: <strong style='font-size:24px;color:#2563eb;'>" + code + "</strong></p><p>Valid for 10 minutes.</p>\"}";
+                        java.net.http.HttpRequest req = java.net.http.HttpRequest.newBuilder()
+                                .uri(java.net.URI.create("https://api.brevo.com/v3/smtp/email"))
+                                .header("api-key", brevoApiKey.trim())
+                                .header("Content-Type", "application/json")
+                                .POST(java.net.http.HttpRequest.BodyPublishers.ofString(payload))
+                                .build();
+                        java.net.http.HttpResponse<String> resp = java.net.http.HttpClient.newHttpClient().send(req, java.net.http.HttpResponse.BodyHandlers.ofString());
+                        if (resp.statusCode() >= 200 && resp.statusCode() < 300) {
+                            System.out.println("  [EMAIL SUCCESS] OTP delivered via Brevo HTTPS API to: " + recipient);
+                            sent = true;
+                        } else {
+                            System.err.println("  [BREVO API ERROR] Status " + resp.statusCode() + ": " + resp.body());
+                        }
+                    } catch (Exception e) {
+                        System.err.println("  [BREVO FAILED] " + e.getMessage());
+                    }
+                }
+
+                // 3. Fallback to Gmail SMTP (works locally and on unblocked hosts)
+                if (!sent && mailSender != null) {
+                    try {
+                        org.springframework.mail.SimpleMailMessage message = new org.springframework.mail.SimpleMailMessage();
+                        message.setFrom("Saurabh.antworksmoney@gmail.com");
+                        message.setTo(recipient);
+                        message.setSubject("🔑 Your GST Invoice Studio OTP: " + code);
+                        message.setText("Hello Business Owner,\n\nYour one-time verification code (OTP) for GST Invoice Studio is:\n\n" 
+                                + code + "\n\nThis OTP is valid for the next 10 minutes. Please do not share this code with anyone.\n\nThank you,\nGST Invoice Studio SaaS Platform");
+                        mailSender.send(message);
+                        System.out.println("  [EMAIL SUCCESS] Real OTP sent via Gmail SMTP to: " + recipient);
+                    } catch (Exception e) {
+                        System.err.println("  [SMTP FAILED] Outbound SMTP port blocked on host: " + e.getMessage());
+                    }
                 }
             });
-        } else {
-            System.out.println("=================================================");
-            System.out.println("  OTP SENT TO [" + cleanIdentifier + "]: " + otpCode);
-            System.out.println("=================================================");
         }
 
         return otpCode;

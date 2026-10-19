@@ -2,7 +2,8 @@
 // Handles Multi-Shop Tenant Isolation, OTP Authentication, and Daily Sales Analytics
 
 const configuredApiBase = (import.meta.env.VITE_API_BASE_URL as string)?.trim();
-const API_BASE_URL = configuredApiBase || '/api/v1';
+const isGitHubPages = typeof window !== 'undefined' && window.location.hostname.endsWith('github.io');
+const API_BASE_URL = configuredApiBase || (isGitHubPages ? 'https://gst-invoice-studio.onrender.com/api/v1' : '/api/v1');
 
 export interface UserSession {
   token: string;

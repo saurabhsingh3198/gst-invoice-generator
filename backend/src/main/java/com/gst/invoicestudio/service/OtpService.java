@@ -38,21 +38,26 @@ public class OtpService {
         otpTokenRepository.save(token);
 
         // Real Email Delivery via Gmail SMTP
+        // Real Email Delivery via Gmail SMTP (asynchronous to avoid blocking HTTP response)
         if (cleanIdentifier.contains("@") && mailSender != null) {
-            try {
-                org.springframework.mail.SimpleMailMessage message = new org.springframework.mail.SimpleMailMessage();
-                message.setFrom("Saurabh.antworksmoney@gmail.com");
-                message.setTo(cleanIdentifier);
-                message.setSubject("🔑 Your GST Invoice Studio OTP: " + otpCode);
-                message.setText("Hello Business Owner,\n\nYour one-time verification code (OTP) for GST Invoice Studio is:\n\n" 
-                        + otpCode + "\n\nThis OTP is valid for the next 10 minutes. Please do not share this code with anyone.\n\nThank you,\nGST Invoice Studio SaaS Platform");
-                mailSender.send(message);
-                System.out.println("=================================================");
-                System.out.println("  REAL EMAIL OTP SENT TO [" + cleanIdentifier + "]: " + otpCode);
-                System.out.println("=================================================");
-            } catch (Exception e) {
-                System.err.println("  [EMAIL FAILED] Could not send email: " + e.getMessage());
-            }
+            final String recipient = cleanIdentifier;
+            final String code = otpCode;
+            java.util.concurrent.CompletableFuture.runAsync(() -> {
+                try {
+                    org.springframework.mail.SimpleMailMessage message = new org.springframework.mail.SimpleMailMessage();
+                    message.setFrom("Saurabh.antworksmoney@gmail.com");
+                    message.setTo(recipient);
+                    message.setSubject("🔑 Your GST Invoice Studio OTP: " + code);
+                    message.setText("Hello Business Owner,\n\nYour one-time verification code (OTP) for GST Invoice Studio is:\n\n" 
+                            + code + "\n\nThis OTP is valid for the next 10 minutes. Please do not share this code with anyone.\n\nThank you,\nGST Invoice Studio SaaS Platform");
+                    mailSender.send(message);
+                    System.out.println("=================================================");
+                    System.out.println("  REAL EMAIL OTP SENT TO [" + recipient + "]: " + code);
+                    System.out.println("=================================================");
+                } catch (Exception e) {
+                    System.err.println("  [EMAIL FAILED] Could not send email: " + e.getMessage());
+                }
+            });
         } else {
             System.out.println("=================================================");
             System.out.println("  OTP SENT TO [" + cleanIdentifier + "]: " + otpCode);

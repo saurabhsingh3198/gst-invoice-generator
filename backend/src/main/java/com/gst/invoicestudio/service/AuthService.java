@@ -68,11 +68,12 @@ public class AuthService {
             shop.setStateCode("09");
             shop = shopRepository.save(shop);
         } else {
-            user = optionalUser.get();
-            shop = shopRepository.findFirstByUserId(user.getId())
+            final User existingUser = optionalUser.get();
+            user = existingUser;
+            shop = shopRepository.findFirstByUserId(existingUser.getId())
                     .orElseGet(() -> {
                         Shop s = new Shop();
-                        s.setUser(user);
+                        s.setUser(existingUser);
                         s.setShopName("My GST Enterprise");
                         return shopRepository.save(s);
                     });

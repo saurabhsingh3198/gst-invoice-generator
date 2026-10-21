@@ -23,6 +23,12 @@ import {
   Upload,
   Image as ImageIcon,
   Stamp,
+  User,
+  Mail,
+  MapPin,
+  Key,
+  Hash,
+  Calendar,
 } from 'lucide-react';
 import { formatIndianCurrency, numberToIndianWords, taxNumberToIndianWords } from '../utils/numberToWords';
 import {
@@ -1417,60 +1423,80 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <div className="md:col-span-2">
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Company / Trade Name (Bold on Invoice)
+                <label className="block text-xs font-bold text-slate-800 mb-1">
+                  Company / Trade Name <span className="text-[#DC2626]">*</span>
                 </label>
-                <input
-                  type="text"
-                  value={data.seller.name}
-                  onChange={(e) => updateSeller('name', e.target.value)}
-                  placeholder="e.g. ACME Enterprise / Your Company Name"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-900 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none"
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <Building2 className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="text"
+                    value={data.seller.name}
+                    onChange={(e) => updateSeller('name', e.target.value)}
+                    placeholder="e.g. ACME Enterprise / Your Company Name"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs font-bold text-slate-900 placeholder:text-slate-400 outline-none transition shadow-2xs"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Address Line 1
                 </label>
-                <input
-                  type="text"
-                  value={data.seller.addressLine1}
-                  onChange={(e) => updateSeller('addressLine1', e.target.value)}
-                  placeholder="e.g. 101, Business Park, M.G. Road"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none"
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <MapPin className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="text"
+                    value={data.seller.addressLine1}
+                    onChange={(e) => updateSeller('addressLine1', e.target.value)}
+                    placeholder="e.g. 101, Business Park, M.G. Road"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs font-medium text-slate-800 placeholder:text-slate-400 outline-none transition shadow-2xs"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Address Line 2 (City / Landmark)
                 </label>
-                <input
-                  type="text"
-                  value={data.seller.addressLine2}
-                  onChange={(e) => updateSeller('addressLine2', e.target.value)}
-                  placeholder="e.g. Andheri East, Mumbai"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none"
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <MapPin className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="text"
+                    value={data.seller.addressLine2}
+                    onChange={(e) => updateSeller('addressLine2', e.target.value)}
+                    placeholder="e.g. Andheri East, Mumbai"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs font-medium text-slate-800 placeholder:text-slate-400 outline-none transition shadow-2xs"
+                  />
+                </div>
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-semibold text-slate-700">
-                    GSTIN / UIN Number
+                  <label className="block text-xs font-bold text-slate-800">
+                    GSTIN / UIN Number <span className="text-[#DC2626]">*</span>
                   </label>
-                  <span className="text-[10px] text-blue-600 font-medium">
+                  <span className="text-[10px] text-blue-600 font-bold">
                     ⚡ Auto-detects State
                   </span>
                 </div>
-                <input
-                  type="text"
-                  value={data.seller.gstin}
-                  onChange={(e) => updateSeller('gstin', e.target.value)}
-                  placeholder="e.g. 27ABCDE1234F1Z5"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold uppercase focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none"
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <Key className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="text"
+                    value={data.seller.gstin}
+                    onChange={(e) => updateSeller('gstin', e.target.value)}
+                    placeholder="e.g. 27ABCDE1234F1Z5"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl font-mono text-xs font-bold uppercase text-slate-900 outline-none transition shadow-2xs"
+                  />
+                </div>
                 {data.seller.gstin && (() => {
                   const info = analyzeGstin(data.seller.gstin);
                   if (info.isValid) {
@@ -1497,33 +1523,43 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Email Address
                 </label>
-                <input
-                  type="email"
-                  value={data.seller.email}
-                  onChange={(e) => updateSeller('email', e.target.value)}
-                  placeholder="e.g. billing@yourcompany.com"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none"
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <Mail className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="email"
+                    value={data.seller.email}
+                    onChange={(e) => updateSeller('email', e.target.value)}
+                    placeholder="e.g. billing@yourcompany.com"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 outline-none transition shadow-2xs"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   State Name
                 </label>
-                <input
-                  type="text"
-                  value={data.seller.stateName}
-                  onChange={(e) => updateSeller('stateName', e.target.value)}
-                  placeholder="Uttar Pradesh"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none"
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <MapPin className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="text"
+                    value={data.seller.stateName}
+                    onChange={(e) => updateSeller('stateName', e.target.value)}
+                    placeholder="Uttar Pradesh"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs font-semibold text-slate-800 outline-none transition shadow-2xs"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   State Code
                 </label>
                 <input
@@ -1531,7 +1567,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.seller.stateCode}
                   onChange={(e) => updateSeller('stateCode', e.target.value)}
                   placeholder="09"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none"
+                  className="w-full px-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs font-mono font-bold text-slate-900 outline-none transition shadow-2xs"
                 />
               </div>
             </div>
@@ -1783,16 +1819,21 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">
-                    Buyer Name
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                    Buyer Name <span className="text-[#DC2626]">*</span>
                   </label>
-                  <input
-                    type="text"
-                    value={data.buyer.name}
-                    onChange={(e) => updateBuyer('name', e.target.value)}
-                    placeholder="e.g. M/s ABC Enterprises / Client Name"
-                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-semibold text-slate-900 outline-none focus:border-blue-500"
-                  />
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                      <User className="w-3.5 h-3.5" />
+                    </div>
+                    <input
+                      type="text"
+                      value={data.buyer.name}
+                      onChange={(e) => updateBuyer('name', e.target.value)}
+                      placeholder="e.g. M/s ABC Enterprises / Client Name"
+                      className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs font-bold text-slate-900 outline-none transition shadow-2xs"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -1881,8 +1922,8 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-semibold text-slate-700">
-                    Invoice Number
+                  <label className="text-xs font-bold text-slate-800">
+                    Invoice Number <span className="text-[#DC2626]">*</span>
                   </label>
                   <button
                     type="button"
@@ -1890,36 +1931,46 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       const next = getNextInvoiceNo(data.dispatch.invoiceNo);
                       updateDispatch('invoiceNo', next);
                     }}
-                    className="text-[11px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200/80 px-2 py-0.5 rounded flex items-center gap-1 transition cursor-pointer active:scale-95"
+                    className="text-[11px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200/80 px-2 py-0.5 rounded-lg flex items-center gap-1 transition cursor-pointer active:scale-95"
                     title="Automatically increment sequence number preserving prefix (e.g. INV/089 → INV/090)"
                   >
                     <Plus className="w-3 h-3 text-blue-600" />
                     <span>Auto Next (#{getNextInvoiceNo(data.dispatch.invoiceNo)})</span>
                   </button>
                 </div>
-                <input
-                  type="text"
-                  value={data.dispatch.invoiceNo}
-                  onChange={(e) => updateDispatch('invoiceNo', e.target.value)}
-                  placeholder="e.g. 74 or INV-001 or INV/24-25/089"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-900 outline-none focus:border-blue-500 font-mono"
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <Hash className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="text"
+                    value={data.dispatch.invoiceNo}
+                    onChange={(e) => updateDispatch('invoiceNo', e.target.value)}
+                    placeholder="e.g. 74 or INV-001 or INV/24-25/089"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl font-mono text-xs font-bold text-slate-900 outline-none transition shadow-2xs"
+                  />
+                </div>
                 <p className="text-[10px] text-slate-500 mt-1">
                   Auto-Sequence preserves prefixes & zeros (e.g. INV/089 → INV/090)
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Invoice Dated
+                <label className="block text-xs font-bold text-slate-800 mb-1">
+                  Invoice Dated <span className="text-[#DC2626]">*</span>
                 </label>
-                <input
-                  type="text"
-                  value={data.dispatch.invoiceDate}
-                  onChange={(e) => updateDispatch('invoiceDate', e.target.value)}
-                  placeholder="e.g. 14-Oct-26"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-semibold text-slate-900 outline-none focus:border-blue-500"
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="text"
+                    value={data.dispatch.invoiceDate}
+                    onChange={(e) => updateDispatch('invoiceDate', e.target.value)}
+                    placeholder="e.g. 14-Oct-26"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs font-bold text-slate-900 outline-none transition shadow-2xs"
+                  />
+                </div>
               </div>
 
               <div>

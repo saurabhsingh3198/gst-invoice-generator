@@ -115,13 +115,13 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
     >
       <div className="bg-white text-slate-800 rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[92vh] sm:max-h-[85vh] border border-slate-200 overflow-hidden relative z-[101]">
         {/* Header */}
-        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 gap-2">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 flex items-center justify-between bg-white gap-2">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="p-2 bg-blue-600 text-white rounded-xl shrink-0">
-              <Package className="w-5 h-5 text-white" />
+            <div className="p-2.5 bg-red-50 text-[#DC2626] border border-red-100 rounded-xl shrink-0">
+              <Package className="w-5 h-5 text-[#DC2626]" />
             </div>
             <div className="min-w-0">
-              <h3 className="font-extrabold text-slate-900 text-sm sm:text-base truncate">
+              <h3 className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight truncate">
                 Product & Item Library
               </h3>
               <p className="text-[11px] sm:text-xs text-slate-500 hidden xs:block truncate">
@@ -131,29 +131,29 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-200 transition shrink-0 cursor-pointer"
+            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-100 transition shrink-0 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Action bar & Category Filter */}
-        <div className="p-3 sm:p-4 border-b border-slate-200 space-y-2.5 bg-slate-50/50">
+        <div className="p-3 sm:p-4 border-b border-slate-100 space-y-2.5 bg-slate-50/50">
           <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-2">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+              <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search products or HSN..."
-                className="w-full text-xs pl-9 pr-4 py-2 bg-white text-slate-800 border border-slate-300 rounded-xl outline-none focus:border-blue-500 placeholder-slate-400"
+                className="w-full text-xs pl-9 pr-4 py-2.5 bg-white text-slate-900 border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl outline-none font-semibold placeholder-slate-400 shadow-2xs transition"
               />
             </div>
 
             <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="px-3.5 py-2 text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 transition shrink-0 cursor-pointer active:scale-95 shadow-xs"
+              className="px-4 py-2.5 text-xs bg-[#DC2626] hover:bg-red-700 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 transition shrink-0 cursor-pointer active:scale-95 shadow-xs"
             >
               <Plus className="w-4 h-4 text-white" />
               <span>{showAddForm ? 'Close Form' : 'New Product'}</span>
@@ -166,9 +166,9 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1 rounded-xl text-[11px] font-bold transition shrink-0 cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition shrink-0 cursor-pointer ${
                   selectedCategory === cat
-                    ? 'bg-blue-600 text-white shadow-xs'
+                    ? 'bg-[#DC2626] text-white shadow-2xs'
                     : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
                 }`}
               >
@@ -182,16 +182,16 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
         {showAddForm && (
           <form
             onSubmit={handleAddNewProduct}
-            className="p-3 sm:p-4 bg-blue-50/50 border-b border-blue-100 space-y-3 animate-in slide-in-from-top-2 overflow-y-auto max-h-[50vh]"
+            className="p-3.5 sm:p-4 bg-red-50/30 border-b border-red-100 space-y-3 animate-in slide-in-from-top-2 overflow-y-auto max-h-[50vh]"
           >
-            <div className="text-xs font-bold text-blue-900 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-blue-600" />
+            <div className="text-xs font-bold text-[#DC2626] flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-[#DC2626]" />
               <span>Add New Product to Library</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-2.5">
               <div className="sm:col-span-2">
-                <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
                   Description / Item Name
                 </label>
                 <input
@@ -200,12 +200,12 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
                   placeholder="e.g. JSW NEO STEEL 12MM"
-                  className="w-full text-xs p-2 border border-slate-300 rounded-xl bg-white text-slate-900 outline-none focus:border-blue-500 uppercase font-semibold placeholder-slate-400"
+                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-white text-slate-900 outline-none focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 uppercase font-semibold placeholder-slate-400 transition shadow-2xs"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
                   HSN / SAC Code
                 </label>
                 <input
@@ -214,12 +214,12 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
                   value={newHsn}
                   onChange={(e) => setNewHsn(e.target.value)}
                   placeholder="721420"
-                  className="w-full text-xs p-2 border border-slate-300 rounded-xl bg-white text-slate-900 outline-none focus:border-blue-500 font-mono font-bold placeholder-slate-400"
+                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-white text-slate-900 outline-none focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 font-mono font-bold placeholder-slate-400 transition shadow-2xs"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
                   Unit
                 </label>
                 <input
@@ -227,12 +227,12 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
                   value={newUnit}
                   onChange={(e) => setNewUnit(e.target.value)}
                   placeholder="PC / KG / BAG"
-                  className="w-full text-xs p-2 border border-slate-300 rounded-xl bg-white text-slate-900 outline-none focus:border-blue-500 uppercase font-bold placeholder-slate-400"
+                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-white text-slate-900 outline-none focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 uppercase font-bold placeholder-slate-400 transition shadow-2xs"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
                   Base Rate (₹)
                 </label>
                 <input
@@ -241,18 +241,18 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
                   value={newRate}
                   onChange={(e) => setNewRate(Number(e.target.value))}
                   placeholder="450"
-                  className="w-full text-xs p-2 border border-slate-300 rounded-xl bg-white text-slate-900 outline-none focus:border-blue-500 font-bold placeholder-slate-400"
+                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-white text-slate-900 outline-none focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 font-bold placeholder-slate-400 transition shadow-2xs"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
                   GST Rate (%)
                 </label>
                 <select
                   value={newGstRate}
                   onChange={(e) => setNewGstRate(Number(e.target.value))}
-                  className="w-full text-xs p-2 border border-slate-300 rounded-xl bg-white text-slate-900 outline-none focus:border-blue-500 font-bold"
+                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-white text-slate-900 outline-none focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 font-bold transition shadow-2xs"
                 >
                   <option value={0}>0% (Exempt)</option>
                   <option value={5}>5%</option>
@@ -263,7 +263,7 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
                   Default Alt Qty (Optional)
                 </label>
                 <input
@@ -271,12 +271,12 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
                   value={newAltQty}
                   onChange={(e) => setNewAltQty(e.target.value)}
                   placeholder="e.g. 50.000 KG"
-                  className="w-full text-xs p-2 border border-slate-300 rounded-xl bg-white text-slate-900 outline-none focus:border-blue-500 font-bold placeholder-slate-400"
+                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-white text-slate-900 outline-none focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 font-bold placeholder-slate-400 transition shadow-2xs"
                 />
               </div>
 
               <div className="sm:col-span-2 md:col-span-1">
-                <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
                   Category
                 </label>
                 <input
@@ -284,7 +284,7 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
                   placeholder="e.g. Steel & TMT, Cement"
-                  className="w-full text-xs p-2 border border-slate-300 rounded-xl bg-white text-slate-900 outline-none focus:border-blue-500 placeholder-slate-400"
+                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-white text-slate-900 outline-none focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 font-semibold placeholder-slate-400 transition shadow-2xs"
                 />
               </div>
             </div>
@@ -293,13 +293,13 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowAddForm(false)}
-                className="px-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 rounded-lg transition cursor-pointer"
+                className="px-3.5 py-1.5 text-xs text-slate-600 hover:text-slate-900 rounded-xl transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow-xs cursor-pointer active:scale-95"
+                className="px-4 py-2 text-xs bg-[#DC2626] hover:bg-red-700 text-white font-bold rounded-xl transition shadow-xs cursor-pointer active:scale-95"
               >
                 Save to Library
               </button>
@@ -322,12 +322,12 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
                   onSelectItem(item);
                   onClose();
                 }}
-                className="group p-3 rounded-2xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50/40 transition cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 bg-white shadow-2xs"
+                className="group p-3 rounded-2xl border border-slate-200 hover:border-red-300 hover:bg-red-50/20 transition cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 bg-white shadow-2xs"
               >
                 {/* Product Info (Top on Mobile, Left on Desktop) */}
                 <div className="space-y-1 flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold text-slate-900 group-hover:text-blue-700 transition break-words">
+                    <span className="text-xs font-bold text-slate-900 group-hover:text-[#DC2626] transition break-words">
                       {item.description}
                     </span>
                     {item.category && (
@@ -375,7 +375,7 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
 
-                    <span className="px-3 py-1.5 sm:py-1 text-xs bg-blue-50 text-blue-700 border border-blue-200 font-bold rounded-xl group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition flex items-center gap-1">
+                    <span className="px-3 py-1.5 sm:py-1 text-xs bg-red-50 text-[#DC2626] border border-red-200/80 font-bold rounded-xl group-hover:bg-[#DC2626] group-hover:text-white group-hover:border-[#DC2626] transition flex items-center gap-1">
                       <Plus className="w-3 h-3" />
                       <span>Add</span>
                     </span>
@@ -387,11 +387,11 @@ export const ProductMasterModal: React.FC<ProductMasterModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-2.5 sm:p-3 border-t border-slate-200 bg-slate-50 text-[11px] text-slate-500 flex items-center justify-between px-3 sm:px-5">
+        <div className="p-2.5 sm:p-3 border-t border-slate-100 bg-slate-50 text-[11px] text-slate-500 flex items-center justify-between px-3 sm:px-5">
           <span>{filtered.length} products available</span>
           <button
             onClick={onClose}
-            className="px-3.5 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-xl transition text-xs cursor-pointer shadow-2xs"
+            className="px-3.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold rounded-xl transition text-xs cursor-pointer shadow-2xs"
           >
             Close
           </button>

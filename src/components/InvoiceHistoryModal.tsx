@@ -209,13 +209,13 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
     >
       <div className="bg-white text-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[92vh] sm:max-h-[85vh] border border-slate-200 overflow-hidden relative z-[101]">
         {/* Header */}
-        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 gap-2">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 flex items-center justify-between bg-white gap-2">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="p-2 bg-blue-600 text-white rounded-xl shrink-0">
-              <History className="w-5 h-5 text-white" />
+            <div className="p-2.5 bg-red-50 text-[#DC2626] border border-red-100 rounded-xl shrink-0">
+              <History className="w-5 h-5 text-[#DC2626]" />
             </div>
             <div className="min-w-0">
-              <h3 className="font-extrabold text-slate-900 text-sm sm:text-base truncate">Invoice History & Backups</h3>
+              <h3 className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight truncate">Invoice History & Backups</h3>
               <p className="text-[11px] sm:text-xs text-slate-500 hidden xs:block truncate">
                 Save, recall, and export/import previous GST invoices
               </p>
@@ -223,17 +223,17 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-200 transition shrink-0 cursor-pointer"
+            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-100 transition shrink-0 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Action Bar */}
-        <div className="p-3 sm:p-4 border-b border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-slate-50/50">
+        <div className="p-3 sm:p-4 border-b border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-slate-50/50">
           <button
             onClick={handleSaveCurrent}
-            className="px-3.5 py-2 text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95"
+            className="px-4 py-2.5 text-xs bg-[#DC2626] hover:bg-red-700 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95"
           >
             <Plus className="w-4 h-4 text-white" />
             <span>Save Current (#{currentInvoice.dispatch.invoiceNo || 'New'})</span>
@@ -242,15 +242,15 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
           <div className="flex items-center justify-end gap-2">
             <button
               onClick={handleExportJson}
-              className="flex-1 sm:flex-initial px-3 py-2 text-xs bg-white hover:bg-slate-100 text-slate-700 font-semibold border border-slate-200 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-2xs"
+              className="flex-1 sm:flex-initial px-3.5 py-2 text-xs bg-white hover:bg-slate-50 text-slate-700 font-bold border border-slate-200 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-2xs active:scale-95"
               title="Download backup file"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 text-slate-600" />
               <span>Export</span>
             </button>
 
-            <label className="flex-1 sm:flex-initial px-3 py-2 text-xs bg-white hover:bg-slate-100 text-slate-700 font-semibold border border-slate-200 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-2xs">
-              <Upload className="w-3.5 h-3.5" />
+            <label className="flex-1 sm:flex-initial px-3.5 py-2 text-xs bg-white hover:bg-slate-50 text-slate-700 font-bold border border-slate-200 rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer shadow-2xs active:scale-95">
+              <Upload className="w-3.5 h-3.5 text-slate-600" />
               <span>Import</span>
               <input
                 type="file"
@@ -264,22 +264,22 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
 
         {/* Notifications */}
         {saveSuccessMessage && (
-          <div className="mx-3 sm:mx-4 mt-2 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2 animate-in fade-in">
+          <div className="mx-3 sm:mx-4 mt-2 px-3.5 py-2 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2 animate-in fade-in">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>{saveSuccessMessage}</span>
+            <span className="font-semibold">{saveSuccessMessage}</span>
           </div>
         )}
 
         {/* Search */}
         <div className="p-3 sm:p-4 pb-1 sm:pb-2">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by invoice number, buyer name, or date..."
-              className="w-full text-xs pl-9 pr-4 py-2 bg-white text-slate-900 border border-slate-300 rounded-xl outline-none focus:border-blue-500 placeholder-slate-400"
+              className="w-full text-xs pl-9 pr-4 py-2.5 bg-white text-slate-900 border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl outline-none font-semibold placeholder-slate-400 shadow-2xs transition"
             />
           </div>
         </div>
@@ -288,7 +288,7 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
         <div className="flex-1 overflow-y-auto p-3 sm:p-4 pt-1 space-y-2.5">
           {filtered.length === 0 ? (
             <div className="text-center py-12 text-slate-400 space-y-2">
-              <FolderOpen className="w-10 h-10 mx-auto opacity-50" />
+              <FolderOpen className="w-10 h-10 mx-auto opacity-50 text-slate-300" />
               <p className="text-xs font-semibold text-slate-700">No saved invoices found</p>
               <p className="text-[11px] text-slate-500">
                 Click &quot;Save Current&quot; to store your invoice in history.
@@ -308,14 +308,14 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
                     onClose();
                   }
                 }}
-                className="group p-3 sm:p-3.5 rounded-2xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50/40 transition cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 bg-white shadow-2xs"
+                className="group p-3 sm:p-3.5 rounded-2xl border border-slate-200 hover:border-red-300 hover:bg-red-50/20 transition cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 bg-white shadow-2xs"
               >
                 <div className="space-y-1 flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-lg font-mono shrink-0">
+                    <span className="text-xs font-bold text-[#DC2626] bg-red-50 border border-red-100 px-2 py-0.5 rounded-lg font-mono shrink-0">
                       #{record.invoiceNo}
                     </span>
-                    <span className="text-xs font-bold text-slate-900 break-words">
+                    <span className="text-xs font-bold text-slate-900 group-hover:text-[#DC2626] transition break-words">
                       {record.buyerName}
                     </span>
                   </div>
@@ -337,7 +337,7 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
                     <div className="text-xs font-bold text-slate-900 font-mono">
                       ₹ {formatIndianCurrency(record.totalAmount)}
                     </div>
-                    <span className="text-[10px] text-blue-600 font-semibold group-hover:underline">
+                    <span className="text-[10px] text-[#DC2626] font-semibold group-hover:underline">
                       Click to Open →
                     </span>
                   </div>
@@ -356,11 +356,11 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-2.5 sm:p-3 border-t border-slate-200 bg-slate-50 text-[11px] text-slate-500 flex items-center justify-between px-3 sm:px-5">
+        <div className="p-2.5 sm:p-3 border-t border-slate-100 bg-slate-50 text-[11px] text-slate-500 flex items-center justify-between px-3 sm:px-5">
           <span>Total Saved: {records.length} invoices</span>
           <button
             onClick={onClose}
-            className="px-3.5 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-xl transition text-xs cursor-pointer shadow-2xs"
+            className="px-3.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold rounded-xl transition text-xs cursor-pointer shadow-2xs"
           >
             Close
           </button>

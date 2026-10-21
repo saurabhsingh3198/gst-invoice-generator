@@ -99,10 +99,10 @@ export const CustomerMasterModal: React.FC<CustomerMasterModalProps> = ({
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150">
       <div className="bg-white text-slate-800 rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
         {/* Modal Header */}
-        <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-white">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-blue-600 text-white">
-              <Users className="w-5 h-5 text-white" />
+            <div className="p-2.5 rounded-xl bg-red-50 text-[#DC2626] border border-red-100">
+              <Users className="w-5 h-5 text-[#DC2626]" />
             </div>
             <div>
               <h3 className="font-extrabold text-base text-slate-900 tracking-tight">
@@ -116,46 +116,46 @@ export const CustomerMasterModal: React.FC<CustomerMasterModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition cursor-pointer"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Toolbar: Search + Add */}
-        <div className="p-4 border-b border-slate-200 flex items-center gap-3 bg-slate-50/50">
+        <div className="p-4 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search customer by name, phone or GSTIN..."
-              className="w-full pl-9 pr-3 py-2 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 placeholder-slate-400"
+              className="w-full pl-9 pr-3.5 py-2.5 text-xs bg-white text-slate-900 border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl outline-none font-semibold placeholder-slate-400 shadow-2xs transition"
             />
           </div>
 
           <button
             type="button"
             onClick={() => setShowAddForm(!showAddForm)}
-            className="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shrink-0 shadow-xs"
+            className="px-4 py-2.5 rounded-xl bg-[#DC2626] hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shrink-0 shadow-xs active:scale-95"
           >
-            <Plus className="w-3.5 h-3.5 text-white" />
+            <Plus className="w-4 h-4 text-white" />
             <span>{showAddForm ? 'Cancel' : '+ New Customer'}</span>
           </button>
         </div>
 
         {/* Add Customer Inline Form */}
         {showAddForm && (
-          <form onSubmit={handleSaveNew} className="p-4 bg-blue-50/50 border-b border-blue-100 space-y-3">
-            <h4 className="text-xs font-bold text-blue-900">Add New Customer to Directory</h4>
+          <form onSubmit={handleSaveNew} className="p-4 bg-red-50/30 border-b border-red-100 space-y-3">
+            <h4 className="text-xs font-bold text-[#DC2626]">Add New Customer to Directory</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <input
                 type="text"
                 placeholder="Party / Customer Name *"
                 value={newCust.name}
                 onChange={(e) => setNewCust({ ...newCust, name: e.target.value })}
-                className="px-3 py-1.5 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl focus:border-blue-500 placeholder-slate-400 outline-none"
+                className="px-3.5 py-2 text-xs bg-white text-slate-900 border border-slate-200 rounded-xl focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 placeholder-slate-400 outline-none font-semibold shadow-2xs transition"
                 required
               />
               <input
@@ -163,41 +163,41 @@ export const CustomerMasterModal: React.FC<CustomerMasterModalProps> = ({
                 placeholder="Mobile / WhatsApp Number"
                 value={newCust.phone}
                 onChange={(e) => setNewCust({ ...newCust, phone: e.target.value })}
-                className="px-3 py-1.5 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl focus:border-blue-500 placeholder-slate-400 outline-none"
+                className="px-3.5 py-2 text-xs bg-white text-slate-900 border border-slate-200 rounded-xl focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 placeholder-slate-400 outline-none font-semibold shadow-2xs transition"
               />
               <input
                 type="text"
                 placeholder="GSTIN (Optional for B2C)"
                 value={newCust.gstin}
                 onChange={(e) => setNewCust({ ...newCust, gstin: e.target.value.toUpperCase() })}
-                className="px-3 py-1.5 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl uppercase focus:border-blue-500 placeholder-slate-400 outline-none font-mono"
+                className="px-3.5 py-2 text-xs bg-white text-slate-900 border border-slate-200 rounded-xl uppercase focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 placeholder-slate-400 outline-none font-mono font-bold shadow-2xs transition"
               />
               <input
                 type="text"
                 placeholder="State Name (e.g. Uttar Pradesh)"
                 value={newCust.stateName}
                 onChange={(e) => setNewCust({ ...newCust, stateName: e.target.value })}
-                className="px-3 py-1.5 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl focus:border-blue-500 placeholder-slate-400 outline-none"
+                className="px-3.5 py-2 text-xs bg-white text-slate-900 border border-slate-200 rounded-xl focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 placeholder-slate-400 outline-none font-semibold shadow-2xs transition"
               />
               <input
                 type="text"
                 placeholder="Full Address (Town / City / Road)"
                 value={newCust.address}
                 onChange={(e) => setNewCust({ ...newCust, address: e.target.value })}
-                className="sm:col-span-2 px-3 py-1.5 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl focus:border-blue-500 placeholder-slate-400 outline-none"
+                className="sm:col-span-2 px-3.5 py-2 text-xs bg-white text-slate-900 border border-slate-200 rounded-xl focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 placeholder-slate-400 outline-none font-semibold shadow-2xs transition"
               />
             </div>
             <div className="flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setShowAddForm(false)}
-                className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-lg cursor-pointer"
+                className="px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-xl cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-1.5 text-xs font-bold bg-blue-600 text-white hover:bg-blue-700 rounded-xl cursor-pointer shadow-xs"
+                className="px-4 py-2 text-xs font-bold bg-[#DC2626] text-white hover:bg-red-700 rounded-xl cursor-pointer shadow-xs active:scale-95"
               >
                 Save Customer
               </button>
@@ -221,15 +221,15 @@ export const CustomerMasterModal: React.FC<CustomerMasterModalProps> = ({
                   onSelectCustomer(cust);
                   onClose();
                 }}
-                className="p-3.5 rounded-2xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50/40 transition cursor-pointer flex items-center justify-between group shadow-2xs bg-white"
+                className="p-3.5 rounded-2xl border border-slate-200 hover:border-red-300 hover:bg-red-50/20 transition cursor-pointer flex items-center justify-between group shadow-2xs bg-white"
               >
                 <div className="space-y-1 min-w-0 pr-3">
                   <div className="flex items-center gap-2">
-                    <span className="font-extrabold text-xs sm:text-sm text-slate-900 truncate">
+                    <span className="font-extrabold text-xs sm:text-sm text-slate-900 group-hover:text-[#DC2626] transition truncate">
                       {cust.name}
                     </span>
                     <span
-                      className="text-[9px] font-bold px-1.5 py-0.2 rounded-md bg-blue-50 text-blue-700 border border-blue-200"
+                      className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-[#DC2626] border border-red-100"
                     >
                       {cust.gstin ? 'B2B' : 'B2C'}
                     </span>
@@ -255,7 +255,7 @@ export const CustomerMasterModal: React.FC<CustomerMasterModalProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[11px] font-bold text-blue-600 group-hover:underline hidden sm:inline">
+                  <span className="text-[11px] font-bold text-[#DC2626] group-hover:underline hidden sm:inline">
                     Select & Fill
                   </span>
                   <button
@@ -273,12 +273,12 @@ export const CustomerMasterModal: React.FC<CustomerMasterModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
+        <div className="p-3 border-t border-slate-100 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
           <span>Total Saved Parties: {customers.length}</span>
           <button
             type="button"
             onClick={onClose}
-            className="px-3.5 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 font-semibold text-slate-700 rounded-xl cursor-pointer shadow-2xs"
+            className="px-3.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 font-semibold text-slate-700 rounded-xl cursor-pointer shadow-2xs"
           >
             Close
           </button>

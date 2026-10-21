@@ -534,12 +534,12 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
       {/* Top Header Card - Unique Classic SaaS Header */}
       <div className="bg-slate-50/90 backdrop-blur-xs text-slate-900 px-3 sm:px-5 py-2 sm:py-3 flex items-center justify-between border-b border-slate-200/90 gap-2 min-w-0">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white shadow-xs shadow-blue-500/20 shrink-0">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-950 flex items-center justify-center text-white shadow-xs shrink-0">
             <Receipt className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-              <h2 className="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight whitespace-nowrap truncate">
+              <h2 className="text-xs sm:text-sm font-black text-slate-900 tracking-tight whitespace-nowrap truncate">
                 <span className="sm:hidden">Invoice Editor</span>
                 <span className="hidden sm:inline">Invoice Studio Editor</span>
               </h2>
@@ -548,7 +548,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <span className="hidden xs:inline">Live Sync</span>
                 <span className="xs:hidden">Live</span>
               </span>
-              <span className="hidden md:inline-flex text-[10px] font-mono font-bold bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded-md shrink-0">
+              <span className="hidden md:inline-flex text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded-md shrink-0">
                 #{data.dispatch?.invoiceNo || 'INV-001'}
               </span>
             </div>
@@ -562,10 +562,10 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
           <button
             type="button"
             onClick={onLoadSample}
-            className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 rounded-lg flex items-center gap-1 sm:gap-1.5 transition shadow-2xs cursor-pointer active:scale-95 shrink-0"
+            className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg flex items-center gap-1 sm:gap-1.5 transition shadow-2xs cursor-pointer active:scale-95 shrink-0"
             title="Load sample invoice data"
           >
-            <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
             <span>Sample</span>
           </button>
           <button
@@ -588,16 +588,16 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
           onClick={() => setActiveTab('items')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'items'
-              ? 'bg-white text-blue-700 border-slate-200/90 shadow-2xs font-bold'
+              ? 'bg-white text-[#DC2626] border-slate-200/90 shadow-2xs font-black'
               : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium'
           }`}
         >
-          <Package className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'items' ? 'text-blue-600' : 'text-slate-400'}`} />
+          <Package className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'items' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           <span>Items</span>
           <span
             className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold leading-none ${
               activeTab === 'items'
-                ? 'bg-blue-50 text-blue-700 border border-blue-200/80'
+                ? 'bg-red-50 text-[#DC2626] border border-red-200'
                 : 'bg-slate-200/80 text-slate-600'
             }`}
           >
@@ -611,11 +611,11 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
           onClick={() => setActiveTab('seller')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'seller'
-              ? 'bg-white text-blue-700 border-slate-200/90 shadow-2xs font-bold'
+              ? 'bg-white text-[#DC2626] border-slate-200/90 shadow-2xs font-black'
               : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium'
           }`}
         >
-          <Building2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'seller' ? 'text-blue-600' : 'text-slate-400'}`} />
+          <Building2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'seller' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           <span>Seller</span>
         </button>
 
@@ -625,11 +625,11 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
           onClick={() => setActiveTab('parties')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'parties'
-              ? 'bg-white text-blue-700 border-slate-200/90 shadow-2xs font-bold'
+              ? 'bg-white text-[#DC2626] border-slate-200/90 shadow-2xs font-black'
               : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium'
           }`}
         >
-          <Users className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'parties' ? 'text-blue-600' : 'text-slate-400'}`} />
+          <Users className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'parties' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           <span>Buyer</span>
         </button>
 
@@ -639,11 +639,11 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
           onClick={() => setActiveTab('dispatch')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'dispatch'
-              ? 'bg-white text-blue-700 border-slate-200/90 shadow-2xs font-bold'
+              ? 'bg-white text-[#DC2626] border-slate-200/90 shadow-2xs font-black'
               : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium'
           }`}
         >
-          <Truck className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'dispatch' ? 'text-blue-600' : 'text-slate-400'}`} />
+          <Truck className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'dispatch' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           <span>Dispatch</span>
         </button>
 
@@ -653,11 +653,11 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
           onClick={() => setActiveTab('tax')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'tax'
-              ? 'bg-white text-blue-700 border-slate-200/90 shadow-2xs font-bold'
+              ? 'bg-white text-[#DC2626] border-slate-200/90 shadow-2xs font-black'
               : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium'
           }`}
         >
-          <Percent className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'tax' ? 'text-blue-600' : 'text-slate-400'}`} />
+          <Percent className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'tax' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           <span>Tax & GST</span>
           {data.showTaxSummary && (
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" title="Tax Table Active"></span>
@@ -670,11 +670,11 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
           onClick={() => setActiveTab('settings')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition whitespace-nowrap cursor-pointer border ${
             activeTab === 'settings'
-              ? 'bg-white text-blue-700 border-slate-200/90 shadow-2xs font-bold'
+              ? 'bg-white text-[#DC2626] border-slate-200/90 shadow-2xs font-black'
               : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium'
           }`}
         >
-          <Settings className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'settings' ? 'text-blue-600' : 'text-slate-400'}`} />
+          <Settings className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'settings' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           <span>Settings</span>
         </button>
       </div>
@@ -689,11 +689,11 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               {/* Row 1 on mobile, Left on desktop */}
               <div className="flex items-center justify-between sm:justify-start gap-2.5">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-600"></span>
-                  <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  <span className="w-2 h-2 rounded-full bg-[#DC2626]"></span>
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
                     Product Items
                   </h3>
-                  <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/80">
+                  <span className="text-[10px] font-bold text-[#DC2626] bg-red-50 px-2 py-0.5 rounded-full border border-red-200">
                     {data.items.length} items
                   </span>
                 </div>
@@ -705,7 +705,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onClick={() => setItemsViewMode('cards')}
                     className={`px-2 py-1 rounded-md flex items-center gap-1 transition cursor-pointer ${
                       itemsViewMode === 'cards'
-                        ? 'bg-white text-blue-700 font-bold shadow-2xs'
+                        ? 'bg-white text-slate-900 font-bold shadow-2xs'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                     title="Card View (best for mobile screens)"
@@ -718,7 +718,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onClick={() => setItemsViewMode('table')}
                     className={`px-2 py-1 rounded-md flex items-center gap-1 transition cursor-pointer ${
                       itemsViewMode === 'table'
-                        ? 'bg-white text-blue-700 font-bold shadow-2xs'
+                        ? 'bg-white text-slate-900 font-bold shadow-2xs'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                     title="Spreadsheet Table View"
@@ -734,19 +734,19 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowProductMaster(true)}
-                  className="px-2 py-1.5 text-[11px] sm:text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg flex items-center justify-center gap-1 transition cursor-pointer active:scale-95 shadow-2xs"
+                  className="px-2 py-1.5 text-[11px] sm:text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl flex items-center justify-center gap-1 transition cursor-pointer active:scale-95 shadow-2xs"
                   title="Choose from saved Product Library"
                 >
-                  <Package className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                  <Package className="w-3.5 h-3.5 text-[#DC2626] shrink-0" />
                   <span className="truncate">Library</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowAdvancedColumns(!showAdvancedColumns)}
-                  className={`px-2 py-1.5 text-[11px] sm:text-xs font-semibold rounded-lg border transition cursor-pointer text-center flex items-center justify-center gap-1 shadow-2xs ${
+                  className={`px-2 py-1.5 text-[11px] sm:text-xs font-semibold rounded-xl border transition cursor-pointer text-center flex items-center justify-center gap-1 shadow-2xs ${
                     showAdvancedColumns
-                      ? 'bg-slate-900 border-slate-900 text-white font-bold'
-                      : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
+                      ? 'bg-slate-950 border-slate-950 text-white font-bold'
+                      : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                   }`}
                   title="Toggle Tax Rate and Discount columns"
                 >
@@ -755,7 +755,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <button
                   type="button"
                   onClick={addItem}
-                  className="px-2.5 py-1.5 text-[11px] sm:text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1 shadow-sm shadow-blue-500/20 transition cursor-pointer active:scale-95"
+                  className="px-2.5 py-1.5 text-[11px] sm:text-xs font-bold bg-[#DC2626] hover:bg-[#b91c1c] text-white rounded-xl flex items-center justify-center gap-1 shadow-md shadow-red-500/25 transition cursor-pointer active:scale-95"
                 >
                   <Plus className="w-3.5 h-3.5 text-white shrink-0" />
                   <span className="truncate">Add Item</span>
@@ -784,7 +784,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       {/* Card Header Bar */}
                       <div className="bg-slate-50 px-3 py-2.5 border-b border-slate-200 flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
-                          <span className="w-5 h-5 rounded-md bg-blue-600 text-white font-bold text-[11px] flex items-center justify-center shrink-0 shadow-2xs">
+                          <span className="w-5 h-5 rounded-md bg-slate-950 text-white font-bold text-[11px] flex items-center justify-center shrink-0 shadow-2xs">
                             {index + 1}
                           </span>
                           <span className="font-bold text-xs text-slate-800 truncate">
@@ -792,13 +792,13 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                           </span>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          <span className="font-extrabold text-xs text-blue-700 bg-blue-50 border border-blue-200/80 px-2 py-0.5 rounded-md font-mono">
+                          <span className="font-black text-xs text-[#DC2626] bg-red-50 border border-red-200 px-2 py-0.5 rounded-md font-mono">
                             ₹ {(Number(item.amount) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                           </span>
                           <button
                             type="button"
                             onClick={() => handleSaveItemToLibrary(item)}
-                            className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition cursor-pointer"
+                            className="p-1 text-slate-400 hover:text-[#DC2626] hover:bg-red-50 rounded transition cursor-pointer"
                             title="Save this item to Product Library"
                           >
                             <Bookmark className="w-3.5 h-3.5" />
@@ -827,7 +827,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                             value={item.description}
                             onChange={(e) => updateItem(index, 'description', e.target.value)}
                             placeholder="e.g. TATA TISCON 550 SD 8MM"
-                            className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg font-semibold text-slate-800 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
+                            className="w-full text-sm sm:text-xs p-2.5 border border-slate-200 rounded-xl font-semibold text-slate-900 bg-white focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 outline-none transition shadow-2xs"
                           />
                         </div>
 
@@ -842,7 +842,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                               value={item.hsnSac}
                               onChange={(e) => updateItem(index, 'hsnSac', e.target.value)}
                               placeholder="721420"
-                              className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg font-mono text-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
+                              className="w-full text-sm sm:text-xs p-2.5 border border-slate-200 rounded-xl font-mono font-semibold text-slate-800 bg-white focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 outline-none transition shadow-2xs"
                             />
                           </div>
                           <div>
@@ -854,7 +854,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                               value={item.altQuantity}
                               onChange={(e) => updateItem(index, 'altQuantity', e.target.value)}
                               placeholder="208.560 KG"
-                              className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg text-slate-800 font-medium focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
+                              className="w-full text-sm sm:text-xs p-2.5 border border-slate-200 rounded-xl text-slate-800 font-medium bg-white focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 outline-none transition shadow-2xs"
                             />
                           </div>
                         </div>
@@ -870,7 +870,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                               value={item.quantity}
                               onChange={(e) => updateItem(index, 'quantity', e.target.value)}
                               placeholder="1"
-                              className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg font-bold text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
+                              className="w-full text-sm sm:text-xs p-2.5 border border-slate-200 rounded-xl font-bold text-slate-900 bg-white focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 outline-none transition shadow-2xs"
                             />
                           </div>
                           <div>
@@ -885,7 +885,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                 updateItem(index, 'per', e.target.value);
                               }}
                               placeholder="PC"
-                              className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg text-center uppercase font-bold text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
+                              className="w-full text-sm sm:text-xs p-2.5 border border-slate-200 rounded-xl text-center uppercase font-bold text-slate-800 bg-white focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 outline-none transition shadow-2xs"
                             />
                           </div>
                           <div>
@@ -897,7 +897,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                               value={item.rate}
                               onChange={(e) => updateItem(index, 'rate', e.target.value)}
                               placeholder="100"
-                              className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg font-semibold text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
+                              className="w-full text-sm sm:text-xs p-2.5 border border-slate-200 rounded-xl font-semibold text-slate-900 bg-white focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 outline-none transition shadow-2xs"
                             />
                           </div>
                         </div>
@@ -914,7 +914,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                 value={item.gstRate !== undefined ? item.gstRate : (data.defaultGstRate ?? 18)}
                                 onChange={(e) => updateItem(index, 'gstRate', Number(e.target.value) || 0)}
                                 placeholder="18"
-                                className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
+                                className="w-full text-sm sm:text-xs p-2.5 border border-slate-200 rounded-xl text-center font-bold text-slate-800 outline-none focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 shadow-2xs"
                               />
                             </div>
                             <div>
@@ -926,7 +926,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                 value={item.rateInclTax || ''}
                                 onChange={(e) => updateItem(index, 'rateInclTax', e.target.value)}
                                 placeholder="3,956.00"
-                                className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg text-slate-600 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
+                                className="w-full text-sm sm:text-xs p-2.5 border border-slate-200 rounded-xl text-slate-600 outline-none focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 shadow-2xs"
                               />
                             </div>
                             <div>
@@ -938,14 +938,14 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                 value={item.discountPercent || ''}
                                 onChange={(e) => updateItem(index, 'discountPercent', e.target.value)}
                                 placeholder="%"
-                                className="w-full text-sm sm:text-xs p-2 border border-slate-200 rounded-lg text-center text-slate-600 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
+                                className="w-full text-sm sm:text-xs p-2.5 border border-slate-200 rounded-xl text-center text-slate-600 outline-none focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 shadow-2xs"
                               />
                             </div>
                           </div>
                         )}
 
                         {/* Amount summary row */}
-                        <div className="bg-blue-50/50 p-2.5 rounded-lg flex items-center justify-between border border-blue-100">
+                        <div className="bg-slate-50 p-2.5 rounded-xl flex items-center justify-between border border-slate-200">
                           <span className="text-[11px] font-bold text-slate-700">
                             Amount (Qty × Rate):
                           </span>
@@ -955,7 +955,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                               type="number"
                               value={item.amount}
                               onChange={(e) => updateItem(index, 'amount', Number(e.target.value) || 0)}
-                              className="w-32 text-right font-extrabold text-xs sm:text-sm text-blue-900 bg-white border border-blue-200 rounded-md px-2 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none font-mono"
+                              className="w-32 text-right font-black text-xs sm:text-sm text-[#DC2626] bg-white border border-slate-200 rounded-lg px-2 py-1 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 outline-none font-mono shadow-2xs"
                             />
                           </div>
                         </div>
@@ -968,9 +968,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <button
                   type="button"
                   onClick={addItem}
-                  className="w-full py-3 border-2 border-dashed border-blue-200 hover:border-blue-400 bg-blue-50/40 hover:bg-blue-50 text-blue-700 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition cursor-pointer active:scale-[0.99]"
+                  className="w-full py-3 border-2 border-dashed border-red-200 hover:border-[#DC2626] bg-red-50/20 hover:bg-red-50/50 text-[#DC2626] font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition cursor-pointer active:scale-[0.99]"
                 >
-                  <Plus className="w-4 h-4 text-blue-600" />
+                  <Plus className="w-4 h-4 text-[#DC2626]" />
                   <span>+ Add Another Line Item</span>
                 </button>
               </div>
@@ -1018,7 +1018,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                             value={item.description}
                             onChange={(e) => updateItem(index, 'description', e.target.value)}
                             placeholder="e.g. TATA TISCON 550 SD 8MM"
-                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg font-semibold text-slate-900 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 resize-y outline-none transition"
+                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg font-semibold text-slate-900 bg-white focus:border-[#DC2626] focus:ring-1 focus:ring-red-500/20 resize-y outline-none transition"
                           />
                         </td>
 
@@ -1029,7 +1029,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                             value={item.hsnSac}
                             onChange={(e) => updateItem(index, 'hsnSac', e.target.value)}
                             placeholder="721420"
-                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg font-mono text-center text-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
+                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg font-mono text-center text-slate-700 focus:border-[#DC2626] focus:ring-1 focus:ring-red-500/20 outline-none transition"
                           />
                         </td>
 
@@ -1040,7 +1040,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                             value={item.altQuantity}
                             onChange={(e) => updateItem(index, 'altQuantity', e.target.value)}
                             placeholder="208.560 KG"
-                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg text-slate-800 font-medium focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
+                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg text-slate-800 font-medium focus:border-[#DC2626] focus:ring-1 focus:ring-red-500/20 outline-none transition"
                           />
                         </td>
 
@@ -1051,7 +1051,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                             value={item.quantity}
                             onChange={(e) => updateItem(index, 'quantity', e.target.value)}
                             placeholder="1"
-                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg font-bold text-center text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
+                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg font-bold text-center text-slate-900 focus:border-[#DC2626] focus:ring-1 focus:ring-red-500/20 outline-none transition"
                           />
                         </td>
 
@@ -1065,7 +1065,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                               updateItem(index, 'per', e.target.value);
                             }}
                             placeholder="PC"
-                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg text-center uppercase font-semibold text-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
+                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg text-center uppercase font-semibold text-slate-700 focus:border-[#DC2626] focus:ring-1 focus:ring-red-500/20 outline-none transition"
                           />
                         </td>
 
@@ -1076,7 +1076,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                             value={item.rate}
                             onChange={(e) => updateItem(index, 'rate', e.target.value)}
                             placeholder="100"
-                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg font-mono font-semibold text-right text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
+                            className="w-full text-xs p-1.5 border border-slate-200 rounded-lg font-mono font-semibold text-right text-slate-900 focus:border-[#DC2626] focus:ring-1 focus:ring-red-500/20 outline-none transition"
                           />
                         </td>
 
@@ -1089,7 +1089,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                 value={item.gstRate !== undefined ? item.gstRate : (data.defaultGstRate ?? 18)}
                                 onChange={(e) => updateItem(index, 'gstRate', Number(e.target.value) || 0)}
                                 placeholder="18"
-                                className="w-full text-xs p-1.5 border border-slate-200 rounded-lg text-center font-bold text-slate-800 focus:border-blue-500 outline-none transition"
+                                className="w-full text-xs p-1.5 border border-slate-200 rounded-lg text-center font-bold text-slate-800 focus:border-[#DC2626] outline-none transition"
                               />
                             </td>
                             <td className="p-1.5">
@@ -1098,7 +1098,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                 value={item.rateInclTax || ''}
                                 onChange={(e) => updateItem(index, 'rateInclTax', e.target.value)}
                                 placeholder="3,956.00"
-                                className="w-full text-xs p-1.5 border border-slate-200 rounded-lg text-right text-slate-600 focus:border-blue-500 outline-none transition"
+                                className="w-full text-xs p-1.5 border border-slate-200 rounded-lg text-right text-slate-600 focus:border-[#DC2626] outline-none transition"
                               />
                             </td>
                             <td className="p-1.5">
@@ -1107,7 +1107,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                                 value={item.discountPercent || ''}
                                 onChange={(e) => updateItem(index, 'discountPercent', e.target.value)}
                                 placeholder="%"
-                                className="w-full text-xs p-1.5 border border-slate-200 rounded-lg text-center text-slate-600 focus:border-blue-500 outline-none transition"
+                                className="w-full text-xs p-1.5 border border-slate-200 rounded-lg text-center text-slate-600 focus:border-[#DC2626] outline-none transition"
                               />
                             </td>
                           </>
@@ -1120,7 +1120,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                             value={item.amount}
                             onChange={(e) => updateItem(index, 'amount', Number(e.target.value) || 0)}
                             placeholder="100"
-                            className="w-full text-xs p-1.5 border border-blue-200 bg-blue-50/40 focus:bg-white rounded-lg font-mono font-bold text-right text-blue-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition"
+                            className="w-full text-xs p-1.5 border border-slate-200 bg-slate-50/50 focus:bg-white rounded-lg font-mono font-black text-right text-[#DC2626] focus:border-[#DC2626] focus:ring-1 focus:ring-red-500/20 outline-none transition"
                           />
                         </td>
 
@@ -1162,7 +1162,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                         {totalQuantityCount}
                       </td>
                       <td colSpan={showAdvancedColumns ? 4 : 2}></td>
-                      <td className="p-2.5 text-right font-extrabold text-blue-900 text-sm whitespace-nowrap font-mono">
+                      <td className="p-2.5 text-right font-black text-[#DC2626] text-sm whitespace-nowrap font-mono">
                         ₹ {totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                       <td></td>
@@ -1243,7 +1243,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <button
                   type="button"
                   onClick={saveCompanyProfile}
-                  className="px-2.5 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-1 font-semibold transition cursor-pointer active:scale-95 shadow-2xs"
+                  className="px-3 py-1.5 text-xs bg-[#DC2626] hover:bg-[#b91c1c] text-white rounded-xl flex items-center gap-1.5 font-bold transition cursor-pointer active:scale-95 shadow-md shadow-red-500/25"
                   title="Save current details as permanent company profile"
                 >
                   <Save className="w-3.5 h-3.5" />
@@ -1252,28 +1252,28 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <button
                   type="button"
                   onClick={loadCompanyProfile}
-                  className="px-2.5 py-1 text-xs bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-md flex items-center gap-1 font-semibold transition cursor-pointer active:scale-95 shadow-2xs"
+                  className="px-3 py-1.5 text-xs bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl flex items-center gap-1.5 font-semibold transition cursor-pointer active:scale-95 shadow-2xs"
                   title="Load your saved permanent company profile"
                 >
-                  <FolderOpen className="w-3.5 h-3.5 text-blue-600" />
+                  <FolderOpen className="w-3.5 h-3.5 text-[#DC2626]" />
                   <span>Load Saved Profile</span>
                 </button>
               </div>
             </div>
 
             {profileToast && (
-              <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-semibold text-emerald-800 flex items-center gap-1.5 animate-in fade-in duration-150">
+              <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-semibold text-emerald-800 flex items-center gap-1.5 animate-in fade-in duration-150">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>{profileToast}</span>
               </div>
             )}
 
             {/* Branding & Digital Authorization (Optional) Card */}
-            <div className="bg-gradient-to-r from-slate-50 to-blue-50/40 p-3.5 rounded-xl border border-slate-200 shadow-2xs space-y-3">
+            <div className="bg-slate-50/80 p-3.5 rounded-xl border border-slate-200 shadow-2xs space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wide">
-                    <span className="w-2 h-2 rounded-full bg-blue-600 inline-block"></span>
+                  <h4 className="text-xs font-black text-slate-800 flex items-center gap-1.5 uppercase tracking-wide">
+                    <span className="w-2 h-2 rounded-full bg-[#DC2626] inline-block"></span>
                     Branding & Digital Authorization (Optional)
                   </h4>
                   <p className="text-[11px] text-slate-500">
@@ -1284,10 +1284,10 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Company Logo Uploader */}
-                <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs flex flex-col justify-between">
+                <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs flex flex-col justify-between">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                      <ImageIcon className="w-3.5 h-3.5 text-blue-600" />
+                      <ImageIcon className="w-3.5 h-3.5 text-[#DC2626]" />
                       Company Logo
                     </span>
                     {data.logoUrl && (
@@ -1298,8 +1298,8 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   </div>
 
                   {data.logoUrl ? (
-                    <div className="flex items-center gap-3 bg-slate-50 p-2 rounded-lg border border-slate-200">
-                      <div className="w-20 h-14 bg-white rounded border border-slate-200 flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                    <div className="flex items-center gap-3 bg-slate-50 p-2 rounded-xl border border-slate-200">
+                      <div className="w-20 h-14 bg-white rounded-lg border border-slate-200 flex items-center justify-center p-1 shrink-0 overflow-hidden">
                         <img
                           src={data.logoUrl}
                           alt="Logo Preview"
@@ -1307,7 +1307,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                         />
                       </div>
                       <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-                        <label className="px-2.5 py-1 text-[11px] font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-md transition cursor-pointer text-center active:scale-95">
+                        <label className="px-2.5 py-1 text-[11px] font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg transition cursor-pointer text-center active:scale-95 shadow-2xs">
                           <span>Change Logo</span>
                           <input
                             type="file"
@@ -1319,19 +1319,19 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                         <button
                           type="button"
                           onClick={() => onChange({ ...data, logoUrl: '' })}
-                          className="px-2.5 py-1 text-[11px] font-semibold text-rose-600 hover:bg-rose-50 rounded-md transition cursor-pointer text-center"
+                          className="px-2.5 py-1 text-[11px] font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer text-center"
                         >
                           Remove
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <label className="border-2 border-dashed border-slate-200 hover:border-blue-400 bg-slate-50/50 hover:bg-blue-50/30 rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 text-center cursor-pointer transition group">
-                      <div className="w-8 h-8 rounded-full bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center text-blue-600 transition">
+                    <label className="border-2 border-dashed border-slate-200 hover:border-red-300 bg-slate-50/50 hover:bg-red-50/20 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 text-center cursor-pointer transition group">
+                      <div className="w-8 h-8 rounded-full bg-red-50 group-hover:bg-red-100 flex items-center justify-center text-[#DC2626] transition">
                         <Upload className="w-4 h-4" />
                       </div>
                       <div>
-                        <span className="text-xs font-bold text-blue-600 group-hover:underline block">
+                        <span className="text-xs font-bold text-[#DC2626] group-hover:underline block">
                           Upload Company Logo
                         </span>
                         <span className="text-[10px] text-slate-400">
@@ -1352,10 +1352,10 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 </div>
 
                 {/* Stamp & Authorized Signature Uploader */}
-                <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs flex flex-col justify-between">
+                <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs flex flex-col justify-between">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                      <Stamp className="w-3.5 h-3.5 text-blue-600" />
+                      <Stamp className="w-3.5 h-3.5 text-[#DC2626]" />
                       Signatory Stamp / Signature
                     </span>
                     {data.signatureUrl && (
@@ -1366,8 +1366,8 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   </div>
 
                   {data.signatureUrl ? (
-                    <div className="flex items-center gap-3 bg-slate-50 p-2 rounded-lg border border-slate-200">
-                      <div className="w-20 h-14 bg-white rounded border border-slate-200 flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                    <div className="flex items-center gap-3 bg-slate-50 p-2 rounded-xl border border-slate-200">
+                      <div className="w-20 h-14 bg-white rounded-lg border border-slate-200 flex items-center justify-center p-1 shrink-0 overflow-hidden">
                         <img
                           src={data.signatureUrl}
                           alt="Signature Preview"
@@ -1375,7 +1375,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                         />
                       </div>
                       <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-                        <label className="px-2.5 py-1 text-[11px] font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-md transition cursor-pointer text-center active:scale-95">
+                        <label className="px-2.5 py-1 text-[11px] font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg transition cursor-pointer text-center active:scale-95 shadow-2xs">
                           <span>Change Signature</span>
                           <input
                             type="file"
@@ -1387,19 +1387,19 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                         <button
                           type="button"
                           onClick={() => onChange({ ...data, signatureUrl: '' })}
-                          className="px-2.5 py-1 text-[11px] font-semibold text-rose-600 hover:bg-rose-50 rounded-md transition cursor-pointer text-center"
+                          className="px-2.5 py-1 text-[11px] font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer text-center"
                         >
                           Remove
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <label className="border-2 border-dashed border-slate-200 hover:border-blue-400 bg-slate-50/50 hover:bg-blue-50/30 rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 text-center cursor-pointer transition group">
-                      <div className="w-8 h-8 rounded-full bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center text-blue-600 transition">
+                    <label className="border-2 border-dashed border-slate-200 hover:border-red-300 bg-slate-50/50 hover:bg-red-50/20 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 text-center cursor-pointer transition group">
+                      <div className="w-8 h-8 rounded-full bg-red-50 group-hover:bg-red-100 flex items-center justify-center text-[#DC2626] transition">
                         <Upload className="w-4 h-4" />
                       </div>
                       <div>
-                        <span className="text-xs font-bold text-blue-600 group-hover:underline block">
+                        <span className="text-xs font-bold text-[#DC2626] group-hover:underline block">
                           Upload Stamp / Signature
                         </span>
                         <span className="text-[10px] text-slate-400">
@@ -1435,7 +1435,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     value={data.seller.name}
                     onChange={(e) => updateSeller('name', e.target.value)}
                     placeholder="e.g. ACME Enterprise / Your Company Name"
-                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs font-bold text-slate-900 placeholder:text-slate-400 outline-none transition shadow-2xs"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-bold text-slate-900 placeholder:text-slate-400 outline-none transition shadow-2xs"
                   />
                 </div>
               </div>
@@ -1453,7 +1453,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     value={data.seller.addressLine1}
                     onChange={(e) => updateSeller('addressLine1', e.target.value)}
                     placeholder="e.g. 101, Business Park, M.G. Road"
-                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs font-medium text-slate-800 placeholder:text-slate-400 outline-none transition shadow-2xs"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-medium text-slate-800 placeholder:text-slate-400 outline-none transition shadow-2xs"
                   />
                 </div>
               </div>
@@ -1471,7 +1471,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     value={data.seller.addressLine2}
                     onChange={(e) => updateSeller('addressLine2', e.target.value)}
                     placeholder="e.g. Andheri East, Mumbai"
-                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs font-medium text-slate-800 placeholder:text-slate-400 outline-none transition shadow-2xs"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-medium text-slate-800 placeholder:text-slate-400 outline-none transition shadow-2xs"
                   />
                 </div>
               </div>
@@ -1481,7 +1481,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   <label className="block text-xs font-bold text-slate-800">
                     GSTIN / UIN Number <span className="text-[#DC2626]">*</span>
                   </label>
-                  <span className="text-[10px] text-blue-600 font-bold">
+                  <span className="text-[10px] text-[#DC2626] font-bold">
                     ⚡ Auto-detects State
                   </span>
                 </div>
@@ -1494,7 +1494,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     value={data.seller.gstin}
                     onChange={(e) => updateSeller('gstin', e.target.value)}
                     placeholder="e.g. 27ABCDE1234F1Z5"
-                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl font-mono text-xs font-bold uppercase text-slate-900 outline-none transition shadow-2xs"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl font-mono text-xs font-bold uppercase text-slate-900 outline-none transition shadow-2xs"
                   />
                 </div>
                 {data.seller.gstin && (() => {
@@ -1509,7 +1509,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   }
                   if (info.stateName) {
                     return (
-                      <p className="text-[10px] text-blue-600 font-medium mt-1">
+                      <p className="text-[10px] text-slate-600 font-medium mt-1">
                         Auto-detected: <strong>{info.stateName} ({info.stateCode})</strong>
                       </p>
                     );
@@ -1535,7 +1535,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     value={data.seller.email}
                     onChange={(e) => updateSeller('email', e.target.value)}
                     placeholder="e.g. billing@yourcompany.com"
-                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 outline-none transition shadow-2xs"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 outline-none transition shadow-2xs"
                   />
                 </div>
               </div>
@@ -1553,7 +1553,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     value={data.seller.stateName}
                     onChange={(e) => updateSeller('stateName', e.target.value)}
                     placeholder="Uttar Pradesh"
-                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs font-semibold text-slate-800 outline-none transition shadow-2xs"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-semibold text-slate-800 outline-none transition shadow-2xs"
                   />
                 </div>
               </div>
@@ -1567,7 +1567,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.seller.stateCode}
                   onChange={(e) => updateSeller('stateCode', e.target.value)}
                   placeholder="09"
-                  className="w-full px-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs font-mono font-bold text-slate-900 outline-none transition shadow-2xs"
+                  className="w-full px-3 py-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-mono font-bold text-slate-900 outline-none transition shadow-2xs"
                 />
               </div>
             </div>
@@ -1576,8 +1576,8 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
             <div className="mt-4 pt-4 border-t border-slate-200">
               <div className="flex items-center justify-between pb-2 mb-3">
                 <div>
-                  <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-blue-600 inline-block"></span>
+                  <h4 className="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#DC2626] inline-block"></span>
                     Company&apos;s Bank Details & Payment QR
                   </h4>
                   <p className="text-[11px] text-slate-500">
@@ -1592,12 +1592,12 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onChange={(e) => updateBankDetails('showBankDetails', e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#DC2626]"></div>
                 </label>
               </div>
 
               {data.bankDetails?.showBankDetails !== false && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50/70 p-3 rounded-lg border border-slate-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50/70 p-3 rounded-xl border border-slate-200">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
                       Bank Name
@@ -1607,7 +1607,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.bankName || ''}
                       onChange={(e) => updateBankDetails('bankName', e.target.value)}
                       placeholder="e.g. State Bank of India, HDFC Bank"
-                      className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none bg-white"
+                      className="w-full text-xs p-2.5 border border-slate-200 rounded-xl font-bold text-slate-800 focus:ring-2 focus:ring-red-500/10 focus:border-[#DC2626] outline-none bg-white shadow-2xs"
                     />
                   </div>
 
@@ -1620,7 +1620,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.accountNo || ''}
                       onChange={(e) => updateBankDetails('accountNo', e.target.value)}
                       placeholder="e.g. 381928371928"
-                      className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold text-slate-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none bg-white"
+                      className="w-full text-xs p-2.5 border border-slate-200 rounded-xl font-mono font-bold text-slate-800 focus:ring-2 focus:ring-red-500/10 focus:border-[#DC2626] outline-none bg-white shadow-2xs"
                     />
                   </div>
 
@@ -1633,7 +1633,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.branchAndIfsc || ''}
                       onChange={(e) => updateBankDetails('branchAndIfsc', e.target.value)}
                       placeholder="e.g. Main Branch & SBIN0001234"
-                      className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none bg-white"
+                      className="w-full text-xs p-2.5 border border-slate-200 rounded-xl font-bold text-slate-800 focus:ring-2 focus:ring-red-500/10 focus:border-[#DC2626] outline-none bg-white shadow-2xs"
                     />
                   </div>
 
@@ -1646,11 +1646,11 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.upiId || ''}
                       onChange={(e) => updateBankDetails('upiId', e.target.value)}
                       placeholder="e.g. yourbusiness@upi"
-                      className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono font-bold text-blue-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none bg-white"
+                      className="w-full text-xs p-2.5 border border-slate-200 rounded-xl font-mono font-bold text-[#DC2626] focus:ring-2 focus:ring-red-500/10 focus:border-[#DC2626] outline-none bg-white shadow-2xs"
                     />
                   </div>
 
-                  <div className="sm:col-span-2 flex items-center justify-between p-2.5 bg-white rounded-lg border border-slate-200">
+                  <div className="sm:col-span-2 flex items-center justify-between p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold text-slate-800">
                         Show &quot;SCAN TO PAY&quot; QR Code
@@ -1663,7 +1663,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       type="checkbox"
                       checked={data.bankDetails?.showQrCode !== false}
                       onChange={(e) => updateBankDetails('showQrCode', e.target.checked)}
-                      className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                      className="w-4 h-4 accent-[#DC2626] rounded border-slate-300 cursor-pointer"
                     />
                   </div>
                 </div>
@@ -1675,52 +1675,64 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
         {/* ================= 3. PARTIES TAB ================= */}
         {activeTab === 'parties' && (
           <div className="space-y-4">
-            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                  Client / Customer Details
-                </h3>
-                <p className="text-[11px] text-slate-500">
-                  Consignee (Ship to) and Buyer (Bill to) information
-                </p>
+            <div className="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-wrap items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-[#DC2626]">
+                  <Users className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-slate-900 tracking-tight">
+                    Client & Customer Details
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Consignee (Ship to) and Buyer (Bill to) information
+                  </p>
+                </div>
               </div>
 
               <button
                 type="button"
                 onClick={copyConsigneeToBuyer}
-                className="px-2.5 py-1.5 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-md flex items-center gap-1.5 transition font-semibold cursor-pointer active:scale-95"
+                className="px-3 py-1.5 text-xs bg-slate-50 hover:bg-red-50 text-slate-700 hover:text-[#DC2626] border border-slate-200 hover:border-red-200 rounded-xl flex items-center gap-1.5 transition font-semibold cursor-pointer active:scale-95 shadow-2xs"
                 title="Copy Consignee details to Buyer"
               >
-                <Copy className="w-3.5 h-3.5" />
+                <Copy className="w-3.5 h-3.5 text-[#DC2626]" />
                 <span>Sync Consignee → Buyer</span>
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Consignee (Ship to) */}
-              <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs space-y-2.5">
-                <div className="flex items-center gap-1.5 pb-1 border-b border-slate-100">
-                  <Truck className="w-4 h-4 text-blue-600 shrink-0" />
-                  <span className="text-xs font-bold text-slate-800">
+              <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-3">
+                <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                  <div className="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700">
+                    <Truck className="w-3.5 h-3.5 text-[#DC2626]" />
+                  </div>
+                  <span className="text-xs font-bold text-slate-900">
                     Consignee (Ship to)
                   </span>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
                     Consignee Name
                   </label>
-                  <input
-                    type="text"
-                    value={data.consignee.name}
-                    onChange={(e) => updateConsignee('name', e.target.value)}
-                    placeholder="e.g. M/s ABC Enterprises / Client Name"
-                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-semibold text-slate-900 outline-none focus:border-blue-500"
-                  />
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                      <Truck className="w-3.5 h-3.5" />
+                    </div>
+                    <input
+                      type="text"
+                      value={data.consignee.name}
+                      onChange={(e) => updateConsignee('name', e.target.value)}
+                      placeholder="e.g. M/s ABC Enterprises / Client Name"
+                      className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-bold text-slate-900 outline-none transition shadow-2xs"
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
                     Shipping Address
                   </label>
                   <textarea
@@ -1728,30 +1740,31 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     value={data.consignee.address}
                     onChange={(e) => updateConsignee('address', e.target.value)}
                     placeholder="e.g. Plot No. 45, Industrial Area, Phase-2"
-                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg text-slate-800 outline-none focus:border-blue-500"
+                    className="w-full p-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-semibold text-slate-800 outline-none transition shadow-2xs"
                   />
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between mb-0.5">
-                    <label className="block text-[11px] font-semibold text-slate-600">
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-[11px] font-bold text-slate-700">
                       GSTIN / UIN (Optional)
                     </label>
-                    <span className="text-[10px] text-blue-600 font-medium">⚡ Auto State</span>
+                    <span className="text-[10px] text-[#DC2626] font-semibold">⚡ Auto State</span>
                   </div>
                   <input
                     type="text"
                     value={data.consignee.gstin || ''}
                     onChange={(e) => updateConsignee('gstin', e.target.value)}
                     placeholder="e.g. 09AABCM1234F1Z5"
-                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-mono uppercase font-bold text-slate-800 outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl font-mono uppercase font-bold text-slate-900 text-xs outline-none transition shadow-2xs"
                   />
                   {data.consignee.gstin && (() => {
                     const info = analyzeGstin(data.consignee.gstin);
                     if (info.stateName) {
                       return (
-                        <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">
-                          ✓ {info.stateName} ({info.stateCode})
+                        <p className="text-[10px] text-emerald-600 font-semibold mt-1 flex items-center gap-1">
+                          <span>✓</span>
+                          <span>{info.stateName} ({info.stateCode})</span>
                         </p>
                       );
                     }
@@ -1759,9 +1772,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   })()}
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2.5">
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
                       State Name
                     </label>
                     <input
@@ -1769,11 +1782,11 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.consignee.stateName}
                       onChange={(e) => updateConsignee('stateName', e.target.value)}
                       placeholder="e.g. Uttar Pradesh"
-                      className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-semibold text-slate-900 outline-none transition shadow-2xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
                       State Code
                     </label>
                     <input
@@ -1781,18 +1794,20 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.consignee.stateCode}
                       onChange={(e) => updateConsignee('stateCode', e.target.value)}
                       placeholder="09"
-                      className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-mono font-bold outline-none focus:border-blue-500"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl font-mono font-bold text-xs text-slate-900 outline-none transition shadow-2xs"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Buyer (Bill to) */}
-              <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs space-y-2.5">
-                <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-                  <div className="flex items-center gap-1.5">
-                    <Building2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span className="text-xs font-bold text-slate-800">
+              <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700">
+                      <Building2 className="w-3.5 h-3.5 text-[#DC2626]" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-900">
                       Buyer (Bill to)
                     </span>
                   </div>
@@ -1800,9 +1815,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     <button
                       type="button"
                       onClick={() => setShowCustomerMaster(true)}
-                      className="px-2.5 py-1 text-[11px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200/80 rounded-lg transition flex items-center gap-1 cursor-pointer shadow-2xs"
+                      className="px-2.5 py-1 text-[11px] font-bold text-[#DC2626] bg-red-50 hover:bg-red-100 border border-red-200/80 rounded-lg transition flex items-center gap-1 cursor-pointer shadow-2xs"
                     >
-                      <Users className="w-3 h-3 text-blue-600" />
+                      <Users className="w-3 h-3 text-[#DC2626]" />
                       <span>Party Directory</span>
                     </button>
                     {data.buyer.name && (
@@ -1831,13 +1846,13 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.buyer.name}
                       onChange={(e) => updateBuyer('name', e.target.value)}
                       placeholder="e.g. M/s ABC Enterprises / Client Name"
-                      className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs font-bold text-slate-900 outline-none transition shadow-2xs"
+                      className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-bold text-slate-900 outline-none transition shadow-2xs"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
                     Billing Address
                   </label>
                   <textarea
@@ -1845,30 +1860,31 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     value={data.buyer.address}
                     onChange={(e) => updateBuyer('address', e.target.value)}
                     placeholder="e.g. Plot No. 45, Industrial Area, Phase-2"
-                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg text-slate-800 outline-none focus:border-blue-500"
+                    className="w-full p-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-semibold text-slate-800 outline-none transition shadow-2xs"
                   />
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between mb-0.5">
-                    <label className="block text-[11px] font-semibold text-slate-600">
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-[11px] font-bold text-slate-700">
                       GSTIN / UIN (Optional)
                     </label>
-                    <span className="text-[10px] text-blue-600 font-medium">⚡ Auto State</span>
+                    <span className="text-[10px] text-[#DC2626] font-semibold">⚡ Auto State</span>
                   </div>
                   <input
                     type="text"
                     value={data.buyer.gstin || ''}
                     onChange={(e) => updateBuyer('gstin', e.target.value)}
                     placeholder="09AABCM1234F1Z5"
-                    className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-mono uppercase font-bold text-slate-800 outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl font-mono uppercase font-bold text-slate-900 text-xs outline-none transition shadow-2xs"
                   />
                   {data.buyer.gstin && (() => {
                     const info = analyzeGstin(data.buyer.gstin);
                     if (info.stateName) {
                       return (
-                        <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">
-                          ✓ {info.stateName} ({info.stateCode})
+                        <p className="text-[10px] text-emerald-600 font-semibold mt-1 flex items-center gap-1">
+                          <span>✓</span>
+                          <span>{info.stateName} ({info.stateCode})</span>
                         </p>
                       );
                     }
@@ -1876,9 +1892,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   })()}
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2.5">
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
                       State Name
                     </label>
                     <input
@@ -1886,11 +1902,11 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.buyer.stateName}
                       onChange={(e) => updateBuyer('stateName', e.target.value)}
                       placeholder="Uttar Pradesh"
-                      className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-semibold text-slate-900 outline-none transition shadow-2xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
                       State Code
                     </label>
                     <input
@@ -1898,7 +1914,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.buyer.stateCode}
                       onChange={(e) => updateBuyer('stateCode', e.target.value)}
                       placeholder="09"
-                      className="w-full text-sm sm:text-xs p-2 border border-slate-300 rounded-lg font-mono font-bold outline-none focus:border-blue-500"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl font-mono font-bold text-xs text-slate-900 outline-none transition shadow-2xs"
                     />
                   </div>
                 </div>
@@ -1910,158 +1926,167 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
         {/* ================= 4. DISPATCH TAB ================= */}
         {activeTab === 'dispatch' && (
           <div className="space-y-4">
-            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                Invoice & Dispatch Logistics
-              </h3>
-              <p className="text-[11px] text-slate-500">
-                Invoice numbers, dates, transport vehicle and destination
-              </p>
+            <div className="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-wrap items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-[#DC2626]">
+                  <Truck className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-slate-900 tracking-tight">
+                    Invoice & Dispatch Logistics
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Invoice numbers, dates, transport vehicle and destination
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-slate-800">
-                    Invoice Number <span className="text-[#DC2626]">*</span>
+            <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-bold text-slate-800">
+                      Invoice Number <span className="text-[#DC2626]">*</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = getNextInvoiceNo(data.dispatch.invoiceNo);
+                        updateDispatch('invoiceNo', next);
+                      }}
+                      className="text-[11px] font-bold text-[#DC2626] hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200/80 px-2.5 py-0.5 rounded-lg flex items-center gap-1 transition cursor-pointer active:scale-95 shadow-2xs"
+                      title="Automatically increment sequence number preserving prefix (e.g. INV/089 → INV/090)"
+                    >
+                      <Plus className="w-3 h-3 text-[#DC2626]" />
+                      <span>Auto Next (#{getNextInvoiceNo(data.dispatch.invoiceNo)})</span>
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <Hash className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      value={data.dispatch.invoiceNo}
+                      onChange={(e) => updateDispatch('invoiceNo', e.target.value)}
+                      placeholder="e.g. 74 or INV-001 or INV/24-25/089"
+                      className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl font-mono text-xs font-bold text-slate-900 outline-none transition shadow-2xs"
+                    />
+                  </div>
+                  <p className="text-[10px] text-slate-500 mt-1">
+                    Auto-Sequence preserves prefixes & zeros (e.g. INV/089 → INV/090)
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                    Invoice Dated <span className="text-[#DC2626]">*</span>
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = getNextInvoiceNo(data.dispatch.invoiceNo);
-                      updateDispatch('invoiceNo', next);
-                    }}
-                    className="text-[11px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200/80 px-2 py-0.5 rounded-lg flex items-center gap-1 transition cursor-pointer active:scale-95"
-                    title="Automatically increment sequence number preserving prefix (e.g. INV/089 → INV/090)"
-                  >
-                    <Plus className="w-3 h-3 text-blue-600" />
-                    <span>Auto Next (#{getNextInvoiceNo(data.dispatch.invoiceNo)})</span>
-                  </button>
-                </div>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <Hash className="w-4 h-4" />
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <Calendar className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      value={data.dispatch.invoiceDate}
+                      onChange={(e) => updateDispatch('invoiceDate', e.target.value)}
+                      placeholder="e.g. 14-Oct-26"
+                      className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-bold text-slate-900 outline-none transition shadow-2xs"
+                    />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Dispatched Through
+                  </label>
                   <input
                     type="text"
-                    value={data.dispatch.invoiceNo}
-                    onChange={(e) => updateDispatch('invoiceNo', e.target.value)}
-                    placeholder="e.g. 74 or INV-001 or INV/24-25/089"
-                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl font-mono text-xs font-bold text-slate-900 outline-none transition shadow-2xs"
+                    value={data.dispatch.dispatchedThrough}
+                    onChange={(e) => updateDispatch('dispatchedThrough', e.target.value)}
+                    placeholder="e.g. By Road / Transport / Courier"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs uppercase font-bold text-slate-900 outline-none transition shadow-2xs"
                   />
                 </div>
-                <p className="text-[10px] text-slate-500 mt-1">
-                  Auto-Sequence preserves prefixes & zeros (e.g. INV/089 → INV/090)
-                </p>
-              </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1">
-                  Invoice Dated <span className="text-[#DC2626]">*</span>
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <Calendar className="w-4 h-4" />
-                  </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Destination (Site / City)
+                  </label>
                   <input
                     type="text"
-                    value={data.dispatch.invoiceDate}
-                    onChange={(e) => updateDispatch('invoiceDate', e.target.value)}
+                    value={data.dispatch.destination}
+                    onChange={(e) => updateDispatch('destination', e.target.value)}
+                    placeholder="e.g. Site / Destination City"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs uppercase font-bold text-slate-900 outline-none transition shadow-2xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Dispatch Document No.
+                  </label>
+                  <input
+                    type="text"
+                    value={data.dispatch.dispatchDocNo}
+                    onChange={(e) => updateDispatch('dispatchDocNo', e.target.value)}
+                    placeholder="e.g. LR-1024 or Doc No"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-bold text-slate-900 outline-none transition shadow-2xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Delivery Note Date
+                  </label>
+                  <input
+                    type="text"
+                    value={data.dispatch.deliveryNoteDate}
+                    onChange={(e) => updateDispatch('deliveryNoteDate', e.target.value)}
                     placeholder="e.g. 14-Oct-26"
-                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 rounded-xl text-xs font-bold text-slate-900 outline-none transition shadow-2xs"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-semibold text-slate-900 outline-none transition shadow-2xs"
                   />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Dispatched Through
-                </label>
-                <input
-                  type="text"
-                  value={data.dispatch.dispatchedThrough}
-                  onChange={(e) => updateDispatch('dispatchedThrough', e.target.value)}
-                  placeholder="e.g. By Road / Transport / Courier"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg uppercase font-bold text-slate-900 outline-none focus:border-blue-500"
-                />
-              </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Buyer's Order No.
+                  </label>
+                  <input
+                    type="text"
+                    value={data.dispatch.buyersOrderNo}
+                    onChange={(e) => updateDispatch('buyersOrderNo', e.target.value)}
+                    placeholder="e.g. PO-892"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-semibold text-slate-900 outline-none transition shadow-2xs"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Destination (Site / City)
-                </label>
-                <input
-                  type="text"
-                  value={data.dispatch.destination}
-                  onChange={(e) => updateDispatch('destination', e.target.value)}
-                  placeholder="e.g. Site / Destination City"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg uppercase font-bold text-slate-900 outline-none focus:border-blue-500"
-                />
-              </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Order Dated
+                  </label>
+                  <input
+                    type="text"
+                    value={data.dispatch.orderDate}
+                    onChange={(e) => updateDispatch('orderDate', e.target.value)}
+                    placeholder="e.g. 12-Oct-26"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-semibold text-slate-900 outline-none transition shadow-2xs"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Dispatch Document No.
-                </label>
-                <input
-                  type="text"
-                  value={data.dispatch.dispatchDocNo}
-                  onChange={(e) => updateDispatch('dispatchDocNo', e.target.value)}
-                  placeholder="e.g. LR-1024 or Doc No"
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold outline-none focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Delivery Note Date
-                </label>
-                <input
-                  type="text"
-                  value={data.dispatch.deliveryNoteDate}
-                  onChange={(e) => updateDispatch('deliveryNoteDate', e.target.value)}
-                  placeholder=""
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Buyer's Order No.
-                </label>
-                <input
-                  type="text"
-                  value={data.dispatch.buyersOrderNo}
-                  onChange={(e) => updateDispatch('buyersOrderNo', e.target.value)}
-                  placeholder=""
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Order Dated
-                </label>
-                <input
-                  type="text"
-                  value={data.dispatch.orderDate}
-                  onChange={(e) => updateDispatch('orderDate', e.target.value)}
-                  placeholder=""
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Terms of Delivery
-                </label>
-                <textarea
-                  rows={2}
-                  value={data.dispatch.termsOfDelivery}
-                  onChange={(e) => updateDispatch('termsOfDelivery', e.target.value)}
-                  placeholder="Delivery terms..."
-                  className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500"
-                />
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Terms of Delivery
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={data.dispatch.termsOfDelivery}
+                    onChange={(e) => updateDispatch('termsOfDelivery', e.target.value)}
+                    placeholder="e.g. F.O.R Destination / Delivery within 3 days"
+                    className="w-full p-3 bg-white border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl text-xs font-semibold text-slate-900 outline-none transition shadow-2xs"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -2069,15 +2094,15 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
 
         {/* ================= 5. TAX & GST TAB ================= */}
         {activeTab === 'tax' && (
-          <div className="space-y-3.5 sm:space-y-4">
+          <div className="space-y-4">
             {/* Main Header / Enable Tax Table Switch */}
-            <div className="bg-gradient-to-r from-slate-900 to-slate-900 text-white p-3 sm:p-4 rounded-xl border border-slate-800 shadow-sm flex items-start sm:items-center justify-between gap-3">
-              <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 min-w-0">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 shrink-0 mt-0.5 sm:mt-0">
-                  <Percent className="w-4 h-4 sm:w-5 sm:h-5" />
+            <div className="bg-slate-900 text-white p-4 rounded-2xl border border-slate-800 shadow-sm flex items-start sm:items-center justify-between gap-3">
+              <div className="flex items-start sm:items-center gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0">
+                  <Percent className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-xs sm:text-sm font-bold text-white tracking-tight">
                       HSN/SAC Tax Breakdown Table
                     </h3>
@@ -2105,24 +2130,24 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   onChange={(e) => onChange({ ...data, showTaxSummary: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-10 sm:w-11 h-5 sm:h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 sm:after:h-5 after:w-4 sm:after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#DC2626]"></div>
               </label>
             </div>
 
             {/* Quick Tax Settings Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {/* 1. Tax Calculation Mode */}
-              <div className="bg-slate-50/90 p-2.5 sm:p-3 rounded-xl border border-slate-200 space-y-1.5">
+              <div className="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-xs space-y-2">
                 <label className="block text-[10px] sm:text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                   Calculation Mode
                 </label>
-                <div className="grid grid-cols-2 gap-1 bg-slate-200/70 p-1 rounded-lg text-xs font-semibold">
+                <div className="grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
                   <button
                     type="button"
                     onClick={() => onChange({ ...data, taxMode: 'auto', taxSummary: [] })}
-                    className={`py-1.5 px-1.5 rounded-md transition cursor-pointer text-center text-[11px] sm:text-xs ${
+                    className={`py-1.5 px-1.5 rounded-lg transition cursor-pointer text-center text-[11px] sm:text-xs ${
                       data.taxMode !== 'manual'
-                        ? 'bg-white text-blue-700 shadow-2xs font-bold'
+                        ? 'bg-white text-[#DC2626] shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -2131,9 +2156,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   <button
                     type="button"
                     onClick={() => onChange({ ...data, taxMode: 'manual', taxSummary: effectiveTaxRows })}
-                    className={`py-1.5 px-1.5 rounded-md transition cursor-pointer text-center text-[11px] sm:text-xs ${
+                    className={`py-1.5 px-1.5 rounded-lg transition cursor-pointer text-center text-[11px] sm:text-xs ${
                       data.taxMode === 'manual'
-                        ? 'bg-white text-blue-700 shadow-2xs font-bold'
+                        ? 'bg-white text-[#DC2626] shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -2148,17 +2173,17 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               </div>
 
               {/* 2. Tax Structure (CGST+SGST vs IGST) */}
-              <div className="bg-slate-50/90 p-2.5 sm:p-3 rounded-xl border border-slate-200 space-y-1.5">
+              <div className="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-xs space-y-2">
                 <label className="block text-[10px] sm:text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                   Tax Structure
                 </label>
-                <div className="grid grid-cols-3 gap-1 bg-slate-200/70 p-1 rounded-lg text-xs font-semibold">
+                <div className="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
                   <button
                     type="button"
                     onClick={() => onChange({ ...data, taxType: 'cgst_sgst' })}
-                    className={`py-1.5 px-1 rounded-md transition cursor-pointer text-center text-[10px] xs:text-[11px] truncate ${
+                    className={`py-1.5 px-1 rounded-lg transition cursor-pointer text-center text-[10px] xs:text-[11px] truncate ${
                       data.taxType === 'cgst_sgst' || !data.taxType
-                        ? 'bg-white text-blue-700 shadow-2xs font-bold'
+                        ? 'bg-white text-[#DC2626] shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                     title="Central GST + State GST (Intra-state, e.g. UP to UP)"
@@ -2168,9 +2193,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   <button
                     type="button"
                     onClick={() => onChange({ ...data, taxType: 'igst' })}
-                    className={`py-1.5 px-1 rounded-md transition cursor-pointer text-center text-[10px] xs:text-[11px] truncate ${
+                    className={`py-1.5 px-1 rounded-lg transition cursor-pointer text-center text-[10px] xs:text-[11px] truncate ${
                       data.taxType === 'igst'
-                        ? 'bg-white text-blue-700 shadow-2xs font-bold'
+                        ? 'bg-white text-[#DC2626] shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                     title="Integrated GST (Inter-state sales)"
@@ -2180,9 +2205,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   <button
                     type="button"
                     onClick={() => onChange({ ...data, taxType: 'auto' })}
-                    className={`py-1.5 px-1 rounded-md transition cursor-pointer text-center text-[10px] xs:text-[11px] truncate ${
+                    className={`py-1.5 px-1 rounded-lg transition cursor-pointer text-center text-[10px] xs:text-[11px] truncate ${
                       data.taxType === 'auto'
-                        ? 'bg-white text-blue-700 shadow-2xs font-bold'
+                        ? 'bg-white text-[#DC2626] shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                     title="Auto-detect based on state codes"
@@ -2196,17 +2221,17 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               </div>
 
               {/* 3. Pricing Mode (Inclusive vs Exclusive) */}
-              <div className="bg-slate-50/90 p-2.5 sm:p-3 rounded-xl border border-slate-200 space-y-1.5 sm:col-span-2 lg:col-span-1">
+              <div className="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-xs space-y-2 sm:col-span-2 lg:col-span-1">
                 <label className="block text-[10px] sm:text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                   Item Price Basis
                 </label>
-                <div className="grid grid-cols-2 gap-1 bg-slate-200/70 p-1 rounded-lg text-xs font-semibold">
+                <div className="grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
                   <button
                     type="button"
                     onClick={() => onChange({ ...data, pricingMode: 'inclusive' })}
-                    className={`py-1.5 px-1.5 rounded-md transition cursor-pointer text-center text-[11px] sm:text-xs ${
+                    className={`py-1.5 px-1.5 rounded-lg transition cursor-pointer text-center text-[11px] sm:text-xs ${
                       data.pricingMode === 'inclusive' || !data.pricingMode
-                        ? 'bg-white text-blue-700 shadow-2xs font-bold'
+                        ? 'bg-white text-[#DC2626] shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -2215,9 +2240,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   <button
                     type="button"
                     onClick={() => onChange({ ...data, pricingMode: 'exclusive' })}
-                    className={`py-1.5 px-1.5 rounded-md transition cursor-pointer text-center text-[11px] sm:text-xs ${
+                    className={`py-1.5 px-1.5 rounded-lg transition cursor-pointer text-center text-[11px] sm:text-xs ${
                       data.pricingMode === 'exclusive'
-                        ? 'bg-white text-blue-700 shadow-2xs font-bold'
+                        ? 'bg-white text-[#DC2626] shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -2233,9 +2258,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
             </div>
 
             {/* Default GST Rate Quick Pills */}
-            <div className="bg-white p-3 rounded-xl border border-slate-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <div className="space-y-0.5">
-                <span className="text-xs font-bold text-slate-700 block">Default GST Rate</span>
+                <span className="text-xs font-bold text-slate-800 block">Default GST Rate</span>
                 <span className="text-[11px] text-slate-500 block">Applied to items without custom GST %</span>
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
@@ -2250,10 +2275,10 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     key={tier.val}
                     type="button"
                     onClick={() => onChange({ ...data, defaultGstRate: tier.val })}
-                    className={`px-2.5 py-1 text-xs rounded-lg font-semibold transition cursor-pointer ${
+                    className={`px-3 py-1.5 text-xs rounded-xl font-bold transition cursor-pointer shadow-2xs ${
                       (data.defaultGstRate ?? 18) === tier.val
-                        ? 'bg-blue-600 text-white shadow-2xs font-bold'
-                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
+                        ? 'bg-[#DC2626] text-white'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
                     }`}
                   >
                     {tier.label}
@@ -2263,14 +2288,14 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
             </div>
 
             {/* HSN/SAC Tax Summary Table Card */}
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
-              <div className="bg-slate-50 px-3 sm:px-4 py-2.5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs">
+              <div className="bg-slate-50/80 px-4 py-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
-                  <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                  <span className="w-2 h-2 rounded-full bg-[#DC2626] shrink-0"></span>
+                  <h4 className="text-xs font-bold text-slate-900 tracking-tight">
                     HSN/SAC Breakdown Entries
                   </h4>
-                  <span className="text-[10px] bg-slate-200 text-slate-700 font-bold px-1.5 py-0.2 rounded-full">
+                  <span className="text-[10px] bg-red-50 text-[#DC2626] border border-red-100 font-bold px-2 py-0.5 rounded-full">
                     {effectiveTaxRows.length} {effectiveTaxRows.length === 1 ? 'row' : 'rows'}
                   </span>
                 </div>
@@ -2279,19 +2304,19 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   <button
                     type="button"
                     onClick={syncTaxFromItems}
-                    className="flex-1 sm:flex-initial px-2.5 py-1 text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 rounded-lg border border-slate-300 flex items-center justify-center gap-1.5 transition cursor-pointer shadow-2xs active:scale-95"
+                    className="flex-1 sm:flex-initial px-3 py-1.5 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 hover:text-[#DC2626] rounded-xl border border-slate-200 flex items-center justify-center gap-1.5 transition cursor-pointer shadow-2xs active:scale-95"
                     title="Recalculate summary live from items table"
                   >
-                    <RefreshCw className="w-3 h-3 text-blue-600 shrink-0" />
+                    <RefreshCw className="w-3.5 h-3.5 text-[#DC2626] shrink-0" />
                     <span>Sync from Items</span>
                   </button>
                   {data.taxMode === 'manual' && (
                     <button
                       type="button"
                       onClick={addTaxRow}
-                      className="px-2.5 py-1 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1 transition cursor-pointer shadow-2xs active:scale-95"
+                      className="px-3 py-1.5 text-xs font-bold bg-[#DC2626] hover:bg-red-700 text-white rounded-xl flex items-center justify-center gap-1 transition cursor-pointer shadow-2xs active:scale-95"
                     >
-                      <Plus className="w-3 h-3 shrink-0" />
+                      <Plus className="w-3.5 h-3.5 shrink-0" />
                       <span>Add HSN Row</span>
                     </button>
                   )}
@@ -2299,7 +2324,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               </div>
 
               {/* Mobile Swipe Hint */}
-              <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-100/60 text-[10px] text-blue-700 flex items-center justify-between">
+              <div className="sm:hidden px-3 py-1 bg-red-50/60 border-b border-red-100/60 text-[10px] text-red-700 flex items-center justify-between">
                 <span>Swipe table horizontally for all tax columns</span>
                 <span className="font-bold">⇄</span>
               </div>
@@ -2308,38 +2333,38 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left border-collapse">
                   <thead>
-                    <tr className="bg-slate-100/90 text-slate-700 border-b border-slate-200 text-[11px] font-semibold whitespace-nowrap">
-                      <th className="p-2 min-w-[85px]">HSN/SAC</th>
-                      <th className="p-2 text-right min-w-[110px]">Taxable Value (₹)</th>
+                    <tr className="bg-slate-50 text-slate-700 border-b border-slate-200 text-[11px] font-bold whitespace-nowrap">
+                      <th className="p-2.5 min-w-[85px]">HSN/SAC</th>
+                      <th className="p-2.5 text-right min-w-[110px]">Taxable Value (₹)</th>
                       {isInterState ? (
                         <>
-                          <th className="p-2 text-center min-w-[70px]">IGST Rate</th>
-                          <th className="p-2 text-right min-w-[95px]">IGST Amt (₹)</th>
+                          <th className="p-2.5 text-center min-w-[70px]">IGST Rate</th>
+                          <th className="p-2.5 text-right min-w-[95px]">IGST Amt (₹)</th>
                         </>
                       ) : (
                         <>
-                          <th className="p-2 text-center min-w-[65px]">CGST %</th>
-                          <th className="p-2 text-right min-w-[95px]">CGST Amt (₹)</th>
-                          <th className="p-2 text-center min-w-[65px]">SGST %</th>
-                          <th className="p-2 text-right min-w-[95px]">SGST Amt (₹)</th>
+                          <th className="p-2.5 text-center min-w-[65px]">CGST %</th>
+                          <th className="p-2.5 text-right min-w-[95px]">CGST Amt (₹)</th>
+                          <th className="p-2.5 text-center min-w-[65px]">SGST %</th>
+                          <th className="p-2.5 text-right min-w-[95px]">SGST Amt (₹)</th>
                         </>
                       )}
-                      <th className="p-2 text-right min-w-[110px] font-bold text-blue-700">Total Tax (₹)</th>
-                      {data.taxMode === 'manual' && <th className="p-2 w-10 text-center"></th>}
+                      <th className="p-2.5 text-right min-w-[110px] font-bold text-[#DC2626]">Total Tax (₹)</th>
+                      {data.taxMode === 'manual' && <th className="p-2.5 w-10 text-center"></th>}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 whitespace-nowrap">
                     {effectiveTaxRows.map((row, idx) => (
                       <tr key={row.id || row.hsnSac || idx} className="hover:bg-slate-50/80 transition">
                         {/* HSN/SAC */}
-                        <td className="p-2">
+                        <td className="p-2.5">
                           {data.taxMode === 'manual' ? (
                             <input
                               type="text"
                               value={row.hsnSac}
                               onChange={(e) => updateTaxItem(idx, 'hsnSac', e.target.value)}
                               placeholder="721420"
-                              className="w-full p-1 border border-slate-200 rounded font-mono font-bold text-slate-800 text-xs outline-none focus:border-blue-500"
+                              className="w-full px-2 py-1 border border-slate-200 focus:border-[#DC2626] focus:ring-1 focus:ring-red-500/10 rounded-lg font-mono font-bold text-slate-800 text-xs outline-none"
                             />
                           ) : (
                             <span className="font-mono font-bold text-slate-800">{row.hsnSac}</span>
@@ -2347,14 +2372,14 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                         </td>
 
                         {/* Taxable Value */}
-                        <td className="p-2 text-right">
+                        <td className="p-2.5 text-right">
                           {data.taxMode === 'manual' ? (
                             <input
                               type="number"
                               step="0.01"
                               value={row.taxableValue}
                               onChange={(e) => updateTaxItem(idx, 'taxableValue', e.target.value)}
-                              className="w-full p-1 border border-slate-200 rounded text-right font-semibold text-slate-800 text-xs outline-none focus:border-blue-500"
+                              className="w-full px-2 py-1 border border-slate-200 focus:border-[#DC2626] focus:ring-1 focus:ring-red-500/10 rounded-lg text-right font-semibold text-slate-800 text-xs outline-none"
                             />
                           ) : (
                             <span className="font-semibold text-slate-800">
@@ -2365,26 +2390,26 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
 
                         {isInterState ? (
                           <>
-                            <td className="p-2 text-center">
+                            <td className="p-2.5 text-center">
                               {data.taxMode === 'manual' ? (
                                 <input
                                   type="number"
                                   value={row.igstRate || 0}
                                   onChange={(e) => updateTaxItem(idx, 'igstRate', e.target.value)}
-                                  className="w-14 p-1 border border-slate-200 rounded text-center text-xs outline-none focus:border-blue-500"
+                                  className="w-14 px-1.5 py-1 border border-slate-200 focus:border-[#DC2626] focus:ring-1 focus:ring-red-500/10 rounded-lg text-center text-xs outline-none"
                                 />
                               ) : (
                                 <span>{row.igstRate || 0}%</span>
                               )}
                             </td>
-                            <td className="p-2 text-right">
+                            <td className="p-2.5 text-right">
                               {data.taxMode === 'manual' ? (
                                 <input
                                   type="number"
                                   step="0.01"
                                   value={row.igstAmount || row.totalTaxAmount}
                                   onChange={(e) => updateTaxItem(idx, 'igstAmount', e.target.value)}
-                                  className="w-full p-1 border border-slate-200 rounded text-right text-xs outline-none focus:border-blue-500"
+                                  className="w-full px-2 py-1 border border-slate-200 focus:border-[#DC2626] focus:ring-1 focus:ring-red-500/10 rounded-lg text-right text-xs outline-none"
                                 />
                               ) : (
                                 <span>₹ {formatIndianCurrency(row.igstAmount || row.totalTaxAmount)}</span>
@@ -2393,51 +2418,51 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                           </>
                         ) : (
                           <>
-                            <td className="p-2 text-center">
+                            <td className="p-2.5 text-center">
                               {data.taxMode === 'manual' ? (
                                 <input
                                   type="number"
                                   value={row.cgstRate}
                                   onChange={(e) => updateTaxItem(idx, 'cgstRate', e.target.value)}
-                                  className="w-14 p-1 border border-slate-200 rounded text-center text-xs outline-none focus:border-blue-500"
+                                  className="w-14 px-1.5 py-1 border border-slate-200 focus:border-[#DC2626] focus:ring-1 focus:ring-red-500/10 rounded-lg text-center text-xs outline-none"
                                 />
                               ) : (
                                 <span>{row.cgstRate}%</span>
                               )}
                             </td>
-                            <td className="p-2 text-right">
+                            <td className="p-2.5 text-right">
                               {data.taxMode === 'manual' ? (
                                 <input
                                   type="number"
                                   step="0.01"
                                   value={row.cgstAmount}
                                   onChange={(e) => updateTaxItem(idx, 'cgstAmount', e.target.value)}
-                                  className="w-full p-1 border border-slate-200 rounded text-right text-xs outline-none focus:border-blue-500"
+                                  className="w-full px-2 py-1 border border-slate-200 focus:border-[#DC2626] focus:ring-1 focus:ring-red-500/10 rounded-lg text-right text-xs outline-none"
                                 />
                               ) : (
                                 <span>₹ {formatIndianCurrency(row.cgstAmount)}</span>
                               )}
                             </td>
-                            <td className="p-2 text-center">
+                            <td className="p-2.5 text-center">
                               {data.taxMode === 'manual' ? (
                                 <input
                                   type="number"
                                   value={row.sgstRate}
                                   onChange={(e) => updateTaxItem(idx, 'sgstRate', e.target.value)}
-                                  className="w-14 p-1 border border-slate-200 rounded text-center text-xs outline-none focus:border-blue-500"
+                                  className="w-14 px-1.5 py-1 border border-slate-200 focus:border-[#DC2626] focus:ring-1 focus:ring-red-500/10 rounded-lg text-center text-xs outline-none"
                                 />
                               ) : (
                                 <span>{row.sgstRate}%</span>
                               )}
                             </td>
-                            <td className="p-2 text-right">
+                            <td className="p-2.5 text-right">
                               {data.taxMode === 'manual' ? (
                                 <input
                                   type="number"
                                   step="0.01"
                                   value={row.sgstAmount}
                                   onChange={(e) => updateTaxItem(idx, 'sgstAmount', e.target.value)}
-                                  className="w-full p-1 border border-slate-200 rounded text-right text-xs outline-none focus:border-blue-500"
+                                  className="w-full px-2 py-1 border border-slate-200 focus:border-[#DC2626] focus:ring-1 focus:ring-red-500/10 rounded-lg text-right text-xs outline-none"
                                 />
                               ) : (
                                 <span>₹ {formatIndianCurrency(row.sgstAmount)}</span>
@@ -2447,12 +2472,12 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                         )}
 
                         {/* Total Tax Amount */}
-                        <td className="p-2 text-right font-bold text-blue-700">
+                        <td className="p-2.5 text-right font-bold text-[#DC2626]">
                           ₹ {formatIndianCurrency(row.totalTaxAmount)}
                         </td>
 
                         {data.taxMode === 'manual' && (
-                          <td className="p-2 text-center">
+                          <td className="p-2.5 text-center">
                             <button
                               type="button"
                               onClick={() => removeTaxRow(idx)}
@@ -2470,24 +2495,24 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   {/* Table Footer Totals */}
                   <tfoot>
                     <tr className="bg-slate-50 border-t-2 border-slate-200 font-bold text-slate-900 text-xs whitespace-nowrap">
-                      <td className="p-2 text-right uppercase">Total:</td>
-                      <td className="p-2 text-right">₹ {formatIndianCurrency(taxTotals.totalTaxableValue)}</td>
+                      <td className="p-2.5 text-right uppercase">Total:</td>
+                      <td className="p-2.5 text-right">₹ {formatIndianCurrency(taxTotals.totalTaxableValue)}</td>
                       {isInterState ? (
                         <>
                           <td></td>
-                          <td className="p-2 text-right">
+                          <td className="p-2.5 text-right">
                             ₹ {formatIndianCurrency(taxTotals.totalIgstAmount || taxTotals.totalTaxAmount)}
                           </td>
                         </>
                       ) : (
                         <>
                           <td></td>
-                          <td className="p-2 text-right">₹ {formatIndianCurrency(taxTotals.totalCgstAmount)}</td>
+                          <td className="p-2.5 text-right">₹ {formatIndianCurrency(taxTotals.totalCgstAmount)}</td>
                           <td></td>
-                          <td className="p-2 text-right">₹ {formatIndianCurrency(taxTotals.totalSgstAmount)}</td>
+                          <td className="p-2.5 text-right">₹ {formatIndianCurrency(taxTotals.totalSgstAmount)}</td>
                         </>
                       )}
-                      <td className="p-2 text-right text-blue-700 font-extrabold text-sm">
+                      <td className="p-2.5 text-right text-[#DC2626] font-extrabold text-sm">
                         ₹ {formatIndianCurrency(taxTotals.totalTaxAmount)}
                       </td>
                       {data.taxMode === 'manual' && <td></td>}
@@ -2500,27 +2525,27 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               <div className="sm:hidden bg-slate-50 p-3 border-t border-slate-200 space-y-2">
                 <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
                   <span>Tax Summary At A Glance</span>
-                  <span className="text-blue-700 font-mono font-extrabold">₹ {formatIndianCurrency(taxTotals.totalTaxAmount)} Tax</span>
+                  <span className="text-[#DC2626] font-mono font-extrabold">₹ {formatIndianCurrency(taxTotals.totalTaxAmount)} Tax</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="bg-white p-2 rounded-lg border border-slate-200">
+                  <div className="bg-white p-2.5 rounded-xl border border-slate-200">
                     <span className="text-[10px] text-slate-500 block">Taxable Value</span>
                     <span className="font-bold text-slate-800">₹ {formatIndianCurrency(taxTotals.totalTaxableValue)}</span>
                   </div>
                   {isInterState ? (
-                    <div className="bg-white p-2 rounded-lg border border-slate-200">
+                    <div className="bg-white p-2.5 rounded-xl border border-slate-200">
                       <span className="text-[10px] text-slate-500 block">Total IGST</span>
-                      <span className="font-bold text-blue-700">₹ {formatIndianCurrency(taxTotals.totalIgstAmount || taxTotals.totalTaxAmount)}</span>
+                      <span className="font-bold text-[#DC2626]">₹ {formatIndianCurrency(taxTotals.totalIgstAmount || taxTotals.totalTaxAmount)}</span>
                     </div>
                   ) : (
                     <>
-                      <div className="bg-white p-2 rounded-lg border border-slate-200">
+                      <div className="bg-white p-2.5 rounded-xl border border-slate-200">
                         <span className="text-[10px] text-slate-500 block">CGST (9%)</span>
-                        <span className="font-bold text-blue-700">₹ {formatIndianCurrency(taxTotals.totalCgstAmount)}</span>
+                        <span className="font-bold text-[#DC2626]">₹ {formatIndianCurrency(taxTotals.totalCgstAmount)}</span>
                       </div>
-                      <div className="bg-white p-2 rounded-lg border border-slate-200">
+                      <div className="bg-white p-2.5 rounded-xl border border-slate-200">
                         <span className="text-[10px] text-slate-500 block">SGST (9%)</span>
-                        <span className="font-bold text-blue-700">₹ {formatIndianCurrency(taxTotals.totalSgstAmount)}</span>
+                        <span className="font-bold text-[#DC2626]">₹ {formatIndianCurrency(taxTotals.totalSgstAmount)}</span>
                       </div>
                     </>
                   )}
@@ -2529,16 +2554,16 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
             </div>
 
             {/* Round Off Setting */}
-            <div className="bg-slate-50/90 p-3 sm:p-4 rounded-xl border border-slate-200 flex items-start sm:items-center justify-between gap-3">
+            <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs flex items-start sm:items-center justify-between gap-3">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
                   <h4 className="text-xs font-bold text-slate-800">
                     Automatic Round Off (Round to Nearest ₹)
                   </h4>
-                  <span className={`text-[10px] px-2 py-0.5 rounded font-bold font-mono ${
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold font-mono ${
                     data.enableRoundOff !== false
-                      ? 'bg-emerald-100 text-emerald-800'
-                      : 'bg-slate-200 text-slate-600'
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      : 'bg-slate-100 text-slate-600'
                   }`}>
                     {data.enableRoundOff !== false ? 'Active' : 'Disabled'}
                   </span>
@@ -2555,18 +2580,18 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   onChange={(e) => onChange({ ...data, enableRoundOff: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                <div className="w-10 h-5.5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-[#DC2626]"></div>
               </label>
             </div>
 
             {/* In Words & Signatory Section */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Tax Amount in Words */}
-              <div className="bg-slate-50/90 p-3 rounded-xl border border-slate-200 space-y-1.5">
+              <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-2">
                 <label className="block text-xs font-bold text-slate-800">
                   Tax Amount (in words)
                 </label>
-                <div className="p-2.5 bg-white rounded-lg border border-slate-200 text-xs font-bold text-slate-900 break-words leading-relaxed">
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 break-words leading-relaxed">
                   {autoTaxWords}
                 </div>
                 <input
@@ -2574,7 +2599,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.customTaxAmountInWords || ''}
                   onChange={(e) => onChange({ ...data, customTaxAmountInWords: e.target.value })}
                   placeholder="Custom override (Leave blank for automatic)"
-                  className="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-blue-500 bg-white"
+                  className="w-full text-xs px-3.5 py-2.5 border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl outline-none bg-white font-semibold transition shadow-2xs"
                 />
                 <p className="text-[10px] text-slate-500">
                   Matches: "INR Six Thousand Thirty Four and Fifty Eight paise Only"
@@ -2582,11 +2607,11 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               </div>
 
               {/* Amount Chargeable in Words */}
-              <div className="bg-slate-50/90 p-3 rounded-xl border border-slate-200 space-y-1.5">
+              <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-2">
                 <label className="block text-xs font-bold text-slate-800">
                   Amount Chargeable (in words)
                 </label>
-                <div className="p-2.5 bg-white rounded-lg border border-slate-200 text-xs font-bold text-slate-800 break-words leading-relaxed">
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 break-words leading-relaxed">
                   {autoAmountWords}
                 </div>
                 <input
@@ -2594,7 +2619,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.customAmountInWords || ''}
                   onChange={(e) => onChange({ ...data, customAmountInWords: e.target.value })}
                   placeholder="Custom override (Leave blank for automatic)"
-                  className="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-blue-500 bg-white"
+                  className="w-full text-xs px-3.5 py-2.5 border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl outline-none bg-white font-semibold transition shadow-2xs"
                 />
                 <p className="text-[10px] text-slate-500">
                   Matches: "INR Thirty Nine Thousand Five Hundred Sixty Only"
@@ -2603,8 +2628,8 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
             </div>
 
             {/* Declaration & Signatory */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="bg-slate-50/90 p-3 rounded-xl border border-slate-200 space-y-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-2">
                 <label className="block text-xs font-bold text-slate-800">
                   Declaration Statement
                 </label>
@@ -2612,11 +2637,11 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   rows={3}
                   value={data.declaration}
                   onChange={(e) => onChange({ ...data, declaration: e.target.value })}
-                  className="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-blue-500 bg-white"
+                  className="w-full text-xs p-3 border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl outline-none bg-white font-semibold transition shadow-2xs"
                 />
               </div>
 
-              <div className="bg-slate-50/90 p-3 rounded-xl border border-slate-200 space-y-1.5">
+              <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-2">
                 <label className="block text-xs font-bold text-slate-800">
                   Authorised Signatory Company Name
                 </label>
@@ -2625,7 +2650,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                   value={data.signatoryCompany || ''}
                   onChange={(e) => onChange({ ...data, signatoryCompany: e.target.value })}
                   placeholder={`Defaults to seller name (${data.seller.name || 'BHANU TRADERS'})`}
-                  className="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-blue-500 bg-white font-bold"
+                  className="w-full text-xs px-3.5 py-2.5 border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl outline-none bg-white font-bold transition shadow-2xs"
                 />
                 <p className="text-[10px] text-slate-500">
                   Appears as: <span className="font-bold">for {data.signatoryCompany?.trim() || data.seller.name || 'BHANU TRADERS'}</span>
@@ -2634,8 +2659,8 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
             </div>
 
             {/* Bank Details & UPI QR inside Tax tab */}
-            <div className="bg-slate-50/90 rounded-xl border border-slate-200 p-3 sm:p-4 space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                 <div>
                   <h4 className="text-xs font-bold text-slate-800">
                     Company&apos;s Bank Details & Payment QR
@@ -2652,14 +2677,14 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     onChange={(e) => updateBankDetails('showBankDetails', e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="w-10 h-5.5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-[#DC2626]"></div>
                 </label>
               </div>
 
               {data.bankDetails?.showBankDetails !== false && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
                       Bank Name
                     </label>
                     <input
@@ -2667,12 +2692,12 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.bankName || ''}
                       onChange={(e) => updateBankDetails('bankName', e.target.value)}
                       placeholder="e.g. State Bank of India, HDFC Bank"
-                      className="w-full text-xs p-2 border border-slate-300 rounded-lg font-bold text-slate-800 outline-none focus:border-blue-500 bg-white"
+                      className="w-full text-xs px-3.5 py-2.5 border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl font-bold text-slate-900 outline-none bg-white transition shadow-2xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
                       Account Number (A/c No.)
                     </label>
                     <input
@@ -2680,12 +2705,12 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.accountNo || ''}
                       onChange={(e) => updateBankDetails('accountNo', e.target.value)}
                       placeholder="e.g. 381928371928"
-                      className="w-full text-xs p-2 border border-slate-300 rounded-lg font-mono font-bold text-slate-800 outline-none focus:border-blue-500 bg-white"
+                      className="w-full text-xs px-3.5 py-2.5 border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl font-mono font-bold text-slate-900 outline-none bg-white transition shadow-2xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
                       Branch & IFS Code
                     </label>
                     <input
@@ -2693,12 +2718,12 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.branchAndIfsc || ''}
                       onChange={(e) => updateBankDetails('branchAndIfsc', e.target.value)}
                       placeholder="e.g. Main Branch & SBIN0001234"
-                      className="w-full text-xs p-2 border border-slate-300 rounded-lg font-bold text-slate-800 outline-none focus:border-blue-500 bg-white"
+                      className="w-full text-xs px-3.5 py-2.5 border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl font-bold text-slate-900 outline-none bg-white transition shadow-2xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
                       UPI ID (Pay) - Generates QR Code
                     </label>
                     <input
@@ -2706,11 +2731,11 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       value={data.bankDetails?.upiId || ''}
                       onChange={(e) => updateBankDetails('upiId', e.target.value)}
                       placeholder="e.g. yourbusiness@upi"
-                      className="w-full text-xs p-2 border border-slate-300 rounded-lg font-mono font-bold text-blue-700 outline-none focus:border-blue-500 bg-white"
+                      className="w-full text-xs px-3.5 py-2.5 border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl font-mono font-bold text-[#DC2626] outline-none bg-white transition shadow-2xs"
                     />
                   </div>
 
-                  <div className="md:col-span-2 flex items-center justify-between p-2.5 bg-white rounded-lg border border-slate-200">
+                  <div className="md:col-span-2 flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold text-slate-800">
                         Show &quot;SCAN TO PAY&quot; QR Code
@@ -2723,7 +2748,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       type="checkbox"
                       checked={data.bankDetails?.showQrCode !== false}
                       onChange={(e) => updateBankDetails('showQrCode', e.target.checked)}
-                      className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                      className="w-4 h-4 accent-[#DC2626] rounded border-slate-300 cursor-pointer"
                     />
                   </div>
                 </div>
@@ -2735,19 +2760,26 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
         {/* ================= 6. SETTINGS TAB ================= */}
         {activeTab === 'settings' && (
           <div className="space-y-4">
-            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                Document Settings & Declarations
-              </h3>
-              <p className="text-[11px] text-slate-500">
-                Custom titles, tax summary options, and legal declarations
-              </p>
+            <div className="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-wrap items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-[#DC2626]">
+                  <Settings className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-slate-900 tracking-tight">
+                    Document Settings & Declarations
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Custom titles, tax summary options, and legal declarations
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Invoice Payment Status & Due Date */}
-            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
+            <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-3">
               <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1">
+                <label className="block text-xs font-bold text-slate-800 mb-1.5">
                   Invoice Payment Status
                 </label>
                 <div className="flex flex-wrap items-center gap-1.5">
@@ -2764,9 +2796,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                       key={st.id || 'none'}
                       type="button"
                       onClick={() => onChange({ ...data, invoiceStatus: st.id as any })}
-                      className={`px-3 py-1 text-xs rounded-lg border transition cursor-pointer active:scale-95 ${
+                      className={`px-3.5 py-1.5 text-xs rounded-xl border transition cursor-pointer active:scale-95 shadow-2xs ${
                         data.invoiceStatus === st.id
-                          ? 'ring-2 ring-blue-500 shadow-xs ' + st.cls
+                          ? 'ring-2 ring-red-500 shadow-xs ' + st.cls
                           : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
                       }`}
                     >
@@ -2780,75 +2812,77 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Payment Due Date (Optional)
                 </label>
                 <input
                   type="date"
                   value={data.dueDate || ''}
                   onChange={(e) => onChange({ ...data, dueDate: e.target.value })}
-                  className="w-full sm:w-60 text-xs p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500 bg-white"
+                  className="w-full sm:w-64 text-xs px-3.5 py-2.5 border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl outline-none bg-white font-semibold transition shadow-2xs"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Document Title
-              </label>
-              <input
-                type="text"
-                value={data.title}
-                onChange={(e) => onChange({ ...data, title: e.target.value })}
-                placeholder="Tax Invoice"
-                className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-bold outline-none focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Custom Amount in Words (Leave blank for automatic calculation)
-              </label>
-              <input
-                type="text"
-                value={data.customAmountInWords || ''}
-                onChange={(e) => onChange({ ...data, customAmountInWords: e.target.value })}
-                placeholder="e.g. INR Forty-Four Thousand Two Hundred Ninety Only"
-                className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg font-mono text-[11px] outline-none focus:border-blue-500"
-              />
-              <p className="text-[10px] text-slate-500 mt-1">
-                By default, the Indian numbering system automatically writes out the amount in words.
-              </p>
-            </div>
-
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between">
+            <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
               <div>
-                <span className="text-xs font-semibold text-slate-800 block">
-                  Show HSN/SAC Tax Summary Table
-                </span>
-                <span className="text-[11px] text-slate-500">
-                  Adds CGST 9% + SGST 9% breakdown row below items
-                </span>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Document Title
+                </label>
+                <input
+                  type="text"
+                  value={data.title}
+                  onChange={(e) => onChange({ ...data, title: e.target.value })}
+                  placeholder="Tax Invoice"
+                  className="w-full text-xs px-3.5 py-2.5 border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl font-bold outline-none transition shadow-2xs"
+                />
               </div>
-              <input
-                type="checkbox"
-                id="showTaxSummary"
-                checked={data.showTaxSummary}
-                onChange={(e) => onChange({ ...data, showTaxSummary: e.target.checked })}
-                className="w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
-              />
-            </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Declaration Statement
-              </label>
-              <textarea
-                rows={3}
-                value={data.declaration}
-                onChange={(e) => onChange({ ...data, declaration: e.target.value })}
-                className="w-full text-sm sm:text-xs p-2.5 sm:p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500"
-              />
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Custom Amount in Words (Leave blank for automatic calculation)
+                </label>
+                <input
+                  type="text"
+                  value={data.customAmountInWords || ''}
+                  onChange={(e) => onChange({ ...data, customAmountInWords: e.target.value })}
+                  placeholder="e.g. INR Forty-Four Thousand Two Hundred Ninety Only"
+                  className="w-full text-xs px-3.5 py-2.5 border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl font-mono text-[11px] font-semibold outline-none transition shadow-2xs"
+                />
+                <p className="text-[10px] text-slate-500 mt-1">
+                  By default, the Indian numbering system automatically writes out the amount in words.
+                </p>
+              </div>
+
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-slate-800 block">
+                    Show HSN/SAC Tax Summary Table
+                  </span>
+                  <span className="text-[11px] text-slate-500">
+                    Adds CGST 9% + SGST 9% breakdown row below items
+                  </span>
+                </div>
+                <input
+                  type="checkbox"
+                  id="showTaxSummary"
+                  checked={data.showTaxSummary}
+                  onChange={(e) => onChange({ ...data, showTaxSummary: e.target.checked })}
+                  className="w-4.5 h-4.5 accent-[#DC2626] rounded border-slate-300 cursor-pointer"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Declaration Statement
+                </label>
+                <textarea
+                  rows={3}
+                  value={data.declaration}
+                  onChange={(e) => onChange({ ...data, declaration: e.target.value })}
+                  className="w-full text-xs p-3 border border-slate-200 focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 rounded-xl outline-none font-semibold transition shadow-2xs"
+                />
+              </div>
             </div>
           </div>
         )}

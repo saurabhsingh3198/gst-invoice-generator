@@ -189,17 +189,17 @@ export const DailySalesModal: React.FC<DailySalesModalProps> = ({ isOpen, onClos
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
       <div className="bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="bg-slate-50 px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between border-b border-slate-200">
+        <div className="bg-white px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-2xs shrink-0">
-              <TrendingUp className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-[#DC2626] shadow-2xs shrink-0">
+              <TrendingUp className="w-5 h-5 text-[#DC2626]" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-base sm:text-lg text-slate-900 tracking-tight">
+                <h3 className="font-extrabold text-base sm:text-lg text-slate-900 tracking-tight">
                   Daily Sales & Stock Report
                 </h3>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-[#DC2626] border border-red-100">
                   {session?.shopName || 'My Shop'}
                 </span>
               </div>
@@ -213,7 +213,7 @@ export const DailySalesModal: React.FC<DailySalesModalProps> = ({ isOpen, onClos
             <button
               type="button"
               onClick={handleExportGstr1Csv}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition shadow-2xs cursor-pointer active:scale-95"
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-2xs cursor-pointer active:scale-95"
               title="Download Official Government GSTR-1 Format for CA Filing"
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
@@ -223,7 +223,7 @@ export const DailySalesModal: React.FC<DailySalesModalProps> = ({ isOpen, onClos
             <button
               type="button"
               onClick={handleExportCsv}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold border border-slate-200 transition shadow-2xs cursor-pointer"
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 transition shadow-2xs cursor-pointer active:scale-95"
               title="Download Excel / CSV Report"
             >
               <Download className="w-3.5 h-3.5 text-slate-600" />
@@ -233,7 +233,7 @@ export const DailySalesModal: React.FC<DailySalesModalProps> = ({ isOpen, onClos
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -241,15 +241,15 @@ export const DailySalesModal: React.FC<DailySalesModalProps> = ({ isOpen, onClos
         </div>
 
         {/* Date Filter Bar */}
-        <div className="bg-slate-50/70 border-b border-slate-200 px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+        <div className="bg-slate-50/70 border-b border-slate-100 px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-slate-500" />
-            <span className="text-xs font-semibold text-slate-700">Select Date:</span>
+            <span className="text-xs font-bold text-slate-700">Select Date:</span>
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="px-2.5 py-1 text-xs font-semibold bg-white text-slate-900 border border-slate-200 rounded-lg shadow-2xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono outline-none"
+              className="px-3 py-1.5 text-xs font-semibold bg-white text-slate-900 border border-slate-200 rounded-xl shadow-2xs focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 font-mono outline-none transition"
             />
           </div>
 
@@ -258,9 +258,9 @@ export const DailySalesModal: React.FC<DailySalesModalProps> = ({ isOpen, onClos
             <button
               type="button"
               onClick={() => setSelectedDate(todayStr)}
-              className={`px-3 py-1 rounded-lg font-semibold transition cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
                 selectedDate === todayStr
-                  ? 'bg-blue-600 text-white shadow-xs'
+                  ? 'bg-[#DC2626] text-white shadow-2xs'
                   : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
               }`}
             >
@@ -273,7 +273,7 @@ export const DailySalesModal: React.FC<DailySalesModalProps> = ({ isOpen, onClos
                 y.setDate(y.getDate() - 1);
                 setSelectedDate(y.toISOString().split('T')[0]);
               }}
-              className="px-3 py-1 rounded-lg font-semibold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition cursor-pointer"
+              className="px-3 py-1.5 rounded-xl font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition cursor-pointer"
             >
               Yesterday
             </button>
@@ -285,41 +285,41 @@ export const DailySalesModal: React.FC<DailySalesModalProps> = ({ isOpen, onClos
           {/* 4 Summary Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {/* Total Revenue */}
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 shadow-2xs">
-              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+            <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-xs">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                 Total Revenue
               </span>
-              <div className="text-lg sm:text-xl font-bold text-slate-900 font-mono">
+              <div className="text-lg sm:text-xl font-extrabold text-[#DC2626] font-mono">
                 ₹ {formatIndianCurrency(summary?.totalRevenue || 0)}
               </div>
               <span className="text-[10px] text-slate-400 font-medium">On {selectedDate}</span>
             </div>
 
             {/* Invoices Count */}
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 shadow-2xs">
-              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+            <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-xs">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                 Bills Issued
               </span>
-              <div className="text-lg sm:text-xl font-bold text-slate-900 font-mono">
+              <div className="text-lg sm:text-xl font-extrabold text-slate-900 font-mono">
                 {summary?.totalInvoicesCount || 0} Invoices
               </div>
               <span className="text-[10px] text-slate-400 font-medium">Recorded in Database</span>
             </div>
 
             {/* GST Tax Collected */}
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 shadow-2xs">
-              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+            <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-xs">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                 GST Tax Collected
               </span>
-              <div className="text-lg sm:text-xl font-bold text-emerald-600 font-mono">
+              <div className="text-lg sm:text-xl font-extrabold text-emerald-600 font-mono">
                 ₹ {formatIndianCurrency(summary?.totalTax || 0)}
               </div>
               <span className="text-[10px] text-slate-400 font-medium">CGST + SGST + IGST</span>
             </div>
 
             {/* Payment Split */}
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 shadow-2xs">
-              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+            <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-xs">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                 Payment Breakdown
               </span>
               <div className="text-xs space-y-0.5 font-bold text-slate-800">
@@ -336,27 +336,27 @@ export const DailySalesModal: React.FC<DailySalesModalProps> = ({ isOpen, onClos
           </div>
 
           {/* Itemized Sales Breakdown Section */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
-            <div className="p-3 sm:p-4 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+          <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+            <div className="p-3 sm:p-4 bg-slate-50/70 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <PackageCheck className="w-4 h-4 text-blue-600" />
-                <h4 className="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wider">
+                <PackageCheck className="w-4 h-4 text-[#DC2626]" />
+                <h4 className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">
                   Products Sold on this Date (Itemized Breakdown)
                 </h4>
-                <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 font-bold px-2 py-0.5 rounded-full">
+                <span className="text-[10px] bg-red-50 text-[#DC2626] border border-red-100 font-bold px-2 py-0.5 rounded-full">
                   {filteredItems.length} Products
                 </span>
               </div>
 
               {/* Search filter */}
               <div className="relative">
-                <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400" />
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Filter product name or HSN..."
-                  className="pl-8 pr-3 py-1.5 text-xs bg-white text-slate-800 border border-slate-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium outline-none placeholder:text-slate-400 shadow-2xs"
+                  className="pl-8 pr-3.5 py-2 text-xs bg-white text-slate-800 border border-slate-200 rounded-xl focus:border-[#DC2626] focus:ring-2 focus:ring-red-500/10 font-semibold outline-none placeholder:text-slate-400 shadow-2xs transition"
                 />
               </div>
             </div>
@@ -365,7 +365,7 @@ export const DailySalesModal: React.FC<DailySalesModalProps> = ({ isOpen, onClos
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-slate-50 text-slate-600 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                  <tr className="bg-slate-50 text-slate-600 font-bold text-[11px] whitespace-nowrap border-b border-slate-200">
                     <th className="py-2.5 px-3">#</th>
                     <th className="py-2.5 px-3">Product Description</th>
                     <th className="py-2.5 px-3">HSN / SAC</th>
@@ -378,13 +378,13 @@ export const DailySalesModal: React.FC<DailySalesModalProps> = ({ isOpen, onClos
                 <tbody className="divide-y divide-slate-100">
                   {loading ? (
                     <tr>
-                      <td colSpan={7} className="py-8 text-center text-slate-400">
+                      <td colSpan={7} className="py-8 text-center text-slate-400 font-semibold">
                         Loading sales data...
                       </td>
                     </tr>
                   ) : filteredItems.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="py-8 text-center text-slate-400">
+                      <td colSpan={7} className="py-8 text-center text-slate-400 font-semibold">
                         No product sales recorded on {selectedDate}.
                       </td>
                     </tr>
@@ -394,7 +394,7 @@ export const DailySalesModal: React.FC<DailySalesModalProps> = ({ isOpen, onClos
                         <td className="py-2.5 px-3 font-mono text-slate-400 font-semibold">{idx + 1}</td>
                         <td className="py-2.5 px-3 font-semibold text-slate-900">{item.description}</td>
                         <td className="py-2.5 px-3 font-mono text-slate-500">{item.hsnSac || '—'}</td>
-                        <td className="py-2.5 px-3 text-right font-mono font-bold text-blue-600">
+                        <td className="py-2.5 px-3 text-right font-mono font-bold text-[#DC2626]">
                           {item.totalQuantity}
                         </td>
                         <td className="py-2.5 px-3 font-medium text-slate-600">{item.unit}</td>
@@ -402,7 +402,7 @@ export const DailySalesModal: React.FC<DailySalesModalProps> = ({ isOpen, onClos
                           ₹ {formatIndianCurrency(item.totalAmount)}
                         </td>
                         <td className="py-2.5 px-3 text-center font-mono">
-                          <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-medium text-[10px]">
+                          <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-[10px]">
                             {item.salesCount} bills
                           </span>
                         </td>
@@ -416,14 +416,14 @@ export const DailySalesModal: React.FC<DailySalesModalProps> = ({ isOpen, onClos
         </div>
 
         {/* Footer */}
-        <div className="bg-slate-50 border-t border-slate-200 px-4 sm:px-6 py-3 flex items-center justify-between">
+        <div className="bg-slate-50 border-t border-slate-100 px-4 sm:px-6 py-3 flex items-center justify-between">
           <span className="text-xs text-slate-500">
             Data secured with multi-tenant shop isolation.
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold text-xs rounded-lg transition cursor-pointer"
+            className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl transition cursor-pointer shadow-2xs"
           >
             Close
           </button>

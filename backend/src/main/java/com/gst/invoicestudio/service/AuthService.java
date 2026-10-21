@@ -27,8 +27,8 @@ public class AuthService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    public void requestOtp(String identifier) {
-        otpService.generateAndSendOtp(identifier);
+    public String requestOtp(String identifier) {
+        return otpService.generateAndSendOtp(identifier);
     }
 
     @Transactional

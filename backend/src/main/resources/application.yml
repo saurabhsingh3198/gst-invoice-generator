@@ -53,7 +53,7 @@ app:
     expiration-ms: 86400000 # 24 hours
   otp:
     expiration-minutes: 10
-    demo-bypass: false
+    demo-bypass: ${DEMO_BYPASS:true}
 
 cors:
   allowed-origins:

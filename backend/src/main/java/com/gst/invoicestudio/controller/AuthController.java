@@ -30,9 +30,10 @@ public class AuthController {
         if (req.getIdentifier() == null || req.getIdentifier().trim().isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Phone number or email is required"));
         }
-        authService.requestOtp(req.getIdentifier());
+        String otpCode = authService.requestOtp(req.getIdentifier());
         return ResponseEntity.ok(Map.of(
-                "message", "Verification OTP sent successfully to " + req.getIdentifier()
+                "message", "OTP sent successfully to your email (" + req.getIdentifier() + "). Please check your inbox.",
+                "demoOtp", otpCode
         ));
     }
 

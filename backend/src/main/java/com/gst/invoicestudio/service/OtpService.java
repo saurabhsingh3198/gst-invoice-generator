@@ -54,13 +54,17 @@ public class OtpService {
             java.util.concurrent.CompletableFuture.runAsync(() -> {
                 boolean sent = false;
 
-                // 1. Resend HTTPS REST API (Port 443)
-                if (resendApiKey != null && !resendApiKey.trim().isEmpty()) {
+                // 1. Resend HTTPS REST API (Port 443 - never blocked by Render)
+                String activeResendKey = (resendApiKey != null && !resendApiKey.trim().isEmpty())
+                        ? resendApiKey.trim()
+                        : System.getenv("RESEND_API_KEY");
+
+                if (activeResendKey != null && !activeResendKey.trim().isEmpty()) {
                     try {
                         String payload = "{\"from\":\"GST Studio <onboarding@resend.dev>\",\"to\":[\"" + recipient + "\"],\"subject\":\"🔑 Your GST Studio OTP: " + code + "\",\"html\":\"<h2>GST Invoice Studio Verification</h2><p>Your 6-digit verification code is: <strong style='font-size:24px;color:#2563eb;'>" + code + "</strong></p><p>Valid for 10 minutes.</p>\"}";
                         java.net.http.HttpRequest req = java.net.http.HttpRequest.newBuilder()
                                 .uri(java.net.URI.create("https://api.resend.com/emails"))
-                                .header("Authorization", "Bearer " + resendApiKey.trim())
+                                .header("Authorization", "Bearer " + activeResendKey.trim())
                                 .header("Content-Type", "application/json")
                                 .POST(java.net.http.HttpRequest.BodyPublishers.ofString(payload))
                                 .build();

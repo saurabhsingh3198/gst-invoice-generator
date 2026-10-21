@@ -12,3 +12,5 @@ services:
         value: 8080
       - key: SPRING_PROFILES_ACTIVE
         value: prod
+      - key: RESEND_API_KEY
+        sync: false

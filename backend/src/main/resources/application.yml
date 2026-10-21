@@ -54,6 +54,9 @@ app:
   otp:
     expiration-minutes: 10
     demo-bypass: ${DEMO_BYPASS:true}
+  mail:
+    resend-api-key: ${RESEND_API_KEY:}
+    brevo-api-key: ${BREVO_API_KEY:}
 
 cors:
   allowed-origins:

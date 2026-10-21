@@ -6,8 +6,6 @@ import { InvoiceForm } from './components/InvoiceForm';
 import { InvoiceHistoryModal } from './components/InvoiceHistoryModal';
 import { formatIndianCurrency } from './utils/numberToWords';
 import { getEffectiveTaxSummary, getTaxTotals } from './utils/taxCalculation';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
 import {
   Printer,
   Download,
@@ -233,6 +231,12 @@ export const App: React.FC = () => {
       const cleanInvoiceNo = rawInvoiceNo.replace(/[^a-zA-Z0-9_-]/g, '_') || '74';
       const fileName = `Sales_${cleanInvoiceNo}.pdf`;
 
+      // Dynamically load html2canvas & jsPDF only when user exports PDF (huge bundle savings)
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ]);
+
       // Render high resolution canvas (scale 2 for crisp vector-like output)
       const canvas = await html2canvas(target, {
         scale: 2,
@@ -416,7 +420,7 @@ Thank you for your business! 🙏`;
       setInvoiceData(JSON.parse(JSON.stringify(sampleInvoiceData)));
       try {
         localStorage.removeItem(DRAFT_STORAGE_KEY);
-      } catch (e) { }
+      } catch { }
     }
   };
 
@@ -452,7 +456,7 @@ Thank you for your business! 🙏`;
           if (parsed.bankDetails) defaultBankDetails = parsed.bankDetails;
           if (parsed.signatoryCompany) defaultSignatory = parsed.signatoryCompany;
         }
-      } catch (e) { }
+      } catch { }
 
       // Automatically compute next sequence invoice number (e.g. 74 -> 75, or INV/089 -> INV/090)
       const currentNo = invoiceData.dispatch?.invoiceNo;
@@ -526,7 +530,7 @@ Thank you for your business! 🙏`;
       });
       try {
         localStorage.removeItem(DRAFT_STORAGE_KEY);
-      } catch (e) { }
+      } catch { }
     }
   };
 

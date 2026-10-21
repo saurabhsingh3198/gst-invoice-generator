@@ -14,19 +14,19 @@ export const UpiQrCode: React.FC<UpiQrCodeProps> = ({
   customQrUrl,
   size = 62,
 }) => {
-  const [dataUrl, setDataUrl] = useState<string>('');
+  const [generatedUrl, setGeneratedUrl] = useState<string>('');
 
   useEffect(() => {
     if (customQrUrl && customQrUrl.trim()) {
-      setDataUrl(customQrUrl);
       return;
     }
 
     if (!upiId || !upiId.trim()) {
-      setDataUrl('');
+      setGeneratedUrl('');
       return;
     }
 
+    let isMounted = true;
     const cleanUpi = upiId.trim();
     const cleanName = encodeURIComponent(payeeName?.trim() || 'Payee');
     const upiUri = `upi://pay?pa=${cleanUpi}&pn=${cleanName}&cu=INR`;
@@ -39,13 +39,21 @@ export const UpiQrCode: React.FC<UpiQrCodeProps> = ({
         light: '#ffffff',
       },
     })
-      .then((url) => setDataUrl(url))
+      .then((url) => {
+        if (isMounted) setGeneratedUrl(url);
+      })
       .catch((err) => {
         console.error('Error generating QR code:', err);
       });
+
+    return () => {
+      isMounted = false;
+    };
   }, [upiId, payeeName, customQrUrl, size]);
 
-  if (!dataUrl) return null;
+  const activeUrl = customQrUrl && customQrUrl.trim() ? customQrUrl : generatedUrl;
+
+  if (!activeUrl) return null;
 
   return (
     <div
@@ -56,7 +64,7 @@ export const UpiQrCode: React.FC<UpiQrCodeProps> = ({
       }}
     >
       <img
-        src={dataUrl}
+        src={activeUrl}
         alt="QR Code"
         style={{
           width: `${size}px`,

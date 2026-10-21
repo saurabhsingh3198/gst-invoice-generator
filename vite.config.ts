@@ -1,21 +1,29 @@
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import type { Plugin } from 'vite';
 import nodemailer from 'nodemailer';
 
-// Gmail SMTP Transporter (configured via env variables or development defaults)
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER || 'Saurabh.antworksmoney@gmail.com',
-    pass: process.env.GMAIL_APP_PASSWORD || 'udwqymfgugqaleoo',
-  },
-});
+// Gmail SMTP Transporter (configured safely via env variables)
+const getTransporter = (user?: string, pass?: string) => {
+  const mailUser = user || process.env.GMAIL_USER;
+  const mailPass = pass || process.env.GMAIL_APP_PASSWORD;
+  if (!mailUser || !mailPass) return null;
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: mailUser,
+      pass: mailPass,
+    },
+  });
+};
 
 // Active OTPs storage
 const activeOtps = new Map<string, { code: string; expiresAt: number }>();
 
-function emailOtpPlugin(): Plugin {
+function emailOtpPlugin(env: Record<string, string>): Plugin {
+  const mailUser = env.GMAIL_USER || process.env.GMAIL_USER || '';
+  const transporter = getTransporter(mailUser, env.GMAIL_APP_PASSWORD || process.env.GMAIL_APP_PASSWORD);
+
   return {
     name: 'email-otp-server-plugin',
     configureServer(server) {
@@ -47,10 +55,10 @@ function emailOtpPlugin(): Plugin {
               });
 
               const isEmail = clean.includes('@');
-              if (isEmail) {
+              if (isEmail && transporter) {
                 try {
                   await transporter.sendMail({
-                    from: '"GST Invoice Studio" <Saurabh.antworksmoney@gmail.com>',
+                    from: `"GST Invoice Studio" <${mailUser}>`,
                     to: clean,
                     subject: `🔑 Your GST Studio OTP: ${otpCode}`,
                     html: `
@@ -79,6 +87,8 @@ function emailOtpPlugin(): Plugin {
                 } catch (mailErr: any) {
                   console.error('[Email OTP] Failed to send email via SMTP:', mailErr.message);
                 }
+              } else if (isEmail) {
+                console.log(`[Email OTP] SMTP credentials not set. Simulated email OTP to ${clean}: ${otpCode}`);
               } else {
                 console.log(`[Mobile OTP] Simulated SMS to ${clean}: ${otpCode}`);
               }
@@ -161,7 +171,10 @@ function emailOtpPlugin(): Plugin {
   };
 }
 
-export default defineConfig({
-  base: './',
-  plugins: [react(), emailOtpPlugin()],
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  return {
+    base: './',
+    plugins: [react(), emailOtpPlugin(env)],
+  };
 });

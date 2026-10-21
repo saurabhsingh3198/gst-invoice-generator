@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   X,
   Calendar,
@@ -19,7 +19,7 @@ interface DailySalesModalProps {
 
 export const DailySalesModal: React.FC<DailySalesModalProps> = ({ isOpen, onClose }) => {
   const session = getStoredUserSession();
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
   const [summary, setSummary] = useState<DailySalesSummary | null>(null);
   const [loading, setLoading] = useState(false);

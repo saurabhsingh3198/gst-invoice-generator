@@ -4,14 +4,18 @@ import crypto from 'crypto';
 // Shared OTP secret
 const OTP_SECRET = process.env.OTP_SECRET || 'gst-invoice-studio-otp-secret-key-2026';
 
-// Gmail SMTP Transporter
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER || 'Saurabh.antworksmoney@gmail.com',
-    pass: process.env.GMAIL_APP_PASSWORD || 'udwqymfgugqaleoo',
-  },
-});
+// Gmail SMTP Transporter (configured safely via env variables)
+const gmailUser = process.env.GMAIL_USER || '';
+const gmailPass = process.env.GMAIL_APP_PASSWORD || '';
+const transporter = (gmailUser && gmailPass)
+  ? nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: gmailUser,
+        pass: gmailPass,
+      },
+    })
+  : null;
 
 export default async function handler(req: any, res: any) {
   // CORS setup
@@ -48,10 +52,10 @@ export default async function handler(req: any, res: any) {
     const token = crypto.createHmac('sha256', OTP_SECRET).update(dataToSign).digest('hex') + '.' + expiresAt;
 
     const isEmail = identifier.includes('@');
-    if (isEmail) {
+    if (isEmail && transporter) {
       // Send real email via Gmail SMTP
       await transporter.sendMail({
-        from: '"GST Invoice Studio" <Saurabh.antworksmoney@gmail.com>',
+        from: `"GST Invoice Studio" <${gmailUser}>`,
         to: identifier,
         subject: `🔑 Your GST Studio OTP: ${otpCode}`,
         html: `
@@ -78,6 +82,8 @@ export default async function handler(req: any, res: any) {
         `,
       });
       console.log(`[Vercel Serverless] Sent OTP email to ${identifier}`);
+    } else if (isEmail) {
+      console.log(`[Vercel Serverless] SMTP credentials not set. Simulated email OTP to ${identifier}: ${otpCode}`);
     } else {
       console.log(`[Vercel Serverless] Mobile identifier ${identifier}: ${otpCode}`);
     }

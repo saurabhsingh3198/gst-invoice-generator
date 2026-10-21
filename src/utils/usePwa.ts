@@ -12,18 +12,16 @@ interface BeforeInstallPromptEvent extends Event {
 export function usePwa() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
-  const [isInstalled, setIsInstalled] = useState(false);
+  const [isInstalled, setIsInstalled] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true
+    );
+  });
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
   useEffect(() => {
-    // Check if already running as standalone PWA
-    const isStandalone =
-      window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as any).standalone === true;
-
-    if (isStandalone) {
-      setIsInstalled(true);
-    }
 
     // Listen for beforeinstallprompt event
     const handleBeforeInstall = (e: Event) => {

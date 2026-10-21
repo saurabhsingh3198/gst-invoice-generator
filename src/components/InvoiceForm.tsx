@@ -20,6 +20,9 @@ import {
   CheckCircle2,
   Save,
   FolderOpen,
+  Upload,
+  Image as ImageIcon,
+  Stamp,
 } from 'lucide-react';
 import { formatIndianCurrency, numberToIndianWords, taxNumberToIndianWords } from '../utils/numberToWords';
 import {
@@ -63,15 +66,49 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
     return 'table';
   });
 
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Logo image should be under 2MB for fast loading.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        onChange({ ...data, logoUrl: reader.result });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Signature / Stamp image should be under 2MB for fast loading.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        onChange({ ...data, signatureUrl: reader.result });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const saveCompanyProfile = () => {
     try {
       const profileToSave = {
         seller: data.seller,
         signatoryCompany: data.signatoryCompany,
         bankDetails: data.bankDetails,
+        logoUrl: data.logoUrl,
+        signatureUrl: data.signatureUrl,
       };
       localStorage.setItem('saved_user_company_profile', JSON.stringify(profileToSave));
-      setProfileToast('Company & Bank Profile saved as default!');
+      setProfileToast('Company Profile, Logo & Bank Details saved as default!');
       setTimeout(() => setProfileToast(''), 3500);
     } catch (e) {
       console.warn('Failed to save company profile', e);
@@ -88,8 +125,10 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
           seller: parsed.seller || data.seller,
           signatoryCompany: parsed.signatoryCompany || data.signatoryCompany,
           bankDetails: parsed.bankDetails || data.bankDetails,
+          logoUrl: parsed.logoUrl !== undefined ? parsed.logoUrl : data.logoUrl,
+          signatureUrl: parsed.signatureUrl !== undefined ? parsed.signatureUrl : data.signatureUrl,
         });
-        setProfileToast('Company profile loaded successfully!');
+        setProfileToast('Company profile & branding loaded successfully!');
         setTimeout(() => setProfileToast(''), 3500);
       } else {
         alert('No saved company profile found. Fill in your company details and click "Save as Default" first.');
@@ -1222,6 +1261,159 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 <span>{profileToast}</span>
               </div>
             )}
+
+            {/* Branding & Digital Authorization (Optional) Card */}
+            <div className="bg-gradient-to-r from-slate-50 to-blue-50/40 p-3.5 rounded-xl border border-slate-200 shadow-2xs space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wide">
+                    <span className="w-2 h-2 rounded-full bg-blue-600 inline-block"></span>
+                    Branding & Digital Authorization (Optional)
+                  </h4>
+                  <p className="text-[11px] text-slate-500">
+                    Upload your company logo and official stamp/signature for authentic billing
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Company Logo Uploader */}
+                <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs flex flex-col justify-between">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                      <ImageIcon className="w-3.5 h-3.5 text-blue-600" />
+                      Company Logo
+                    </span>
+                    {data.logoUrl && (
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        Active
+                      </span>
+                    )}
+                  </div>
+
+                  {data.logoUrl ? (
+                    <div className="flex items-center gap-3 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                      <div className="w-20 h-14 bg-white rounded border border-slate-200 flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                        <img
+                          src={data.logoUrl}
+                          alt="Logo Preview"
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                        <label className="px-2.5 py-1 text-[11px] font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-md transition cursor-pointer text-center active:scale-95">
+                          <span>Change Logo</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleLogoUpload}
+                            className="hidden"
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => onChange({ ...data, logoUrl: '' })}
+                          className="px-2.5 py-1 text-[11px] font-semibold text-rose-600 hover:bg-rose-50 rounded-md transition cursor-pointer text-center"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <label className="border-2 border-dashed border-slate-200 hover:border-blue-400 bg-slate-50/50 hover:bg-blue-50/30 rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 text-center cursor-pointer transition group">
+                      <div className="w-8 h-8 rounded-full bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center text-blue-600 transition">
+                        <Upload className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-blue-600 group-hover:underline block">
+                          Upload Company Logo
+                        </span>
+                        <span className="text-[10px] text-slate-400">
+                          PNG, JPG, SVG (Max 2MB)
+                        </span>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
+                  <p className="text-[10px] text-slate-400 mt-2">
+                    Displays on the top-left beside your business name
+                  </p>
+                </div>
+
+                {/* Stamp & Authorized Signature Uploader */}
+                <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs flex flex-col justify-between">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                      <Stamp className="w-3.5 h-3.5 text-blue-600" />
+                      Signatory Stamp / Signature
+                    </span>
+                    {data.signatureUrl && (
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        Active
+                      </span>
+                    )}
+                  </div>
+
+                  {data.signatureUrl ? (
+                    <div className="flex items-center gap-3 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                      <div className="w-20 h-14 bg-white rounded border border-slate-200 flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                        <img
+                          src={data.signatureUrl}
+                          alt="Signature Preview"
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                        <label className="px-2.5 py-1 text-[11px] font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-md transition cursor-pointer text-center active:scale-95">
+                          <span>Change Signature</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleSignatureUpload}
+                            className="hidden"
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => onChange({ ...data, signatureUrl: '' })}
+                          className="px-2.5 py-1 text-[11px] font-semibold text-rose-600 hover:bg-rose-50 rounded-md transition cursor-pointer text-center"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <label className="border-2 border-dashed border-slate-200 hover:border-blue-400 bg-slate-50/50 hover:bg-blue-50/30 rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 text-center cursor-pointer transition group">
+                      <div className="w-8 h-8 rounded-full bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center text-blue-600 transition">
+                        <Upload className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-blue-600 group-hover:underline block">
+                          Upload Stamp / Signature
+                        </span>
+                        <span className="text-[10px] text-slate-400">
+                          Transparent PNG recommended
+                        </span>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleSignatureUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
+                  <p className="text-[10px] text-slate-400 mt-2">
+                    Appears directly above &quot;Authorised Signatory&quot;
+                  </p>
+                </div>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <div className="md:col-span-2">
@@ -2499,6 +2691,54 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
               <p className="text-[11px] text-slate-500">
                 Custom titles, tax summary options, and legal declarations
               </p>
+            </div>
+
+            {/* Invoice Payment Status & Due Date */}
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-800 mb-1">
+                  Invoice Payment Status
+                </label>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {(
+                    [
+                      { id: undefined, label: 'None (Standard)', cls: 'text-slate-600 bg-white border-slate-300' },
+                      { id: 'PAID', label: 'PAID', cls: 'text-emerald-700 bg-emerald-50 border-emerald-300 font-bold' },
+                      { id: 'PENDING', label: 'PENDING', cls: 'text-amber-700 bg-amber-50 border-amber-300 font-bold' },
+                      { id: 'PARTIAL', label: 'PARTIAL', cls: 'text-purple-700 bg-purple-50 border-purple-300 font-bold' },
+                      { id: 'UNPAID', label: 'UNPAID', cls: 'text-rose-700 bg-rose-50 border-rose-300 font-bold' },
+                    ] as const
+                  ).map((st) => (
+                    <button
+                      key={st.id || 'none'}
+                      type="button"
+                      onClick={() => onChange({ ...data, invoiceStatus: st.id as any })}
+                      className={`px-3 py-1 text-xs rounded-lg border transition cursor-pointer active:scale-95 ${
+                        data.invoiceStatus === st.id
+                          ? 'ring-2 ring-blue-500 shadow-xs ' + st.cls
+                          : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      {st.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[10px] text-slate-500 mt-1">
+                  Displays an official status badge on the top right of the invoice
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Payment Due Date (Optional)
+                </label>
+                <input
+                  type="date"
+                  value={data.dueDate || ''}
+                  onChange={(e) => onChange({ ...data, dueDate: e.target.value })}
+                  className="w-full sm:w-60 text-xs p-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500 bg-white"
+                />
+              </div>
             </div>
 
             <div>

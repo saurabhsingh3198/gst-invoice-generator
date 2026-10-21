@@ -447,6 +447,8 @@ Thank you for your business! 🙏`;
         showQrCode: true,
       };
       let defaultSignatory = '';
+      let defaultLogo = '';
+      let defaultSignature = '';
 
       try {
         const savedProfile = localStorage.getItem('saved_user_company_profile');
@@ -455,6 +457,8 @@ Thank you for your business! 🙏`;
           if (parsed.seller) defaultSeller = parsed.seller;
           if (parsed.bankDetails) defaultBankDetails = parsed.bankDetails;
           if (parsed.signatoryCompany) defaultSignatory = parsed.signatoryCompany;
+          if (parsed.logoUrl) defaultLogo = parsed.logoUrl;
+          if (parsed.signatureUrl) defaultSignature = parsed.signatureUrl;
         }
       } catch { }
 
@@ -469,6 +473,8 @@ Thank you for your business! 🙏`;
         title: 'Tax Invoice',
         seller: defaultSeller,
         signatoryCompany: defaultSignatory,
+        logoUrl: defaultLogo,
+        signatureUrl: defaultSignature,
         consignee: {
           name: '',
           address: '',
@@ -872,6 +878,18 @@ Thank you for your business! 🙏`;
             >
               <MessageSquare className="w-3.5 h-3.5 text-white" />
               <span>WhatsApp</span>
+            </button>
+
+            {/* Direct Instant Print Button */}
+            <button
+              id="btn-print-invoice"
+              type="button"
+              onClick={handlePrint}
+              className="hidden sm:flex px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95 hover:border-slate-600"
+              title="Print Invoice directly (Ctrl+P)"
+            >
+              <Printer className="w-3.5 h-3.5 text-blue-400" />
+              <span>Print</span>
             </button>
 
             {/* Primary Action: Download PDF (hidden on mobile, mobile has sticky bottom PDF button) */}

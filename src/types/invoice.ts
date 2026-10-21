@@ -92,4 +92,8 @@ export interface InvoiceData {
   bankDetails?: BankDetails;
   enableRoundOff?: boolean;
   roundOffAmount?: number;
+  logoUrl?: string;
+  signatureUrl?: string;
+  invoiceStatus?: 'PAID' | 'UNPAID' | 'PARTIAL' | 'PENDING';
+  dueDate?: string;
 }

@@ -112,6 +112,7 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
           {/* 1. Header Title: Tax Invoice centered above box, matching Sales_74 exactly */}
           <div
             style={{
+              position: 'relative',
               textAlign: 'center',
               fontWeight: 'bold',
               fontSize: '13px',
@@ -122,7 +123,48 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
               width: '100%',
             }}
           >
-            {data.title || 'Tax Invoice'}
+            <span>{data.title || 'Tax Invoice'}</span>
+            {data.invoiceStatus && (
+              <span
+                style={{
+                  position: 'absolute',
+                  right: '0px',
+                  top: '-1px',
+                  border:
+                    data.invoiceStatus === 'PAID'
+                      ? '1.5px solid #059669'
+                      : data.invoiceStatus === 'PENDING'
+                      ? '1.5px solid #d97706'
+                      : data.invoiceStatus === 'PARTIAL'
+                      ? '1.5px solid #7c3aed'
+                      : '1.5px solid #dc2626',
+                  color:
+                    data.invoiceStatus === 'PAID'
+                      ? '#059669'
+                      : data.invoiceStatus === 'PENDING'
+                      ? '#d97706'
+                      : data.invoiceStatus === 'PARTIAL'
+                      ? '#7c3aed'
+                      : '#dc2626',
+                  backgroundColor:
+                    data.invoiceStatus === 'PAID'
+                      ? '#ecfdf5'
+                      : data.invoiceStatus === 'PENDING'
+                      ? '#fffbeb'
+                      : data.invoiceStatus === 'PARTIAL'
+                      ? '#f5f3ff'
+                      : '#fef2f2',
+                  borderRadius: '3px',
+                  padding: '1px 6px',
+                  fontSize: '9px',
+                  fontWeight: 'bold',
+                  letterSpacing: '0.8px',
+                  textTransform: 'uppercase',
+                }}
+              >
+                ● {data.invoiceStatus}
+              </span>
+            )}
           </div>
 
           {/* Main Outer Box Border - 1px exact black border matching Sales_74 */}
@@ -161,41 +203,61 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                         borderBottom: '1px solid #000000',
                         minHeight: '92px',
                         boxSizing: 'border-box',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        gap: '6px',
                       }}
                     >
-                      <div
-                        style={{
-                          fontWeight: 'bold',
-                          fontSize: '11.5px',
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        {data.seller.name}
-                      </div>
-                      {data.seller.addressLine1 && (
-                        <div style={{ fontSize: '9.5px', textTransform: 'uppercase' }}>
-                          {data.seller.addressLine1}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontWeight: 'bold',
+                            fontSize: '11.5px',
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          {data.seller.name}
                         </div>
-                      )}
-                      {data.seller.addressLine2 && (
-                        <div style={{ fontSize: '9.5px', textTransform: 'uppercase' }}>
-                          {data.seller.addressLine2}
+                        {data.seller.addressLine1 && (
+                          <div style={{ fontSize: '9.5px', textTransform: 'uppercase' }}>
+                            {data.seller.addressLine1}
+                          </div>
+                        )}
+                        {data.seller.addressLine2 && (
+                          <div style={{ fontSize: '9.5px', textTransform: 'uppercase' }}>
+                            {data.seller.addressLine2}
+                          </div>
+                        )}
+                        <div style={{ fontSize: '9.5px', marginTop: '1px' }}>
+                          <span>GSTIN/UIN: </span>
+                          <span style={{ fontWeight: 'bold' }}>{data.seller.gstin}</span>
                         </div>
-                      )}
-                      <div style={{ fontSize: '9.5px', marginTop: '1px' }}>
-                        <span>GSTIN/UIN: </span>
-                        <span style={{ fontWeight: 'bold' }}>{data.seller.gstin}</span>
-                      </div>
-                      <div style={{ fontSize: '9.5px' }}>
-                        <span>State Name : </span>
-                        <span>{data.seller.stateName}</span>
-                        <span>, Code : </span>
-                        <span>{data.seller.stateCode}</span>
-                      </div>
-                      {data.seller.email && (
                         <div style={{ fontSize: '9.5px' }}>
-                          <span>E-Mail : </span>
-                          <span>{data.seller.email}</span>
+                          <span>State Name : </span>
+                          <span>{data.seller.stateName}</span>
+                          <span>, Code : </span>
+                          <span>{data.seller.stateCode}</span>
+                        </div>
+                        {data.seller.email && (
+                          <div style={{ fontSize: '9.5px' }}>
+                            <span>E-Mail : </span>
+                            <span>{data.seller.email}</span>
+                          </div>
+                        )}
+                      </div>
+                      {data.logoUrl && (
+                        <div style={{ flexShrink: 0, padding: '1px 0' }}>
+                          <img
+                            src={data.logoUrl}
+                            alt="Logo"
+                            style={{
+                              maxHeight: '56px',
+                              maxWidth: '100px',
+                              objectFit: 'contain',
+                              display: 'block',
+                            }}
+                          />
                         </div>
                       )}
                     </div>
@@ -344,7 +406,14 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                             <div style={{ fontSize: '8.5px', color: '#222222' }}>
                               Mode/Terms of Payment
                             </div>
-                            <div>{data.dispatch.modeTermsOfPayment || '\u00A0'}</div>
+                            <div>
+                              {data.dispatch.modeTermsOfPayment || '\u00A0'}
+                              {data.dueDate && (
+                                <span style={{ marginLeft: '4px', fontSize: '8.5px', color: '#b91c1c', fontWeight: 'bold' }}>
+                                  (Due: {data.dueDate})
+                                </span>
+                              )}
+                            </div>
                           </td>
                         </tr>
 
@@ -1558,7 +1627,27 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                       <span style={{ textTransform: 'uppercase' }}>{signatoryCompany}</span>
                     </div>
 
-                    <div style={{ height: data.bankDetails?.showBankDetails !== false ? '64px' : '38px' }}></div>
+                    <div
+                      style={{
+                        height: data.bankDetails?.showBankDetails !== false ? '64px' : '38px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end',
+                      }}
+                    >
+                      {data.signatureUrl && (
+                        <img
+                          src={data.signatureUrl}
+                          alt="Signature / Stamp"
+                          style={{
+                            maxHeight: data.bankDetails?.showBankDetails !== false ? '58px' : '34px',
+                            maxWidth: '130px',
+                            objectFit: 'contain',
+                            display: 'block',
+                          }}
+                        />
+                      )}
+                    </div>
 
                     <div style={{ fontSize: '9px', color: '#111111' }}>
                       Authorised Signatory
